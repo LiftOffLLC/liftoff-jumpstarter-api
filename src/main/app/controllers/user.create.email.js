@@ -8,7 +8,6 @@ import Config from '../../config';
 import RedisClient from '../commons/redisClient';
 import errorCodes from '../commons/errors';
 import Constants from '../commons/constants';
-import addMailToQueue from '../commons/addMailToQueue';
 
 const validator = UserModel.validatorRules();
 const options = {
@@ -63,7 +62,7 @@ const options = {
     const mailVariables = {
       webUrl: Config.get('webUrl')
     };
-    await addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
+
     return reply(result).code(201);
   }
 };

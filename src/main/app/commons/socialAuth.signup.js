@@ -12,7 +12,6 @@ import RedisClient from './redisClient';
 import Social from './social';
 import errorCodes from './errors';
 import Constants from './constants';
-import addMailToQueue from './addMailToQueue';
 
 const validator = UserModel.validatorRules();
 
@@ -97,7 +96,7 @@ async function handler(providerName, request, reply) {
   const mailVariables = {
     webUrl: Config.get('webUrl')
   };
-  await addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
+
   user.sessionToken = request.server.methods.sessionsSign(session);
 
   // allow entity filtering to happen here.
