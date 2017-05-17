@@ -6,7 +6,6 @@ import Util, {
 } from 'util';
 import UserModel from '../models/user';
 import UserRole from '../models/userRole';
-import Config from '../../config';
 import SocialLoginModel from '../models/socialLogin';
 import RedisClient from './redisClient';
 import Social from './social';
@@ -92,10 +91,6 @@ async function handler(providerName, request, reply) {
     isAdmin: user.isAdmin
   });
   await RedisClient.saveSession(user.id, sessionId, session);
-
-  const mailVariables = {
-    webUrl: Config.get('webUrl')
-  };
 
   user.sessionToken = request.server.methods.sessionsSign(session);
 

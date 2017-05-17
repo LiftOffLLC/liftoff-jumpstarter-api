@@ -5,6 +5,7 @@ import Path from 'path';
 import Config from '../../config';
 
 const EmailTemplate = require('email-templates').EmailTemplate;
+
 const templateDir = Path.join(__dirname, '..', 'views', 'mail-templates');
 const mailAddress = Config.get('mailAddress').toJS();
 

@@ -4,7 +4,6 @@ import _ from 'lodash';
 import Uuid from 'node-uuid';
 import UserModel from '../models/user';
 import UserRole from '../models/userRole';
-import Config from '../../config';
 import RedisClient from '../commons/redisClient';
 import errorCodes from '../commons/errors';
 import Constants from '../commons/constants';
@@ -58,10 +57,6 @@ const options = {
     // allow entity filtering to happen here.
     _.set(request, 'auth.credentials.userId', result.id);
     _.set(request, 'auth.credentials.scope', result.isAdmin ? UserRole.ADMIN : UserRole.USER);
-
-    const mailVariables = {
-      webUrl: Config.get('webUrl')
-    };
 
     return reply(result).code(201);
   }
