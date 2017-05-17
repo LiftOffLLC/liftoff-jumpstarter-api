@@ -70,16 +70,15 @@ Source Code is located at `src/main` and test code in `src/test`
 
 
 ## Understanding APIs  
-
-	1. Each API is written in separate file in /controllers folder.
-	2. During bootstraping the server  
-		* routes are build by scanning all the files in /controllers folder
-		* methods are dynamically decorated for server/request and are picked from /methods folder.
-		* plugins are added to Hapi server, which give additional functionality like logging, listing all apis, monitoring server status, auth, etc.  
-		* policies are applied to each api. basically, used to control the data flow right from request to post-response. more details can be found at MrHorse project. The use cases are checking the permission, controlling the response, forcing https, etc.  
+1. Each API is written in separate file in /controllers folder.
+2. During bootstraping the server  
+	* routes are build by scanning all the files in /controllers folder
+	* methods are dynamically decorated for server/request and are picked from /methods folder.
+	* plugins are added to Hapi server, which give additional functionality like logging, listing all apis, monitoring server status, auth, etc.  
+	* policies are applied to each api. basically, used to control the data flow right from request to post-response. more details can be found at MrHorse project. The use cases are checking the permission, controlling the response, forcing https, etc.  
 
 #### Sample Read API  
-```
+```node
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,
   description: 'Config Details - Access - ADMIN',
@@ -118,7 +117,7 @@ module.exports = {
 
 Details:  
 
-```
+```node
 {
   enabled: true,
   operation: handler
@@ -132,21 +131,21 @@ Each API must return these two fields - enabled (if true, will be exposed) and o
 * **config** - discussed below.   
 
 
-```
+```node
   auth: Constants.AUTH.ADMIN_ONLY,
 ```  
 By default, the framework has 3 roles - guest, user and admin. Each controller needs to be auth configured as per the access level.     
 Available options are: ```ALL, ADMIN_ONLY, ADMIN_OR_USER and ADMIN_OR_USER_OR_GUEST```. Avoid using ```ALL``` Access level, use ```ADMIN_OR_USER_OR_GUEST``` instead.     
 
 
-```
+```node
 	description: 'Config Details - Access - ADMIN',
 	tags: ['api'],
 ```
 description and tags are used foe swagger doc generation.  
 **NOTE**: tags must have ```api``` for this router to be listed under swagger.
 
-```
+```node
   validate: {
     params: {
       userId: Joi.number().integer().positive().description('User Id')
@@ -157,7 +156,7 @@ Validating the payload, param or query. Uses Joi library for validation.
 
 The following options can be used inside the validate block, to strip unknown fields. **NOTE:** Avoid Using it.  
 
-```
+```node
 options: {
       allowUnknown: true,
       stripUnknown: true
@@ -166,7 +165,7 @@ options: {
 
 Plugins add values to hapi framework. In this sample, we build the responses for swagger using hapi-swagger plugin.      
 
-```
+```node
 	plugins: {
     'hapi-swagger': {
       responses: _.omit(Constants.API_STATUS_CODES, [201])
@@ -181,7 +180,7 @@ Policies can be used to in handling the pre- and post- operations.
 Modifying the request, response, validating roles, etc. Hapi provides various lifecycle methods, which can be used for controlling the flow. More details can be found at Mr.Horse project page.  
  
 
-```
+```node
 	handler: async(request, reply) => reply(Config.toJS())
 ```
 Business logic, which returns the response. use ```reply``` for sending the response.  
@@ -197,7 +196,7 @@ Each model has to subclassed from BaseModel. Refer Objection.js/Knex for usage. 
 
 `entityFilteringScope` is for defining the fields that can be displayed/hidden for a given role. The policy `entityFilter` does the filtering on postHandler event.   
 
-```
+```node
 static entityFilteringScope() {
     return {
       admin: ['encryptedPassword', 'passwordSalt'], // fields hidden from admin
@@ -242,18 +241,18 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 create modules
 
 ## Pending Items
-	[ ] Generic model, crud api generator
-	[ ] extract mails into modules.
-	[ ] rsync to identify the change-sets
-	[ ] i18n support
-	[ ] elaborate on caching for performance
-	[ ] rate-limit feature
-	[ ] standardize error codes
-	[ ] Docker Image
-	[ ] dotenv for easy deployment
+- [ ] Generic model, crud api generator
+- [ ] extract mails into modules.
+- [ ] rsync to identify the change-sets
+- [ ] i18n support
+- [ ] elaborate on caching for performance
+- [ ] rate-limit feature
+- [ ] standardize error codes
+- [ ] Docker Image
+- [ ] dotenv for easy deployment
 
 ## Contribute back
-	[ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
-	[ ] increment version
-	[ ] Teams to provide their product name so that they can inform about updates.
+[ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
+[ ] increment version  
+[ ] Teams to provide their product name so that they can inform about updates.
 
