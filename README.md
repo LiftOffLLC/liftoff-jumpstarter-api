@@ -2,24 +2,23 @@
 Aimed to provide Jumpstart Server for building REST APIs.
 
 ## Packages Used
-|Package|Purpose|Desc| 
-| :--- | :--- | :--- |
-|Node.js|Node Env|use 6.9.1; and use nvm for node version management| 
-|Babel|Babelify code|-| 
-|Hapi.js|Server logic|-| 
-|Objection.js/Knex|ORM Framework|-|
-|newrelic|Monitoring|-|
-|Node Mailer|Mail Delivery|-|
-|Nes|Socket Notification|-|
-|kue|Worker/Job Management|-|
-|Redis|Caching; Worker Jobs Management (for kue)|-|
-|Lodash|commons utility|-|
-|Postgres|default database connector|-|
-|Eslint|Check Eslint Issues|-|
-|PM2|Process management utility to start/stop server|-|
+|Package|Purpose|
+| :--- | :--- |
+|Node.js|Node Env; use 6.9.1; and use nvm for node version management| 
+|Babel|Babelify code|
+|Hapi.js|Server logic|
+|Objection.js/Knex|ORM Framework|
+|newrelic|Monitoring|
+|Node Mailer|Mail Delivery|
+|Nes|Socket Notification|
+|kue|Worker/Job Management|
+|Redis|Caching; Worker Jobs Management (for kue)|
+|Lodash|commons utility|
+|Postgres|default database connector|
+|Eslint|Check Eslint Issues|
+|PM2|Process management utility to start/stop server|
 
 ## Project Setup
-
 Clone -> Change Configurations. replace XXX
 use yarn for predictability.
 
