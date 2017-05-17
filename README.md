@@ -246,7 +246,7 @@ create modules
 - [ ] rsync to identify the change-sets
 - [ ] i18n support
 - [ ] elaborate on caching for performance
-- [ ] rate-limit feature
+- [ ] rate-limit feature - https://developer.github.com/v3/#rate-limiting
 - [ ] standardize error codes
 - [ ] Docker Image
 - [ ] dotenv for easy deployment
