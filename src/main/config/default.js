@@ -1,3 +1,6 @@
+/* eslint-disable import/imports-first */
+require('dotenv').config();
+
 import CatboxRedis from 'catbox-redis';
 import path from 'path';
 import token from '../app/commons/token';
@@ -69,7 +72,7 @@ export default {
   },
   // auth-jwt strategy for sesssion.
   auth: {
-    key: process.env.AUTH_JWT_KEY || 'XXX', // Never Share your secret key
+    key: process.env.AUTH_JWT_KEY || 'NeverShareYourSecret', // Never Share your secret key
     validateFunc: token.validateToken, // validate function defined above
     verifyOptions: {
       ignoreExpiration: true, // do not reject expired tokens
@@ -110,7 +113,7 @@ export default {
     sendgrid: {
       package: 'nodemailer-sendgrid-transport',
       auth: {
-        api_key: 'XXX'
+        api_key: process.env.SENDGRID_API_KEY || 'XXX'
       }
     },
     // SES credentials

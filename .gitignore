@@ -70,4 +70,6 @@ env_prd_config.txt
 mydb2dump.sql
 nes_client.js
 
+.env
+
 artifacts
