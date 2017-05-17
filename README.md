@@ -1,5 +1,5 @@
 # Liftoff Jumpstart Server Kit v1.0
-Aimed to provide Jumpstart Server for building REST APIs.
+Aimed to provide jumpstart kit for building REST APIs.
 
 ## Packages Used
 |Package|Purpose|
@@ -19,8 +19,13 @@ Aimed to provide Jumpstart Server for building REST APIs.
 |PM2|Process management utility to start/stop server|
 
 ## Project Setup
-Clone -> Change Configurations. replace XXX
-use yarn for predictability.
+1. Download the latest zip file or clone the repo with depth=1
+2. Modify the config details  
+2.1. newrelic key  
+2.2. database details  
+2.3. redis details  
+2.4. mail configurations, etc.   
+3. After adding your project dependencies, use `yarn install` to lock dependencies.  
 
 ## Project Practices
 #### Code Formating and Linting
@@ -62,34 +67,179 @@ Source Code is located at `src/main` and test code in `src/test`
 /seeds/master --> seed data; can be extended per env; but needs to be changed in config file
 ```
 
-## Writing APIs
-	### Permissions
 
-	### Authorization
 
-	### Models
-	1. Entity Filtering
-	2. Stats generation
-	3. isActive + timestamps in all models
-	4. 
+## Understanding APIs  
 
-	### Fail-Fast
-		- Wrong Config for email/database will fail
+	1. Each API is written in separate file in /controllers folder.
+	2. During bootstraping the server  
+		* routes are build by scanning all the files in /controllers folder
+		* methods are dynamically decorated for server/request and are picked from /methods folder.
+		* plugins are added to Hapi server, which give additional functionality like logging, listing all apis, monitoring server status, auth, etc.  
+		* policies are applied to each api. basically, used to control the data flow right from request to post-response. more details can be found at MrHorse project. The use cases are checking the permission, controlling the response, forcing https, etc.  
 
-	### Gotchas
-		1. polymorphic association
-		2. paging for inner associations.
+#### Sample Read API  
+```
+const options = {
+  auth: Constants.AUTH.ADMIN_ONLY,
+  description: 'Config Details - Access - ADMIN',
+  tags: ['api'],
+  validate: {
+    params: {
+      userId: Joi.number().integer().positive().description('User Id')
+    }
+  },
+  plugins: {
+    'hapi-swagger': {
+      responses: _.omit(Constants.API_STATUS_CODES, [201])
+    },
+    policies: [
+      isAuthorized('params.userId')
+    ]
+  },
+  handler: async(request, reply) => reply(Config.toJS())
+};
 
+// eslint-disable-next-line no-unused-vars
+const handler = (server) => {
+  const details = {
+    method: ['GET'],
+    path: '/api/appinfo/{userId}',
+    config: options
+  };
+  return details;
+};
+
+module.exports = {
+  enabled: true,
+  operation: handler
+};
+```
+
+Details:  
+
+```
+{
+  enabled: true,
+  operation: handler
+}
+```  
+
+Each API must return these two fields - enabled (if true, will be exposed) and operation handler. operation handler must return the following details  
+
+* **method** - can be an array of HTTP Methods.  
+* **path** - api path.  
+* **config** - discussed below.   
+
+
+```
+  auth: Constants.AUTH.ADMIN_ONLY,
+```  
+By default, the framework has 3 roles - guest, user and admin. Each controller needs to be auth configured as per the access level.     
+Available options are: ```ALL, ADMIN_ONLY, ADMIN_OR_USER and ADMIN_OR_USER_OR_GUEST```. Avoid using ```ALL``` Access level, use ```ADMIN_OR_USER_OR_GUEST``` instead.     
+
+
+```
+	description: 'Config Details - Access - ADMIN',
+	tags: ['api'],
+```
+description and tags are used foe swagger doc generation.  
+**NOTE**: tags must have ```api``` for this router to be listed under swagger.
+
+```
+  validate: {
+    params: {
+      userId: Joi.number().integer().positive().description('User Id')
+    }
+  },
+```
+Validating the payload, param or query. Uses Joi library for validation.  
+
+The following options can be used inside the validate block, to strip unknown fields. **NOTE:** Avoid Using it.  
+
+```
+options: {
+      allowUnknown: true,
+      stripUnknown: true
+    },
+```  
+
+Plugins add values to hapi framework. In this sample, we build the responses for swagger using hapi-swagger plugin.      
+
+```
+	plugins: {
+    'hapi-swagger': {
+      responses: _.omit(Constants.API_STATUS_CODES, [201])
+    },
+    policies: [
+      isAuthorized('params.userId')
+    ]
+  },
+```
+
+Policies can be used to in handling the pre- and post- operations. 
+Modifying the request, response, validating roles, etc. Hapi provides various lifecycle methods, which can be used for controlling the flow. More details can be found at Mr.Horse project page.  
+ 
+
+```
+	handler: async(request, reply) => reply(Config.toJS())
+```
+Business logic, which returns the response. use ```reply``` for sending the response.  
+
+### Models  
+Each model has to subclassed from BaseModel. Refer Objection.js/Knex for usage. Each model to have three fields `createdAt`, `updatedAt` and `isActive`. `isActive` is for tracking deleted flags.  
+
+#### Hooks
+`$beforeInsert`, `$beforeUpdate`, `$afterGet`, `$validateHook` are the methods wired. These methods can be used to override default logic, like triggering events at model level.
+
+#### Utility Methods
+`buildCriteriaWithObject` and `buildCriteria` are used to build query criteria object.  
+
+`entityFilteringScope` is for defining the fields that can be displayed/hidden for a given role. The policy `entityFilter` does the filtering on postHandler event.   
+
+```
+static entityFilteringScope() {
+    return {
+      admin: ['encryptedPassword', 'passwordSalt'], // fields hidden from admin
+      user: ['phoneToken', 'isPhoneVerified'
+      ], // fields hidden from user role.
+      guest: ['resetPasswordToken', 'resetPasswordSentAt',
+        'socialLogins'
+      ] // fields hidden from user role. 
+      // guest: 'all' -- Optionally this array be also be 'all' to hide all the fields from this model.
+    };
+  }
+```  
+
+#### Validation Rules
+Uses Joi Framework to define the rules. Refer User model for sample implementation.  
+As a practice, define all the validation rules in models, instead of controller for better re-use.  
+
+#### CRUD Methods
+Checkout Read API in /commons folder for usage. The following are the methods exposed from base -   
+`createOrUpdate(model, fetchById = true)`,   
+`count(filters = {})`,   
+`findOne(filters = {}, options = {})`,  
+`findAll(filters = {}, options = {})`,   
+`deleteAll(filters = {}, hardDeleteFlag = true)`  
+
+### Gotchas
+1. polymorphic association  
+2. paging for inner associations  
+
+## Fail-Fast Approach
+- Wrong Config for email/database will fail  
+		
 ## Adding Permissions
 
 ## Worker Threads
 
 ## Socket Notifications
-	Simple Use-case - Use Nes.
-	Complicated - Use custom implementation
+* Simple Use-case - Use Nes.
+* Complicated - Use custom implementation
 
 ## Re-usable coding 
-	create modules
+create modules
 
 ## Pending Items
 	[ ] Generic model, crud api generator
@@ -99,9 +249,11 @@ Source Code is located at `src/main` and test code in `src/test`
 	[ ] elaborate on caching for performance
 	[ ] rate-limit feature
 	[ ] standardize error codes
+	[ ] Docker Image
+	[ ] dotenv for easy deployment
 
 ## Contribute back
-	[ ] create an issue, pull request, review and merge.
+	[ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
 	[ ] increment version
-	[ ] Teams to provide their product name so that we can inform about any updates.
+	[ ] Teams to provide their product name so that they can inform about updates.
 
