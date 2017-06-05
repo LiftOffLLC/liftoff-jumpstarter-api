@@ -46,10 +46,11 @@ exports.up = function up(knex, Promise) {
       table.string('provider').notNullable().comment('Source type: facebook, google etc');
       table.string('refreshToken').notNullable().comment('Source type: facebook, google etc');
       table.string('accessToken').notNullable().comment('Source type: facebook, google etc');
-      // TimeStamps
       table.boolean('isPrimaryLogin').defaultTo(false).comment('Is Signed via?');
-      table.boolean('isActive').defaultTo(true).comment('Active?');
       table.text('rawBody').comment('social data of user');
+
+      // TimeStamps
+      table.boolean('isActive').defaultTo(true).comment('Active?');
       table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
       table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
     }).then(() => {

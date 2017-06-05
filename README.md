@@ -249,7 +249,9 @@ create modules
 - [ ] rate-limit feature - https://developer.github.com/v3/#rate-limiting
 - [ ] standardize error codes
 - [ ] Docker Image
-- [ ] dotenv for easy deployment
+- [√] dotenv for easy deployment
+- [ ] version header check for all apis except couple of them like sitemap.xml, robots.txt, ping etc
+- [ ] rate-limit for /login, /signup.
 
 ## Contribute back
 [ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
