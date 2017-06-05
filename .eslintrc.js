@@ -1,9 +1,11 @@
 module.exports = {
   "extends": "airbnb",
   "plugins": [
-    "react",
-    "jsx-a11y",
-    "import"
+    "import",
+    "hapi",
+    "lodash",
+    "promise",
+    "jsdoc"
   ],
   "rules": {
     "comma-dangle": ["error", "never"]
