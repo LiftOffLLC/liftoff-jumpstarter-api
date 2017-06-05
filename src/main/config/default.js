@@ -53,10 +53,10 @@ export default {
       },
       validateQuery: 'SELECT 1',
       migrations: {
-        directory: path.join(__dirname, '..', 'migrations')
+        directory: path.join(__dirname, '..', 'database', 'migrations')
       },
       seeds: {
-        directory: path.join(__dirname, '..', 'seeds', 'master')
+        directory: path.join(__dirname, '..', 'database', 'seeds', 'master')
       }
 
       // IMPORTANT :: Commenting out acquireConnectionTimeout
