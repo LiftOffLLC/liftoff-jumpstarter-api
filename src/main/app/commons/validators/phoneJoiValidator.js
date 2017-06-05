@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import PhoneUtil from './phone';
+import PhoneUtil from '../phone';
 
 const phoneJoiValidator = Joi.extend({
   base: Joi.string().min(10),

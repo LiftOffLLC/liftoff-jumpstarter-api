@@ -11,7 +11,7 @@
     "clean": "rm -rf build",
     "build": "npm run clean && babel src/main -d build && npm run copy:blacklistFile && npm run copy:public && npm run copy:views",
     "worker": "node -r babel-core/register src/main/worker.js",
-    "copy:blacklistFile": "cp src/main/app/commons/disposable_email_blacklist.conf build/app/commons/disposable_email_blacklist.conf",
+    "copy:blacklistFile": "cp src/main/app/commons/validators/disposable_email_blacklist.conf build/app/commons/validators/disposable_email_blacklist.conf",
     "copy:views": "cp -r src/main/public build/public",
     "copy:public": "cp -r src/main/app/views build/app/views",
     "start": "npm run build; pm2 delete all; node build/pm2.js",

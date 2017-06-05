@@ -4,8 +4,8 @@ import Logger from 'winston';
 import Joi from 'joi';
 import Uuid from 'node-uuid';
 import BaseModel from './base';
-import PhoneJoiValidator from '../commons/phoneJoiValidator';
-import EmailBlackListValidator from '../commons/emailBlackListValidator';
+import PhoneJoiValidator from '../commons/validators/phoneJoiValidator';
+import EmailBlackListValidator from '../commons/validators/emailBlackListValidator';
 
 export default class User extends BaseModel {
   static get tableName() {

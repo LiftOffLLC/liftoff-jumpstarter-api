@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
 import _ from 'lodash';
 import Logger from 'winston';
-import traverseDeep from '../commons/traverseDeep';
+import {
+  traverseDeep
+} from '../commons/utils';
 import UserRole from '../models/userRole';
 
 const omitEntities = async(items, scope) => {
