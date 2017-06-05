@@ -1,4 +1,3 @@
-
 # Liftoff Jumpstart Server Kit v1.0
 Aimed to provide jumpstart kit for building REST APIs.
 
