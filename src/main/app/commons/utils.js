@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Worker from './worker';
 
 export default {
   /**
@@ -37,5 +38,19 @@ export default {
   getRandom: (min, max) => {
     const range = (max - min) + 1;
     return Math.floor((Math.random() * (range)) + min);
+  },
+
+  // Adds Mail to Queue for later processing.
+  addMailToQueue: async(templateName, from, to, message, variableOpts = {}) => {
+    const value = {
+      templateName,
+      from,
+      to,
+      message,
+      variableOpts
+    };
+
+    await Worker.addJob('emails.dispatch', value);
+    return true;
   }
 };

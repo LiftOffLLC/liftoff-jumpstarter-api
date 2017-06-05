@@ -73,3 +73,5 @@ nes_client.js
 .env
 
 artifacts
+https://github.com/serverless/serverless
+NOTES.md

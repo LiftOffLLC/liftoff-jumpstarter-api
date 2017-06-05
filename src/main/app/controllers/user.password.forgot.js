@@ -6,7 +6,9 @@ import Uuid from 'node-uuid';
 import UserModel from '../models/user';
 import Config from '../../config';
 import Constants from '../commons/constants';
-import addMailToQueue from '../commons/addMailToQueue';
+import {
+  addMailToQueue
+} from '../commons/utils';
 
 const validator = UserModel.validatorRules();
 const inspect = Util.inspect;
