@@ -9,9 +9,9 @@ export default {
       // NOTE:: since this is getting called from config,
       // refrain to loading redisClient dynamically
       // eslint-disable-next-line global-require
-      const redisClient = require('./redisClient');
+      const RedisClient = require('./redisClient');
 
-      const session = await redisClient.getSession(decoded.subject.userId, decoded.id);
+      const session = await RedisClient.getSession(decoded.subject.userId, decoded.id);
 
       Logger.info('validateToken : decoded : ', decoded);
       Logger.info('validateToken : session : ', session);
