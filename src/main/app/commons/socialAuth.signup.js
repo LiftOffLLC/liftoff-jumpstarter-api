@@ -26,14 +26,15 @@ async function handler(providerName, request, reply) {
     return reply(Boom.badRequest('Invalid social credentials'));
   }
 
-  request.log(['info', `${providerName}.signup`], ` prfile response:  ${inspect(profile)}`);
+  request.log(['info', `${providerName}.signup`], ` profile response:  ${inspect(profile)}`);
 
-  const socialLogin = await SocialLoginModel.findOne([
-    SocialLoginModel.buildCriteria('provider', providerName),
-    SocialLoginModel.buildCriteria('providerId', profile.id)
-  ], {
-    columns: '*,user.*'
-  });
+  const socialLogin = await SocialLoginModel.findOne(
+    SocialLoginModel.buildCriteriaWithObject({
+      provider: providerName,
+      providerId: profile.id
+    }), {
+      columns: '*,user.*'
+    });
 
   // Is already registered with social login, error out.
   if (profile && socialLogin) {

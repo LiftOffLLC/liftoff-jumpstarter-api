@@ -23,12 +23,13 @@ async function handler(providerName, request, reply) {
 
   request.log(['info', `${providerName}.connect`], ` prfile response:  ${inspect(profile)}`);
 
-  const socialLogin = await SocialLoginModel.findOne([
-    SocialLoginModel.buildCriteria('provider', providerName),
-    SocialLoginModel.buildCriteria('providerId', profile.id)
-  ], {
-    columns: '*,user.*'
-  });
+  const socialLogin = await SocialLoginModel.findOne(
+    SocialLoginModel.buildCriteriaWithObject({
+      provider: providerName,
+      providerId: profile.id
+    }), {
+      columns: '*,user.*'
+    });
 
   // Update the existing socialLogin details
   const socialObject = {

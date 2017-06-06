@@ -25,10 +25,11 @@ async function handler(providerName, request, reply) {
     return reply(Boom.unauthorized('Invalid social credentials'));
   }
 
-  const socialLogin = await SocialLoginModel.findOne([
-    SocialLoginModel.buildCriteria('provider', providerName),
-    SocialLoginModel.buildCriteria('providerId', profile.id)
-  ]);
+  const socialLogin = await SocialLoginModel.findOne(
+    SocialLoginModel.buildCriteriaWithObject({
+      provider: providerName,
+      providerId: profile.id
+    }));
 
   if (!socialLogin) {
     throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
@@ -39,6 +40,7 @@ async function handler(providerName, request, reply) {
       columns: '*,socialLogins.*'
     }
   );
+
   request.log(['info', 'user.login'], `user found - ${inspect(user)}`);
   const sessionId = Uuid.v4();
   const session = await request.server.asyncMethods.sessionsAdd(sessionId, {

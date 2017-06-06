@@ -5,7 +5,7 @@ import Constants from '../../commons/constants';
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'robots.txt',
-  handler: async(request, reply) => reply.file(Path.join(__dirname, '..', '..', 'public', 'robots.txt'))
+  handler: async(request, reply) => reply.file(Path.join(__dirname, '..', '..', '..', 'public', 'robots.txt'))
 };
 
 // eslint-disable-next-line no-unused-vars

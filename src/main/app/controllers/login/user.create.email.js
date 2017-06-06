@@ -3,7 +3,6 @@ import Boom from 'boom';
 import _ from 'lodash';
 import Uuid from 'node-uuid';
 import UserModel from '../../models/user';
-
 import UserRole from '../../models/userRole';
 import RedisClient from '../../commons/redisClient';
 import errorCodes from '../../commons/errors';
