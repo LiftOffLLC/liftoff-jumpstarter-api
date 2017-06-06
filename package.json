@@ -6,7 +6,7 @@
   "scripts": {
     "format": "./bin/codeformat.sh",
     "lint": "eslint src",
-    "inspect": "jsinspect -t 30 --ignore 'src/main/migrations/20161006232820_users.js' src/main",
+    "inspect": "jsinspect -t 30 --ignore 'src/main/database/migrations/20161006232820_users.js' src/main",
     "dev": "./bin/dev.sh",
     "clean": "rm -rf build",
     "build": "npm run clean && babel src/main -d build && npm run copy:blacklistFile && npm run copy:public && npm run copy:views",

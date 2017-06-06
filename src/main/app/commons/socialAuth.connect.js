@@ -49,7 +49,7 @@ async function handler(providerName, request, reply) {
 export default function socialSignUp(providerName) {
   const options = {
     auth: Constants.AUTH.ALL,
-    description: `User create ${providerName} - Access - ALL`,
+    description: `User Social Connect ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
       payload: {

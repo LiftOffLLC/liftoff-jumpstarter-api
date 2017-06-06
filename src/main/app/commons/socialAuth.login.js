@@ -1,15 +1,11 @@
 import Boom from 'boom';
-import Uuid from 'node-uuid';
-import _ from 'lodash';
 import {
   inspect
 } from 'util';
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
-import RedisClient from './redisClient';
 import Social from './social';
 import Constants from './constants';
-import UserRole from '../models/userRole';
 
 const validator = UserModel.validatorRules();
 
@@ -35,31 +31,7 @@ async function handler(providerName, request, reply) {
     throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
   }
 
-  const user = await UserModel.findOne(
-    UserModel.buildCriteria('id', socialLogin.userId), {
-      columns: '*,socialLogins.*'
-    }
-  );
-
-  request.log(['info', 'user.login'], `user found - ${inspect(user)}`);
-  const sessionId = Uuid.v4();
-  const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
-    id: sessionId,
-    userId: user.id,
-    isAdmin: user.isAdmin
-  });
-  await RedisClient.saveSession(user.id, sessionId, session);
-  user.sessionToken = request.server.methods.sessionsSign(session);
-
-  // allow entity filtering to happen here.
-  _.set(request, 'auth.credentials.userId', user.id);
-  _.set(request, 'auth.credentials.scope', user.isAdmin ? UserRole.ADMIN : UserRole.USER);
-
-  // HAck to send back the social access/refresh token to self
-  for (const socialLog of user.socialLogins) {
-    _.set(socialLog, '_accessToken', socialLog.accessToken);
-    _.set(socialLog, '_refreshToken', socialLog.refreshToken);
-  }
+  const user = await UserModel.signSession(request, socialLogin.userId);
   return reply(user);
 }
 

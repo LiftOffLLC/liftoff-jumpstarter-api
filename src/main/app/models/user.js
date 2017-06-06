@@ -1,9 +1,12 @@
 /* eslint-disable class-methods-use-this,newline-per-chained-call */
 import Bcrypt from 'bcrypt';
+import _ from 'lodash';
 import Logger from 'winston';
 import Joi from 'joi';
 import Uuid from 'node-uuid';
 import BaseModel from './base';
+import UserRole from './userRole';
+import RedisClient from '../commons/redisClient';
 import PhoneJoiValidator from '../commons/validators/phoneJoiValidator';
 import EmailBlackListValidator from '../commons/validators/emailBlackListValidator';
 
@@ -85,5 +88,37 @@ export default class User extends BaseModel {
 
   encryptPassword(pwd, passwordSalt) {
     return Bcrypt.hashSync(pwd, passwordSalt);
+  }
+
+  static async signSession(request, userId) {
+    const user = await this.findOne(
+      this.buildCriteria('id', userId), {
+        columns: '*,socialLogins.*'
+      }
+    );
+
+    const sessionId = Uuid.v4();
+    const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
+      id: sessionId,
+      userId: user.id,
+      isAdmin: user.isAdmin
+    });
+    await RedisClient.saveSession(user.id, sessionId, session);
+    const sessionToken = request.server.methods.sessionsSign(session);
+    // Set Session Token for response.
+    user.sessionToken = sessionToken;
+
+    // allow entity filtering to happen here.
+    _.set(request, 'auth.credentials.userId', user.id);
+    _.set(request, 'auth.credentials.scope', user.isAdmin ? UserRole.ADMIN : UserRole.USER);
+
+    // HAck to send back the social access/refresh token to self
+    if (user.socialLogins) {
+      for (const socialLog of user.socialLogins) {
+        _.set(socialLog, '_accessToken', socialLog.accessToken);
+        _.set(socialLog, '_refreshToken', socialLog.refreshToken);
+      }
+    }
+    return user;
   }
 }
