@@ -1,4 +1,4 @@
-/* eslint-disable arrow-body-style */
+/* eslint-disable arrow-body-style,promise/avoid-new */
 import _ from 'lodash';
 import requireDirs from 'require-dir';
 import Promise from 'bluebird';

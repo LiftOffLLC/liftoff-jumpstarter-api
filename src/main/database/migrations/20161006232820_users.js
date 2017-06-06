@@ -37,6 +37,7 @@ exports.up = function up(knex, Promise) {
       table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
     }).then(() => {
       console.log('Created Table: users table');
+      return true;
     }),
 
     knex.schema.createTableIfNotExists('social_logins', (table) => {
@@ -69,6 +70,7 @@ exports.down = function down(knex, Promise) {
     knex.raw('truncate table knex_migrations')
   ]).then((values) => {
     console.log('dropped all tables : ', values);
+    return true;
   }, (reason) => {
     console.log('failed to rollback db : ', reason);
   });

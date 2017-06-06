@@ -1,11 +1,17 @@
 module.exports = {
-  "extends": "airbnb",
+  "extends": [
+    "airbnb",
+    // "plugin:lodash/recommended",
+    "plugin:promise/recommended",
+    // "eslint",
+    // "hapi"
+  ],
   "plugins": [
+    "react",
+    "jsx-a11y",
     "import",
-    "hapi",
-    "lodash",
-    "promise",
-    "jsdoc"
+    "security",
+    "promise"
   ],
   "rules": {
     "comma-dangle": ["error", "never"]
