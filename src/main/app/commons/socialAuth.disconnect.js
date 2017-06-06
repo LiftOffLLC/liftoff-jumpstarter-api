@@ -35,7 +35,7 @@ export default function socialDisconnect(providerName) {
   };
 
   return () => ({
-    method: ['POST'],
+    method: ['DELETE'],
     path: `/api/users/{userId}/${providerName}/disconnect`,
     config: options
   });

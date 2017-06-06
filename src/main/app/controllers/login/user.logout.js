@@ -60,7 +60,7 @@ const options = {
 // eslint-disable-next-line no-unused-vars
 const handler = (server) => {
   const details = {
-    method: ['POST'],
+    method: ['DELETE'],
     path: '/api/users/{userId}/logout',
     config: options
   };
