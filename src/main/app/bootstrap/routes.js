@@ -19,7 +19,6 @@ module.exports = async(server) => {
     }
   });
 
-  console.log('enabledRoutes :::: ', enabledRoutes);
   _.each(enabledRoutes, (controller) => {
     const operation = controller.operation;
     if (_.isFunction(operation)) {
