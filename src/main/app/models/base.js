@@ -125,7 +125,6 @@ export default class BaseModel extends Model {
     if (propFilterScope) {
       this.ENTITY_FILTERING_SCOPE = propFilterScope;
     }
-    return;
   }
 
   /**

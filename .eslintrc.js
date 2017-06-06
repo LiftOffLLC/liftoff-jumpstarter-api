@@ -1,9 +1,9 @@
 module.exports = {
   "extends": [
+    "eslint",
     "airbnb",
     // "plugin:lodash/recommended",
     "plugin:promise/recommended",
-    // "eslint",
   ],
   "plugins": [
     "react",
