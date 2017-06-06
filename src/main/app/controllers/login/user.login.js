@@ -2,10 +2,10 @@ import Util from 'util';
 import Boom from 'boom';
 import Uuid from 'node-uuid';
 import _ from 'lodash';
-import UserModel from '../models/user';
-import UserRole from '../models/userRole';
-import RedisClient from '../commons/redisClient';
-import Constants from '../commons/constants';
+import UserModel from '../../models/user';
+import UserRole from '../../models/userRole';
+import RedisClient from '../../commons/redisClient';
+import Constants from '../../commons/constants';
 
 const validator = UserModel.validatorRules();
 const inspect = Util.inspect;

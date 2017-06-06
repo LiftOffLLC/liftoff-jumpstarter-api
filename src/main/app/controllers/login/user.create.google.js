@@ -1,4 +1,4 @@
-import socialAuthSignup from '../commons/socialAuth.signup';
+import socialAuthSignup from '../../commons/socialAuth.signup';
 
 module.exports = {
   enabled: true,

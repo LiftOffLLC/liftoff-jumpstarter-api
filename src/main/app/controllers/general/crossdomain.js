@@ -1,5 +1,5 @@
 import Path from 'path';
-import Constants from '../commons/constants';
+import Constants from '../../commons/constants';
 
 // NOTE: Swagger documentation not needed.
 const options = {

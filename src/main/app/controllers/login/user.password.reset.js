@@ -1,9 +1,9 @@
 import Util from 'util';
 import Boom from 'boom';
 import _ from 'lodash';
-import UserModel from '../models/user';
-import Config from '../../config';
-import Constants from '../commons/constants';
+import UserModel from '../../models/user';
+import Config from '../../../config';
+import Constants from '../../commons/constants';
 
 const inspect = Util.inspect;
 const validator = UserModel.validatorRules();
