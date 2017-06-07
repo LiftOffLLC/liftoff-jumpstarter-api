@@ -1,8 +1,8 @@
 import PhoneLib from 'google-libphonenumber';
 import _ from 'lodash';
 import Logger from 'winston';
+const Config = require('../../config');
 
-const DEFAULT_COUNTRY_CODE = '+91';
 /**
  * Get E164 Phone number.
  * This method validates the phone number and sends e164 format, else sends null.
@@ -17,7 +17,7 @@ exports.e164PhoneNumber = (phoneNumber) => {
   let phone = _.clone(phoneNumber);
 
   if (phone && phone.match(/[0-9]/i) && phone.length === 10) {
-    phone = `${DEFAULT_COUNTRY_CODE}${phone}`;
+    phone = `${Config.get('countryCode')}${phone}`;
   }
 
   try {
@@ -25,7 +25,7 @@ exports.e164PhoneNumber = (phoneNumber) => {
     const PNF = PhoneLib.PhoneNumberFormat;
     const PNT = PhoneLib.PhoneNumberType;
 
-    const ph = phoneUtil.parse(phone, 'IN');
+    const ph = phoneUtil.parse(phone, Config.get('country'));
     const type = phoneUtil.getNumberType(ph);
 
     if (ph && phoneUtil.isValidNumber(ph) &&
