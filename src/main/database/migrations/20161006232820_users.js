@@ -20,6 +20,9 @@ exports.up = function up(knex, Promise) {
       table.string('emailToken', 15).index().comment('Email Verification Token');
       table.boolean('isEmailVerified').defaultTo(false).comment('Check if email is verified');
 
+      // Phone Related
+      table.string('phoneNumber', 15).index().comment('E164 Phone number; mobile number');
+
       // Password and Salt
       table.string('encryptedPassword').notNullable().comment('Encrypted password');
       table.string('passwordSalt').notNullable().comment('Password Salt');
