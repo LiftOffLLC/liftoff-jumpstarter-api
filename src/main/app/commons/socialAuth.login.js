@@ -27,11 +27,36 @@ async function handler(providerName, request, reply) {
       providerId: profile.id
     }));
 
+  let userId;
   if (!socialLogin) {
-    throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
+    const emailUser = await UserModel.findOne(
+      UserModel.buildCriteria('email', request.payload.email.toLowerCase())
+    );
+    if (emailUser) { // if user exists create socialLogin else throw error
+      try {
+        const socialObject = {
+          userId: emailUser.id,
+          provider: providerName,
+          providerId: profile.id,
+          accessToken: request.payload.accessToken,
+          refreshToken: request.payload.refreshToken,
+          isPrimaryLogin: true
+        };
+
+        await SocialLoginModel.createOrUpdate(socialObject);
+      } catch (e) {
+        request.log(['error', `${providerName}.login`], e);
+        return reply(Boom.forbidden(e.message, request.payload.email));
+      }
+      userId = emailUser.id;
+    } else {
+      throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
+    }
+  } else {
+    userId = socialLogin.userId;
   }
 
-  const user = await UserModel.signSession(request, socialLogin.userId);
+  const user = await UserModel.signSession(request, userId);
   return reply(user);
 }
 
@@ -43,7 +68,8 @@ export default function socialLoginFn(providerName) {
     validate: {
       payload: {
         accessToken: validator.accessToken.required(),
-        refreshToken: validator.refreshToken.required()
+        refreshToken: validator.refreshToken.required(),
+        email: validator.refreshToken.required()
       }
     },
     plugins: {

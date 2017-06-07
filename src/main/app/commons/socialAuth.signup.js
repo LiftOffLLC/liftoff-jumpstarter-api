@@ -38,27 +38,31 @@ async function handler(providerName, request, reply) {
     return reply(Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName)));
   }
 
-  const usersRegisteredUsingEmail = await UserModel.count(
-    UserModel.buildCriteria('email', request.payload.email)
+  let user;
+  const usersRegisteredUsingEmail = await UserModel.findOne(
+    UserModel.buildCriteria('email', request.payload.email.toLowerCase())
   );
 
-  if (usersRegisteredUsingEmail > 0) {
-    return reply(Boom.forbidden(Util.format(errorCodes.emailDuplicate, request.payload.email)));
+  if (usersRegisteredUsingEmail) {
+    user = usersRegisteredUsingEmail;
+  } else {
+    const userObject = {
+      email: request.payload.email,
+      name: request.payload.name,
+      phoneNumber: request.payload.phoneNumber,
+      encryptedPassword: Uuid.v4(),
+      avatarUrl: request.payload.avatarUrl,
+      subscribedToNewsletter: request.payload.subscribedToNewsletter,
+    };
+    try {
+      user = await UserModel.createOrUpdate(userObject);
+    } catch (e) {
+      request.log(['error', `${providerName}.signup`], e);
+      return reply(Boom.forbidden(e.message, request.payload.email));
+    }
   }
 
-  const userObject = {
-    email: request.payload.email,
-    name: request.payload.name,
-    phoneNumber: request.payload.phoneNumber,
-    encryptedPassword: Uuid.v4(),
-    avatarUrl: request.payload.avatarUrl,
-    subscribedToNewsletter: request.payload.subscribedToNewsletter,
-    signedAsArtist: request.payload.signedAsArtist
-  };
-  let user;
   try {
-    user = await UserModel.createOrUpdate(userObject);
-
     const socialObject = {
       userId: user.id,
       provider: providerName,
