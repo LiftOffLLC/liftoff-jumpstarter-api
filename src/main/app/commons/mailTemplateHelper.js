@@ -13,9 +13,14 @@ function getDefaultFromAddress(templateName) {
   const returnValue = {};
 
   switch (templateName) {
+    case 'welcome-msg':
+      returnValue.from = mailAddress.info;
+      break;
+
     case 'password-reset':
       returnValue.from = mailAddress.support;
       break;
+
     default:
       break;
   }

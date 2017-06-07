@@ -8,6 +8,10 @@ import SocialLoginModel from '../models/socialLogin';
 import Social from './social';
 import errorCodes from './errors';
 import Constants from './constants';
+import {
+  addMailToQueue
+} from '../commons/utils';
+import Config from '../../config';
 
 const validator = UserModel.validatorRules();
 
@@ -79,6 +83,10 @@ async function handler(providerName, request, reply) {
     return reply(Boom.forbidden(e.message, request.payload.email));
   }
 
+  const mailVariables = {
+    webUrl: Config.get('webUrl')
+  };
+  await addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
   // on successful, create login_token for this user.
   user = await UserModel.signSession(request, user.id);
   return reply(user).code(201);
