@@ -2,12 +2,12 @@ import Util from 'util';
 import _ from 'lodash';
 import JWT from 'jsonwebtoken';
 import Logger from 'winston';
-import UserModel from '../models/user';
-import Config from '../../config';
-import RedisClient from '../commons/redisClient';
-import isAuthorized from '../policies/isAuthorized';
-import Constants from '../commons/constants';
-import UserRole from '../models/userRole';
+import UserModel from '../../models/user';
+import Config from '../../../config';
+import RedisClient from '../../commons/redisClient';
+import isAuthorized from '../../policies/isAuthorized';
+import Constants from '../../commons/constants';
+import UserRole from '../../models/userRole';
 
 const validator = UserModel.validatorRules();
 const inspect = Util.inspect;
@@ -60,7 +60,7 @@ const options = {
 // eslint-disable-next-line no-unused-vars
 const handler = (server) => {
   const details = {
-    method: ['POST'],
+    method: ['DELETE'],
     path: '/api/users/{userId}/logout',
     config: options
   };

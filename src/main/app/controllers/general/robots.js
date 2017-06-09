@@ -1,18 +1,18 @@
 import Path from 'path';
-import Constants from '../commons/constants';
+import Constants from '../../commons/constants';
 
 // NOTE: Swagger documentation not needed.
 const options = {
   auth: Constants.AUTH.ALL,
-  description: 'cross-domain handler required for kaltura',
-  handler: async(request, reply) => reply.file(Path.join(__dirname, '..', '..', 'public', 'crossdomain.xml'))
+  description: 'robots.txt',
+  handler: async(request, reply) => reply.file(Path.join(__dirname, '..', '..', '..', 'public', 'robots.txt'))
 };
 
 // eslint-disable-next-line no-unused-vars
 const handler = (server) => {
   const details = {
     method: ['GET'],
-    path: '/crossdomain.xml',
+    path: '/robots.txt',
     config: options
   };
   return details;

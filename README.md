@@ -245,9 +245,9 @@ create modules
 - [ ] extract mails into modules.
 - [ ] rsync to identify the change-sets
 - [ ] i18n support
+- [ ] standardize error codes
 - [ ] elaborate on caching for performance
 - [ ] rate-limit feature - https://developer.github.com/v3/#rate-limiting
-- [ ] standardize error codes
 - [ ] Docker Image
 - [√] dotenv for easy deployment
 - [ ] version header check for all apis except couple of them like sitemap.xml, robots.txt, ping etc

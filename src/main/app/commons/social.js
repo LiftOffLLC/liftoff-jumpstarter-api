@@ -1,5 +1,4 @@
-/* eslint-disable class-methods-use-this */
-
+/* eslint-disable class-methods-use-this,promise/avoid-new */
 import querystring from 'querystring';
 import request from 'request';
 import Promise from 'bluebird';
@@ -14,12 +13,19 @@ export default class Social {
   async request(path, fields) {
     const queryData = querystring.stringify(fields);
     const uri = `${path}?${queryData}`;
+
     return await new Promise((resolve, reject) => {
       request.get(uri, (err, response, body) => {
-        if (err) return reject(err);
-        if (!body) return reject(new Error(`No response from ${this.provider}`));
+        if (err) {
+          return reject(err);
+        }
+        if (!body) {
+          return reject(new Error(`No response from ${this.provider}`));
+        }
         const data = JSON.parse(body);
-        if (data.error) return reject(data.error);
+        if (data.error) {
+          return reject(data.error);
+        }
         return resolve(data);
       });
     });
@@ -42,13 +48,24 @@ export default class Social {
     const {
       profileUrl
     } = Config.get('social').get(this.provider).toJS();
+
     const queries = {
       access_token: accesstToken
     };
-    if (!_.isEmpty(fields)) queries.fields = fields;
+
+    if (!_.isEmpty(fields)) {
+      queries.fields = fields;
+    }
+
     const profile = await this.request(profileUrl, queries);
-    if (this.provider === 'google') return this.getProfileDataFromGoogleProfile(profile);
-    if (this.provider === 'facebook') return this.getProfileDataFromFacebookProfile(profile);
+
+    if (this.provider === 'google') {
+      return this.getProfileDataFromGoogleProfile(profile);
+    }
+
+    if (this.provider === 'facebook') {
+      return this.getProfileDataFromFacebookProfile(profile);
+    }
     return profile;
   }
 }

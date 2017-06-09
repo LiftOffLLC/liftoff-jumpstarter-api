@@ -20,6 +20,9 @@ exports.up = function up(knex, Promise) {
       table.string('emailToken', 15).index().comment('Email Verification Token');
       table.boolean('isEmailVerified').defaultTo(false).comment('Check if email is verified');
 
+      // Phone Related
+      table.string('phoneNumber', 15).index().comment('E164 Phone number; mobile number');
+
       // Password and Salt
       table.string('encryptedPassword').notNullable().comment('Encrypted password');
       table.string('passwordSalt').notNullable().comment('Password Salt');
@@ -37,6 +40,7 @@ exports.up = function up(knex, Promise) {
       table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
     }).then(() => {
       console.log('Created Table: users table');
+      return true;
     }),
 
     knex.schema.createTableIfNotExists('social_logins', (table) => {
@@ -69,6 +73,7 @@ exports.down = function down(knex, Promise) {
     knex.raw('truncate table knex_migrations')
   ]).then((values) => {
     console.log('dropped all tables : ', values);
+    return true;
   }, (reason) => {
     console.log('failed to rollback db : ', reason);
   });

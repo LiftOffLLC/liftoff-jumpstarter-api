@@ -1,15 +1,11 @@
 import Boom from 'boom';
-import Uuid from 'node-uuid';
-import _ from 'lodash';
 import {
   inspect
 } from 'util';
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
-import RedisClient from './redisClient';
 import Social from './social';
 import Constants from './constants';
-import UserRole from '../models/userRole';
 
 const validator = UserModel.validatorRules();
 
@@ -25,39 +21,42 @@ async function handler(providerName, request, reply) {
     return reply(Boom.unauthorized('Invalid social credentials'));
   }
 
-  const socialLogin = await SocialLoginModel.findOne([
-    SocialLoginModel.buildCriteria('provider', providerName),
-    SocialLoginModel.buildCriteria('providerId', profile.id)
-  ]);
+  const socialLogin = await SocialLoginModel.findOne(
+    SocialLoginModel.buildCriteriaWithObject({
+      provider: providerName,
+      providerId: profile.id
+    }));
 
+  let userId;
   if (!socialLogin) {
-    throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
-  }
+    const emailUser = await UserModel.findOne(
+      UserModel.buildCriteria('email', request.payload.email.toLowerCase())
+    );
+    if (emailUser) { // if user exists create socialLogin else throw error
+      try {
+        const socialObject = {
+          userId: emailUser.id,
+          provider: providerName,
+          providerId: profile.id,
+          accessToken: request.payload.accessToken,
+          refreshToken: request.payload.refreshToken,
+          isPrimaryLogin: true
+        };
 
-  const user = await UserModel.findOne(
-    UserModel.buildCriteria('id', socialLogin.userId), {
-      columns: '*,socialLogins.*'
+        await SocialLoginModel.createOrUpdate(socialObject);
+      } catch (e) {
+        request.log(['error', `${providerName}.login`], e);
+        return reply(Boom.forbidden(e.message, request.payload.email));
+      }
+      userId = emailUser.id;
+    } else {
+      throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
     }
-  );
-  request.log(['info', 'user.login'], `user found - ${inspect(user)}`);
-  const sessionId = Uuid.v4();
-  const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
-    id: sessionId,
-    userId: user.id,
-    isAdmin: user.isAdmin
-  });
-  await RedisClient.saveSession(user.id, sessionId, session);
-  user.sessionToken = request.server.methods.sessionsSign(session);
-
-  // allow entity filtering to happen here.
-  _.set(request, 'auth.credentials.userId', user.id);
-  _.set(request, 'auth.credentials.scope', user.isAdmin ? UserRole.ADMIN : UserRole.USER);
-
-  // HAck to send back the social access/refresh token to self
-  for (const socialLog of user.socialLogins) {
-    _.set(socialLog, '_accessToken', socialLog.accessToken);
-    _.set(socialLog, '_refreshToken', socialLog.refreshToken);
+  } else {
+    userId = socialLogin.userId;
   }
+
+  const user = await UserModel.signSession(request, userId);
   return reply(user);
 }
 
@@ -69,7 +68,8 @@ export default function socialLoginFn(providerName) {
     validate: {
       payload: {
         accessToken: validator.accessToken.required(),
-        refreshToken: validator.refreshToken.required()
+        refreshToken: validator.refreshToken.required(),
+        email: validator.refreshToken.required()
       }
     },
     plugins: {

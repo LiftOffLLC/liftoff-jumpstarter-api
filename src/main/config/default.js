@@ -42,8 +42,8 @@ export default {
       connection: {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5432,
-        user: process.env.DB_USER || 'manjunathan',
-        password: process.env.DB_PASS || 'password',
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASS || '',
         database: process.env.DB_NAME || 'liftoff_dev',
         charset: 'utf8'
       },
@@ -53,10 +53,10 @@ export default {
       },
       validateQuery: 'SELECT 1',
       migrations: {
-        directory: path.join(__dirname, '..', 'migrations')
+        directory: path.join(__dirname, '..', 'database', 'migrations')
       },
       seeds: {
-        directory: path.join(__dirname, '..', 'seeds', 'master')
+        directory: path.join(__dirname, '..', 'database', 'seeds', 'master')
       }
 
       // IMPORTANT :: Commenting out acquireConnectionTimeout
@@ -95,6 +95,8 @@ export default {
   },
   webUrl: `${process.env.WEB_APP_URL || 'http://localhost:3000'}`,
   adminUrl: `${process.env.WEB_APP_URL || 'http://localhost:3000'}/admin`,
+  countryCode: process.env.COUNTRY_CODE || '+91',
+  country: process.env.COUNTRY || 'IN',
   // Forgot password configureation
   passwordReset: {
     duration: 60 * 60 * 24 * 1000,
