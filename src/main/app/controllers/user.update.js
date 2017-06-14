@@ -40,13 +40,9 @@ const options = {
     if (payload.oldPassword || payload.password) {
       const user = await UserModel.findOne(UserModel.buildCriteria('id', payload.id));
 
-      if (user.verifyPassword(payload.oldPassword || '')) {
-        if (payload.password) {
-          payload.encryptedPassword = payload.password;
-          // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
-        } else {
-          return reply(Boom.unauthorized('Invalid credentials.'));
-        }
+      if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
+        payload.encryptedPassword = payload.password;
+        // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
         return reply(Boom.unauthorized('Invalid credentials.'));
       }
