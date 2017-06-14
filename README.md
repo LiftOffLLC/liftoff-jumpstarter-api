@@ -241,17 +241,33 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 create modules
 
 ## Pending Items
-- [ ] Generic model, crud api generator
-- [ ] extract mails into modules.
-- [ ] rsync to identify the change-sets
-- [ ] i18n support
-- [ ] standardize error codes
-- [ ] elaborate on caching for performance
-- [ ] rate-limit feature - https://developer.github.com/v3/#rate-limiting
-- [ ] Docker Image
-- [√] dotenv for easy deployment
-- [ ] version header check for all apis except couple of them like sitemap.xml, robots.txt, ping etc
-- [ ] rate-limit for /login, /signup.
+1. Generalize social.js to pull send standardized output.  
+2. Document Preparation Guide for jumpstart  
+  a. create .env file and modify accordingly.  
+  b. replace __company_name__ and __user_name__ in email templates.  
+  c. versioning header/ plugins/hapi-swagger.js  
+  d. status monitoring tool / plugins.status-monitor.js  
+3. Generalize error codes and better error schema for response.  
+  a. i18n - internalization support (low)  
+  b. format error code.  
+  c. externalize error messages use error_codes.  
+      message_utility('user.not.found', {id: userId}, opts="lang-en")  
+4. Database Issues (caveats)  
+  a. cannot use nested property for filter.  
+  b. pagination/ordering doesnt work for inner associations.  
+  c. polymorphic associations issue.  
+  d. caching responses.  
+5. chat server jumpstarter kit  
+6. microservices support  
+  a. create microservices for pdf generation; image upload; image transformation.  
+7. sync project  
+  a. ability to sync project once jumpstarter kit is updated  
+8. Need elaboration on how to cache responses.  
+9. rate-limit for critical apis. like login/signup.  
+10. docker image and deployment steps for aws.  
+11. strict header versioning check for vendor-specific headers.  
+12. Generic CRUD for all models. Scaffolding.  
+13. APIs to support unique constraints in path /userIdOruserName/update  
 
 ## Contribute back
 [ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
