@@ -28,7 +28,8 @@ Aimed to provide jumpstart kit for building REST APIs.
 	2.1.3. JWT Tokens (Secret Key), etc.   
 2.2. Fix config/default.js  
 2.3. Fix plugins/hapi-swagger.js for swagger documentation  
-2.4. Fix plugins/status-monitor.js for monitoring       
+2.4. Fix plugins/status-monitor.js for monitoring   
+2.5. Modify company_name and user_name in views/mail-templates folder.    
 3. After adding your project dependencies, use `yarn install` to lock dependencies.  
 
 ## Project Practices
@@ -272,6 +273,10 @@ create modules
 11. strict header versioning check for vendor-specific headers.  
 12. Generic CRUD for all models. Scaffolding.  
 13. APIs to support unique constraints in path /userIdOruserName/update  
+14. Update dependencies and yarn lock file regularly.  
+15. Pass server context in all hapi plugins.  
+16. Extract error Handler plugin to plugins folder (depends on 15).  
+17. Remove all default values from config/default.js, so that developers are forced to provide all these parameters.  
 
 ## Contribute back
 [ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.

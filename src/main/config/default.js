@@ -111,7 +111,7 @@ export default {
     support: process.env.SUPPORT_FROM_EMAIL || 'Support Team <support@dummy.com>'
   },
   mailer: {
-    transport: 'ses',
+    transport: process.env.DEFAULT_MAIL_SERVICE || 'ses',
     sendgrid: {
       package: 'nodemailer-sendgrid-transport',
       auth: {
