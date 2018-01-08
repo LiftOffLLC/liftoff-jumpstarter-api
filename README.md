@@ -19,12 +19,17 @@ Aimed to provide jumpstart kit for building REST APIs.
 |PM2|Process management utility to start/stop server|
 
 ## Project Setup
-1. Download the latest zip file or clone the repo with depth=1
-2. Modify the config details  
-2.1. newrelic key  
-2.2. database details  
-2.3. redis details  
-2.4. mail configurations, etc.   
+1. Download the latest zip file or clone the repo with depth=1 using below command -  
+	`git clone --depth=1 git@github.com:LiftOffLLC/liftoff-jumpstarter-api.git`
+2. Modify the config details 
+2.1 Copy .env.development as .env file in project folder and modify the relevant properties for the project   
+	2.1.1. Database Config  
+	2.1.2. Redis Config (Login auth tokens are stored)  
+	2.1.3. JWT Tokens (Secret Key), etc.   
+2.2. Fix config/default.js  
+2.3. Fix plugins/hapi-swagger.js for swagger documentation  
+2.4. Fix plugins/status-monitor.js for monitoring   
+2.5. Modify company_name and user_name in views/mail-templates folder.    
 3. After adding your project dependencies, use `yarn install` to lock dependencies.  
 
 ## Project Practices
@@ -268,6 +273,10 @@ create modules
 11. strict header versioning check for vendor-specific headers.  
 12. Generic CRUD for all models. Scaffolding.  
 13. APIs to support unique constraints in path /userIdOruserName/update  
+14. Update dependencies and yarn lock file regularly.  
+15. Pass server context in all hapi plugins.  
+16. Extract error Handler plugin to plugins folder (depends on 15).  
+17. Remove all default values from config/default.js, so that developers are forced to provide all these parameters.  
 
 ## Contribute back
 [ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
