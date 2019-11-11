@@ -23,7 +23,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     // Fetch user with provided email
@@ -31,20 +31,20 @@ const options = {
       UserModel.buildCriteria('email', request.payload.email),
     );
     if (!user) {
-      return reply(Boom.notFound('User Not Found'));
+      throw Boom.notFound('User Not Found');
     }
     request.log(['info', __filename], `user found - ${inspect(user)}`);
 
     // Validate token
     if (request.payload.resetPasswordToken !== user.resetPasswordToken) {
-      return reply(Boom.badRequest('Invalid Token'));
+      throw Boom.badRequest('Invalid Token');
     }
 
     if (
       +new Date(request.payload.resetPasswordSentAt) - +new Date() >
       Config.get('passwordReset').get('duration')
     ) {
-      return reply(Boom.badRequest('Token Expired'));
+      throw Boom.badRequest('Token Expired');
     }
 
     // Reset token and create hash from password
@@ -57,7 +57,7 @@ const options = {
       ['info', __filename],
       `updated response - ${inspect(updatedUser)}`,
     );
-    return reply(updatedUser);
+    return updatedUser;
   },
 };
 
@@ -65,7 +65,7 @@ const handler = () => {
   const details = {
     method: ['POST'],
     path: '/api/users/reset_password',
-    config: options,
+    options,
   };
   return details;
 };

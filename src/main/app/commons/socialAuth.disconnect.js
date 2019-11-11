@@ -22,19 +22,19 @@ export default function socialDisconnect(providerName) {
       },
       policies: [isAuthorized('params.userId')],
     },
-    handler: async (request, reply) => {
+    handler: async (request, h) => {
       const criteria = SocialLoginModel.buildCriteriaWithObject({
         provider: providerName,
         userId: request.params.userId,
       });
       await SocialLoginModel.deleteAll(criteria, false);
-      return reply(Constants.SUCCESS_RESPONSE);
+      return Constants.SUCCESS_RESPONSE;
     },
   };
 
   return () => ({
     method: ['DELETE'],
     path: `/api/users/{userId}/${providerName}/disconnect`,
-    config: options,
+    options,
   });
 }

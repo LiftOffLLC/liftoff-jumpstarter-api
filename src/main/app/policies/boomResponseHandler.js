@@ -4,7 +4,7 @@ import _ from 'lodash';
 /**
   Policy to handle boom response payload
 */
-const boomResponseHandler = async(request, reply, next) => {
+const boomResponseHandler = async (request, h) => {
   try {
     Logger.info(__filename, 'entry');
     const response = request.response;
@@ -23,7 +23,7 @@ const boomResponseHandler = async(request, reply, next) => {
     Logger.error(__filename, 'exit :: ', err);
   }
 
-  return next(null, true);
+  return h.continue;
 };
 
 boomResponseHandler.applyPoint = 'onPreResponse';

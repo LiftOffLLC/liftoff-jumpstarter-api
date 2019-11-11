@@ -11,11 +11,16 @@ require('newrelic');
 // NOTE: event name is camelCase as per node convention
 process.on('unhandledRejection', (reason, promise) => {
   // See Promise.onPossiblyUnhandledRejection for parameter documentation
-  console.log('Possibly Unhandled Rejection at: Promise ', promise, ' reason: ', reason);
+  console.log(
+    'Possibly Unhandled Rejection at: Promise ',
+    promise,
+    ' reason: ',
+    reason,
+  );
 });
 
 // NOTE: event name is camelCase as per node convention
-process.on('rejectionHandled', (promise) => {
+process.on('rejectionHandled', promise => {
   // See Promise.onUnhandledRejectionHandled for parameter documentation
   console.log('Possibly Unhandled Rejection at: Promise ', promise);
 });
@@ -24,15 +29,20 @@ console.log(Date.now(), '::: bootstraping ::::: ');
 // create server instance
 const server = Bootstrap.server(Config);
 
-const configureDatabase = async() => {
+const configureDatabase = async () => {
   try {
-    const dbConfig = Config.get('database').get('postgres').toJS();
+    const dbConfig = Config.get('database')
+      .get('postgres')
+      .toJS();
     const knex = knexClass(dbConfig);
 
     await knex.raw(dbConfig.validateQuery);
 
     if (dbConfig.recreateDatabase === 'true') {
-      console.log(Date.now(), '::: running database migration :::: started !!!');
+      console.log(
+        Date.now(),
+        '::: running database migration :::: started !!!',
+      );
       await knex.migrate.rollback(dbConfig);
       await knex.migrate.latest(dbConfig);
 
@@ -51,7 +61,7 @@ const configureDatabase = async() => {
   }
 };
 
-const start = async() => {
+const start = async () => {
   try {
     // configure database.
     console.log(Date.now(), ':::: about to configure database ::::');
@@ -105,8 +115,15 @@ const start = async() => {
     */
     if (!module.parent) {
       console.log(Date.now(), ':::: starting server ::::');
+
       await server.start();
-      console.log(Date.now(), `${(server.settings.app.get('server').get('name'))} started at ${server.info.uri}`);
+
+      console.log(
+        Date.now(),
+        `${server.settings.app.get('server').get('name')} started at ${
+          server.info.uri
+        }`,
+      );
     }
   } catch (e) {
     console.error('could not start server: ', e);

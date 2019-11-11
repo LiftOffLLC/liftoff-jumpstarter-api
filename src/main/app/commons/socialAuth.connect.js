@@ -9,7 +9,7 @@ import Constants from './constants';
 const inspect = Util.inspect;
 const validator = UserModel.validatorRules();
 
-async function handler(providerName, request, reply) {
+async function handler(providerName, request, h) {
   request.log(
     ['info', `${providerName}.connect`],
     `payload:: ${inspect(request.payload)}`,
@@ -24,7 +24,7 @@ async function handler(providerName, request, reply) {
       ['error', `${providerName}.connect`],
       `fetch profile${e.stack}`,
     );
-    return reply(Boom.badRequest('Invalid social credentials'));
+    throw Boom.badRequest('Invalid social credentials');
   }
 
   request.log(
@@ -54,7 +54,7 @@ async function handler(providerName, request, reply) {
   };
 
   await SocialLoginModel.createOrUpdate(socialObject, false);
-  return reply(Constants.SUCCESS_RESPONSE);
+  return Constants.SUCCESS_RESPONSE;
 }
 
 export default function socialSignUp(providerName) {
@@ -73,13 +73,12 @@ export default function socialSignUp(providerName) {
         responses: _.omit(Constants.API_STATUS_CODES, [200]),
       },
     },
-    handler: async (request, reply) =>
-      await handler(providerName, request, reply),
+    handler: async (request, h) => await handler(providerName, request, h),
   };
 
   return () => ({
     method: ['POST'],
     path: `/api/users/{userId}/${providerName}/connect`,
-    config: options,
+    options,
   });
 }

@@ -22,23 +22,23 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
     },
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     let user = await UserModel.findOne(
       UserModel.buildCriteria('email', _.toLower(request.payload.email)),
     );
     if (!user) {
-      return reply(Boom.notFound('User doesnot exists'));
+      throw Boom.notFound('User doesnot exists');
     }
 
     if (user.verifyPassword(request.payload.password)) {
       // on successful, create login_token for this user.
       user = await UserModel.signSession(request, user.id);
-      return reply(user);
+      return user;
     }
 
-    return reply(Boom.unauthorized('Invalid credentials.'));
+    throw Boom.unauthorized('Invalid credentials.');
   },
 };
 
@@ -47,7 +47,7 @@ const handler = server => {
   const details = {
     method: ['POST'],
     path: '/api/users/login',
-    config: options,
+    options,
   };
   return details;
 };

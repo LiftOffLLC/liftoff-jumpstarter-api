@@ -7,7 +7,7 @@ import Constants from './constants';
 
 const validator = UserModel.validatorRules();
 
-async function handler(providerName, request, reply) {
+async function handler(providerName, request, h) {
   request.log(
     ['info', `user.login.${providerName}`],
     `payload:: ${inspect(request.payload)}`,
@@ -22,7 +22,7 @@ async function handler(providerName, request, reply) {
       ['error', `user.login.${providerName}`],
       `fetch profile${e.stack}`,
     );
-    return reply(Boom.unauthorized('Invalid social credentials'));
+    throw Boom.unauthorized('Invalid social credentials');
   }
 
   const socialLogin = await SocialLoginModel.findOne(
@@ -52,18 +52,18 @@ async function handler(providerName, request, reply) {
         await SocialLoginModel.createOrUpdate(socialObject);
       } catch (e) {
         request.log(['error', `${providerName}.login`], e);
-        return reply(Boom.forbidden(e.message, request.payload.email));
+        throw Boom.forbidden(e.message, request.payload.email);
       }
       userId = emailUser.id;
     } else {
-      throw reply(Boom.notFound(`${providerName} not registered, Try Signup.`));
+      throw Boom.notFound(`${providerName} not registered, Try Signup.`);
     }
   } else {
     userId = socialLogin.userId;
   }
 
   const user = await UserModel.signSession(request, userId);
-  return reply(user);
+  return user;
 }
 
 export default function socialLoginFn(providerName) {
@@ -101,13 +101,12 @@ export default function socialLoginFn(providerName) {
         },
       },
     },
-    handler: async (request, reply) =>
-      await handler(providerName, request, reply),
+    handler: async (request, h) => await handler(providerName, request, h),
   };
 
   return () => ({
     method: ['POST'],
     path: `/api/users/login/${providerName}`,
-    config: options,
+    options,
   });
 }

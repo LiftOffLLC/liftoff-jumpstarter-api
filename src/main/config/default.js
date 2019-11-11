@@ -14,6 +14,7 @@ export default {
   server: {
     name: 'Liftoff Jumpstart v1.0 Server',
     version: '1.0.0',
+    host: process.env.HOST || 'localhost',
     port: process.env.PORT || 8080,
     forceSSL: process.env.FORCE_SSL || 'false',
     cache: [

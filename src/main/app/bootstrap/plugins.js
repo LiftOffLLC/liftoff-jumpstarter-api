@@ -51,13 +51,11 @@ const HapiAsyncHandler = {
       if (handler && handler instanceof Function) {
         const t = handler;
 
-        const modifiedHandler = (request, reply) => {
-          const p = t(request, reply);
+        const modifiedHandler = (request, h) => {
+          const p = t(request, h);
           if (p && p.catch) {
             p.catch(err => {
-              reply(
-                Boom.wrap(err instanceof Error ? err : new Error(err), 417),
-              );
+              Boom.wrap(err instanceof Error ? err : new Error(err), 417);
             });
           }
         };

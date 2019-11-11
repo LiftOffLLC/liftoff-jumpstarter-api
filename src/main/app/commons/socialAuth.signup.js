@@ -11,7 +11,7 @@ import Config from '../../config';
 
 const validator = UserModel.validatorRules();
 
-async function handler(providerName, request, reply) {
+async function handler(providerName, request, h) {
   request.log(
     ['info', `${providerName}.signup`],
     `payload:: ${inspect(request.payload)}`,
@@ -23,7 +23,7 @@ async function handler(providerName, request, reply) {
     profile = await provider.getProfile(request.payload.accessToken);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], `fetch profile${e.stack}`);
-    return reply(Boom.badRequest('Invalid social credentials'));
+    throw Boom.badRequest('Invalid social credentials');
   }
 
   request.log(
@@ -43,9 +43,7 @@ async function handler(providerName, request, reply) {
 
   // Is already registered with social login, error out.
   if (profile && socialLogin) {
-    return reply(
-      Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName)),
-    );
+    throw Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName));
   }
 
   let user;
@@ -68,7 +66,7 @@ async function handler(providerName, request, reply) {
       user = await UserModel.createOrUpdate(userObject);
     } catch (e) {
       request.log(['error', `${providerName}.signup`], e);
-      return reply(Boom.forbidden(e.message, request.payload.email));
+      throw Boom.forbidden(e.message, request.payload.email);
     }
   }
 
@@ -86,7 +84,7 @@ async function handler(providerName, request, reply) {
     await SocialLoginModel.createOrUpdate(socialObject);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], e);
-    return reply(Boom.forbidden(e.message, request.payload.email));
+    throw Boom.forbidden(e.message, request.payload.email);
   }
 
   const mailVariables = {
@@ -95,7 +93,10 @@ async function handler(providerName, request, reply) {
   await addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
   // on successful, create login_token for this user.
   user = await UserModel.signSession(request, user.id);
-  return reply(user).code(201);
+
+  const response = h.response(user);
+  response.code(201);
+  return response;
 }
 
 export default function socialSignUp(providerName) {
@@ -134,13 +135,12 @@ export default function socialSignUp(providerName) {
         },
       },
     },
-    handler: async (request, reply) =>
-      await handler(providerName, request, reply),
+    handler: async (request, h) => await handler(providerName, request, h),
   };
 
   return () => ({
     method: ['POST'],
     path: `/api/users/signup/${providerName}`,
-    config: options,
+    options,
   });
 }

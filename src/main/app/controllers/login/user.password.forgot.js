@@ -24,7 +24,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     request.log(['info', __filename], `query:: ${inspect(request.query)}`);
 
     // Fetch user with provided email
@@ -32,7 +32,7 @@ const options = {
       UserModel.buildCriteria('email', request.query.email),
     );
     if (!user) {
-      return reply(Boom.notFound('User Not Found'));
+      throw Boom.notFound('User Not Found');
     }
 
     // Generate random id
@@ -69,7 +69,7 @@ const options = {
       ['info', __filename],
       `updated response - ${inspect(updatedUser)}`,
     );
-    return reply(Constants.SUCCESS_RESPONSE);
+    throw Constants.SUCCESS_RESPONSE;
   },
 };
 
@@ -77,7 +77,7 @@ const handler = () => {
   const details = {
     method: ['GET'],
     path: '/api/users/forgot_password',
-    config: options,
+    options,
   };
   return details;
 };

@@ -1,13 +1,11 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
 import _ from 'lodash';
 import Logger from 'winston';
-import {
-  traverseDeep
-} from '../commons/utils';
+import { traverseDeep } from '../commons/utils';
 import UserRole from '../models/userRole';
 
-const omitEntities = async(items, scope) => {
-  await traverseDeep(items, async(obj) => {
+const omitEntities = async (items, scope) => {
+  await traverseDeep(items, async obj => {
     if (obj.ENTITY_FILTERING_SCOPE) {
       const omitFields = obj.ENTITY_FILTERING_SCOPE[scope];
       if (omitFields) {
@@ -32,7 +30,7 @@ const omitEntities = async(items, scope) => {
 /**
   Policy to filter entities/properties from response payload
 */
-const entityFilter = async(request, reply, next) => {
+const entityFilter = async (request, h) => {
   try {
     Logger.info(__filename, 'entry');
     const response = request.response.source;
@@ -43,7 +41,7 @@ const entityFilter = async(request, reply, next) => {
     Logger.error(__filename, 'exit :: ', err);
   }
 
-  return next(null, true);
+  return h.continue;
 };
 
 entityFilter.applyPoint = 'onPostHandler';

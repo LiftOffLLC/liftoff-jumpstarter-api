@@ -29,17 +29,15 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [200]),
     },
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     const userCount = await UserModel.count(
       UserModel.buildCriteria('email', request.payload.email),
     );
 
     // Error out if email already exists.
     if (userCount > 0) {
-      return reply(
-        Boom.forbidden(
-          Util.format(errorCodes.emailDuplicate, request.payload.email),
-        ),
+      throw Boom.forbidden(
+        Util.format(errorCodes.emailDuplicate, request.payload.email),
       );
     }
 
@@ -72,7 +70,10 @@ const options = {
       webUrl: Config.get('webUrl'),
     };
     await addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
-    return reply(result).code(201);
+
+    const response = h.response(result);
+    result.code(201);
+    return response;
   },
 };
 
@@ -81,7 +82,7 @@ const handler = server => {
   const details = {
     method: ['POST'],
     path: '/api/users',
-    config: options,
+    options,
   };
   return details;
 };

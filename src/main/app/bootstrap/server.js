@@ -14,11 +14,18 @@ module.exports = config => {
     failAction: 'ignore', // Action on bad cookie - 'error': return 400, 'log': log and continue, 'ignore': continue
   };
   const cors = _.zipObject(['cors', 'state'], [true, cookieState]);
-  const server = new Hapi.Server(
-    _.zipObject(
-      ['app', 'cache', 'host', 'port', 'routes'],
-      [config, cacheConfig, host, port, cors],
-    ),
-  );
+  // const server = new Hapi.Server(
+  //   _.zipObject(
+  //     ['app', 'cache', 'host', 'port', 'routes'],
+  //     [config, cacheConfig, host, port, cors],
+  //   ),
+  // );
+  const server = new Hapi.server({
+    app: config,
+    // cache: cacheConfig,
+    host: host,
+    port: port,
+    routes: cors,
+  });
   return server;
 };

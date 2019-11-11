@@ -27,7 +27,7 @@ const options = {
     },
     policies: [isAuthorized('params.userId')],
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     request.log(
       ['info', __filename],
       `userId:: ${inspect(request.params.userId)}`,
@@ -57,7 +57,7 @@ const options = {
     Logger.info('logout :: deleting sessionId :: ', sessionId);
     await RedisClient.deleteSession(request.params.userId, sessionId);
 
-    return reply(Constants.SUCCESS_RESPONSE);
+    return Constants.SUCCESS_RESPONSE;
   },
 };
 
@@ -66,7 +66,7 @@ const handler = server => {
   const details = {
     method: ['DELETE'],
     path: '/api/users/{userId}/logout',
-    config: options,
+    options,
   };
   return details;
 };

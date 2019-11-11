@@ -32,7 +32,7 @@ const options = {
       checkIfExists(UserModel, 'User', ['id'], ['params.userId']),
     ],
   },
-  handler: async (request, reply) => {
+  handler: async (request, h) => {
     const payload = _.cloneDeep(request.payload);
     payload.id = request.params.userId;
 
@@ -46,14 +46,14 @@ const options = {
         payload.encryptedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
-        return reply(Boom.unauthorized('Invalid credentials.'));
+        throw Boom.unauthorized('Invalid credentials.');
       }
     }
 
     delete payload.oldPassword;
     delete payload.password;
     const result = await UserModel.createOrUpdate(payload);
-    return reply(result);
+    return result;
   },
 };
 
@@ -62,7 +62,7 @@ const handler = server => {
   const details = {
     method: ['PUT'],
     path: '/api/users/{userId}',
-    config: options,
+    options,
   };
   return details;
 };

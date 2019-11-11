@@ -9,7 +9,7 @@ import Constants from './constants';
 
 const inspect = Util.inspect;
 
-async function readHandler(model, request, reply) {
+async function readHandler(model, request, h) {
   const criteriaOpts = {
     limit: request.query.limit,
     offset: request.query.offset,
@@ -22,10 +22,10 @@ async function readHandler(model, request, reply) {
   const count = await model.count(_.cloneDeep(filterOpts));
   const items = await model.findAll(_.cloneDeep(filterOpts), criteriaOpts);
 
-  return reply({
+  return {
     count,
     items,
-  });
+  };
 }
 
 export default function readAPI(pathPrefix, params, model) {
@@ -71,12 +71,12 @@ export default function readAPI(pathPrefix, params, model) {
       },
       policies: params.policies || [],
     },
-    handler: async (request, reply) => await readHandler(model, request, reply),
+    handler: async (request, h) => await readHandler(model, request, h),
   };
 
   return () => ({
     method: ['GET'],
     path: `/api/${pathPrefix}`,
-    config: options,
+    options,
   });
 }
