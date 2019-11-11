@@ -13,30 +13,28 @@ export default function socialDisconnect(providerName) {
     tags: ['api'],
     validate: {
       params: {
-        userId: validator.userId.required()
-      }
+        userId: validator.userId.required(),
+      },
     },
     plugins: {
       'hapi-swagger': {
-        responses: _.omit(Constants.API_STATUS_CODES, [201, 403])
+        responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
       },
-      policies: [
-        isAuthorized('params.userId')
-      ]
+      policies: [isAuthorized('params.userId')],
     },
-    handler: async(request, reply) => {
+    handler: async (request, reply) => {
       const criteria = SocialLoginModel.buildCriteriaWithObject({
         provider: providerName,
-        userId: request.params.userId
+        userId: request.params.userId,
       });
       await SocialLoginModel.deleteAll(criteria, false);
       return reply(Constants.SUCCESS_RESPONSE);
-    }
+    },
   };
 
   return () => ({
     method: ['DELETE'],
     path: `/api/users/{userId}/${providerName}/disconnect`,
-    config: options
+    config: options,
   });
 }

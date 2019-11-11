@@ -5,12 +5,12 @@ const plugin = {
   enabled: true,
   name: 'mrhorse',
   plugin: {
-    register: MrHorse,
+    plugin: MrHorse,
     options: {
-      policyDirectory: path.join(__dirname, '..', 'policies')
-    }
+      policyDirectory: path.join(__dirname, '..', 'policies'),
+    },
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Boom from 'boom';
+import Boom from '@hapi/boom'
 import Logger from 'winston';
 import UserRole from '../models/userRole';
 

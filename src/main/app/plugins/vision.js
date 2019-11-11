@@ -5,10 +5,10 @@ const plugin = {
   enabled: true,
   name: 'vision',
   plugin: {
-    register: Vision,
-    options: {}
+    plugin: Vision,
+    options: {},
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

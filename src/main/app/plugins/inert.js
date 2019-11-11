@@ -5,10 +5,10 @@ const plugin = {
   enabled: true,
   name: 'inert',
   plugin: {
-    register: Inert,
-    options: {}
+    plugin: Inert,
+    options: {},
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

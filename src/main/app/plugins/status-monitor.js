@@ -2,18 +2,18 @@ import HapiStatusMonitor from 'hapijs-status-monitor';
 import Config from '../../config';
 
 const plugin = {
-  enabled: Config.get('env') === 'development',
+  enabled: false,
   name: 'hapijs-status-monitor',
   plugin: {
-    register: HapiStatusMonitor,
+    plugin: HapiStatusMonitor,
     options: {
       title: 'Liftoff Jumpstart v1.0 Server Status Monitor',
       path: '/status',
       routeConfig: {
-        auth: false
-      }
-    }
-  }
+        auth: false,
+      },
+    },
+  },
 };
 
 module.exports = plugin;

@@ -1,22 +1,21 @@
-import Boom from 'boom';
+import Boom from '@hapi/boom';
 import Uuid from 'node-uuid';
-import Util, {
-  inspect
-} from 'util';
+import Util, { inspect } from 'util';
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
 import Social from './social';
 import errorCodes from './errors';
 import Constants from './constants';
-import {
-  addMailToQueue
-} from '../commons/utils';
+import { addMailToQueue } from '../commons/utils';
 import Config from '../../config';
 
 const validator = UserModel.validatorRules();
 
 async function handler(providerName, request, reply) {
-  request.log(['info', `${providerName}.signup`], `payload:: ${inspect(request.payload)}`);
+  request.log(
+    ['info', `${providerName}.signup`],
+    `payload:: ${inspect(request.payload)}`,
+  );
 
   const provider = new Social(providerName);
   let profile;
@@ -27,24 +26,31 @@ async function handler(providerName, request, reply) {
     return reply(Boom.badRequest('Invalid social credentials'));
   }
 
-  request.log(['info', `${providerName}.signup`], ` profile response:  ${inspect(profile)}`);
+  request.log(
+    ['info', `${providerName}.signup`],
+    ` profile response:  ${inspect(profile)}`,
+  );
 
   const socialLogin = await SocialLoginModel.findOne(
     SocialLoginModel.buildCriteriaWithObject({
       provider: providerName,
-      providerId: profile.id
-    }), {
-      columns: '*,user.*'
-    });
+      providerId: profile.id,
+    }),
+    {
+      columns: '*,user.*',
+    },
+  );
 
   // Is already registered with social login, error out.
   if (profile && socialLogin) {
-    return reply(Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName)));
+    return reply(
+      Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName)),
+    );
   }
 
   let user;
   const usersRegisteredUsingEmail = await UserModel.findOne(
-    UserModel.buildCriteria('email', request.payload.email.toLowerCase())
+    UserModel.buildCriteria('email', request.payload.email.toLowerCase()),
   );
 
   if (usersRegisteredUsingEmail) {
@@ -74,7 +80,7 @@ async function handler(providerName, request, reply) {
       accessToken: request.payload.accessToken,
       refreshToken: request.payload.refreshToken,
       rawBody: request.payload.rawBody,
-      isPrimaryLogin: true
+      isPrimaryLogin: true,
     };
 
     await SocialLoginModel.createOrUpdate(socialObject);
@@ -84,7 +90,7 @@ async function handler(providerName, request, reply) {
   }
 
   const mailVariables = {
-    webUrl: Config.get('webUrl')
+    webUrl: Config.get('webUrl'),
   };
   await addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
   // on successful, create login_token for this user.
@@ -105,33 +111,36 @@ export default function socialSignUp(providerName) {
         refreshToken: validator.refreshToken.required(),
         phoneNumber: validator.phoneNumber.optional(),
         avatarUrl: validator.avatarUrl.optional(),
-        rawBody: validator.rawBody.optional()
-      }
+        rawBody: validator.rawBody.optional(),
+      },
     },
     plugins: {
       'hapi-swagger': {
         responses: {
           201: {
-            description: 'Created user successfully.'
+            description: 'Created user successfully.',
           },
           400: {
-            description: 'Malformed request, check email,userName,accessToken and refreshToken are provided.'
+            description:
+              'Malformed request, check email,userName,accessToken and refreshToken are provided.',
           },
           403: {
-            description: `Could not signup user because some of the fields (email or username, ${providerName}) already be added.`
+            description: `Could not signup user because some of the fields (email or username, ${providerName}) already be added.`,
           },
           500: {
-            description: 'The server encountered an unexpected condition which prevented it from fulfilling the request.'
-          }
-        }
-      }
+            description:
+              'The server encountered an unexpected condition which prevented it from fulfilling the request.',
+          },
+        },
+      },
     },
-    handler: async(request, reply) => await handler(providerName, request, reply)
+    handler: async (request, reply) =>
+      await handler(providerName, request, reply),
   };
 
   return () => ({
     method: ['POST'],
     path: `/api/users/signup/${providerName}`,
-    config: options
+    config: options,
   });
 }

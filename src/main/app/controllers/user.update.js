@@ -1,4 +1,4 @@
-import Boom from 'boom';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import UserModel from '../models/user';
 import checkIfExists from '../policies/checkIfExists';
@@ -13,32 +13,34 @@ const options = {
   tags: ['api'],
   validate: {
     params: {
-      userId: validator.userId.required()
+      userId: validator.userId.required(),
     },
     payload: {
       name: validator.name.optional(),
       phoneNumber: validator.phoneNumber.optional(),
       avatarUrl: validator.avatarUrl.optional(),
       oldPassword: validator.password.optional(),
-      password: validator.password.optional()
-    }
+      password: validator.password.optional(),
+    },
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201])
+      responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
     policies: [
       isAuthorized('params.userId'),
-      checkIfExists(UserModel, 'User', ['id'], ['params.userId'])
-    ]
+      checkIfExists(UserModel, 'User', ['id'], ['params.userId']),
+    ],
   },
-  handler: async(request, reply) => {
+  handler: async (request, reply) => {
     const payload = _.cloneDeep(request.payload);
     payload.id = request.params.userId;
 
     // Update password.
     if (payload.oldPassword || payload.password) {
-      const user = await UserModel.findOne(UserModel.buildCriteria('id', payload.id));
+      const user = await UserModel.findOne(
+        UserModel.buildCriteria('id', payload.id),
+      );
 
       if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
         payload.encryptedPassword = payload.password;
@@ -52,20 +54,20 @@ const options = {
     delete payload.password;
     const result = await UserModel.createOrUpdate(payload);
     return reply(result);
-  }
+  },
 };
 
 // eslint-disable-next-line no-unused-vars
-const handler = (server) => {
+const handler = server => {
   const details = {
     method: ['PUT'],
     path: '/api/users/{userId}',
-    config: options
+    config: options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };

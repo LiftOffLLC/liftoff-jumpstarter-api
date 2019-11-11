@@ -1,5 +1,5 @@
 import Util from 'util';
-import Boom from 'boom';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import UserModel from '../../models/user';
 import Config from '../../../config';
@@ -15,20 +15,20 @@ const options = {
     payload: {
       email: validator.email.required(),
       password: validator.password.required(),
-      resetPasswordToken: validator.resetPasswordToken.required()
-    }
+      resetPasswordToken: validator.resetPasswordToken.required(),
+    },
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201])
-    }
+      responses: _.omit(Constants.API_STATUS_CODES, [201]),
+    },
   },
-  handler: async(request, reply) => {
+  handler: async (request, reply) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     // Fetch user with provided email
     const user = await UserModel.findOne(
-      UserModel.buildCriteria('email', request.payload.email)
+      UserModel.buildCriteria('email', request.payload.email),
     );
     if (!user) {
       return reply(Boom.notFound('User Not Found'));
@@ -40,7 +40,10 @@ const options = {
       return reply(Boom.badRequest('Invalid Token'));
     }
 
-    if (+new Date(request.payload.resetPasswordSentAt) - +new Date() > Config.get('passwordReset').get('duration')) {
+    if (
+      +new Date(request.payload.resetPasswordSentAt) - +new Date() >
+      Config.get('passwordReset').get('duration')
+    ) {
       return reply(Boom.badRequest('Token Expired'));
     }
 
@@ -50,21 +53,24 @@ const options = {
     user.encryptedPassword = request.payload.password;
     const updatedUser = await UserModel.createOrUpdate(user);
 
-    request.log(['info', __filename], `updated response - ${inspect(updatedUser)}`);
+    request.log(
+      ['info', __filename],
+      `updated response - ${inspect(updatedUser)}`,
+    );
     return reply(updatedUser);
-  }
+  },
 };
 
 const handler = () => {
   const details = {
     method: ['POST'],
     path: '/api/users/reset_password',
-    config: options
+    config: options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };

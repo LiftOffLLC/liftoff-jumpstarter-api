@@ -14,19 +14,19 @@ const options = {
   validate: {
     payload: {
       email: validator.email.required(),
-      password: validator.password.required()
-    }
+      password: validator.password.required(),
+    },
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201, 403])
-    }
+      responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
+    },
   },
-  handler: async(request, reply) => {
+  handler: async (request, reply) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     let user = await UserModel.findOne(
-      UserModel.buildCriteria('email', _.toLower(request.payload.email))
+      UserModel.buildCriteria('email', _.toLower(request.payload.email)),
     );
     if (!user) {
       return reply(Boom.notFound('User doesnot exists'));
@@ -39,20 +39,20 @@ const options = {
     }
 
     return reply(Boom.unauthorized('Invalid credentials.'));
-  }
+  },
 };
 
 // eslint-disable-next-line no-unused-vars
-const handler = (server) => {
+const handler = server => {
   const details = {
     method: ['POST'],
     path: '/api/users/login',
-    config: options
+    config: options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };
