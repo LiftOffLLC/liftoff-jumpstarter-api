@@ -1,7 +1,7 @@
 {
   "name": "wb4server",
-  "version": "1.0.0",
-  "description": "Liftoff Jumpstart v1.0 REST API Server",
+  "version": "2.0.0",
+  "description": "Liftoff Jumpstart v2.0 REST API Server",
   "main": "src/main/index.js",
   "scripts": {
     "format": "./bin/codeformat.sh",
@@ -118,6 +118,6 @@
     "prettier": "^1.19.1"
   },
   "engines": {
-    "node": "<=12"
+    "node": "12"
   }
 }

@@ -1,24 +1,24 @@
-# Liftoff Jumpstart Server Kit v1.0
+# Liftoff Jumpstart Server Kit v2.0
 
 Aimed to provide jumpstart kit for building REST APIs.
 
 ## Packages Used
 
-| Package           | Purpose                                                      |
-| :---------------- | :----------------------------------------------------------- |
-| Node.js           | Node Env; use 6.9.1; and use nvm for node version management |
-| Babel             | Babelify code                                                |
-| Hapi.js           | Server logic                                                 |
-| Objection.js/Knex | ORM Framework                                                |
-| newrelic          | Monitoring                                                   |
-| Node Mailer       | Mail Delivery                                                |
-| Nes               | Socket Notification                                          |
-| kue               | Worker/Job Management                                        |
-| Redis             | Caching; Worker Jobs Management (for kue)                    |
-| Lodash            | commons utility                                              |
-| Postgres          | default database connector                                   |
-| Eslint            | Check Eslint Issues                                          |
-| PM2               | Process management utility to start/stop server              |
+| Package           | Purpose                                                    |
+| :---------------- | :--------------------------------------------------------- |
+| Node.js           | Node Env; use v12; and use nvm for node version management |
+| Hapi.js           | Server logic                                               |
+| Objection.js/Knex | ORM Framework                                              |
+| newrelic          | Monitoring                                                 |
+| Node Mailer       | Mail Delivery                                              |
+| Nes               | Socket Notification                                        |
+| kue               | Worker/Job Management                                      |
+| Redis             | Caching; Worker Jobs Management (for kue)                  |
+| Lodash            | commons utility                                            |
+| Postgres          | default database connector                                 |
+| Eslint            | Check Eslint Issues                                        |
+| Prettier          | Code Formatting                                            |
+| PM2               | Process management utility to start/stop server            |
 
 ## Project Setup
 
@@ -33,7 +33,9 @@ Aimed to provide jumpstart kit for building REST APIs.
    2.3. Fix plugins/hapi-swagger.js for swagger documentation  
    2.4. Fix plugins/status-monitor.js for monitoring  
    2.5. Modify company_name and user_name in views/mail-templates folder.
-3. After adding your project dependencies, use `yarn install` to lock dependencies.
+3. After adding your project dependencies, use `yarn` to lock dependencies.
+
+**NOTE** hapi-swagger is broken since Joi v16 because of a lot of breaking changes. Swagger documentation will not work until a new release for the plugin comes out. Downgrade joi to v15 and make the necessary syntax changes if swagger is an absolute necessity.
 
 ## Project Practices
 
@@ -41,6 +43,7 @@ Aimed to provide jumpstart kit for building REST APIs.
 
 `$:> npm run format` -- to format the code  
 `$:> npm run lint` -- to Check lint issues  
+`$:> npm run lint:fix` -- to fix possible lint issues  
 `$:> npm run inspect` -- to Detect copied code  
 `$:> npm run test` -- to run test cases
 
@@ -57,8 +60,8 @@ Aimed to provide jumpstart kit for building REST APIs.
 
 #### Running Prod Server on Heroku.
 
-`$:> yarn install` to lock all the dependencies  
-`$:> npm start` will stop all the running processes and start the server; No need of Procfile if running only the server.
+`$:> yarn` to lock all the dependencies  
+`$:> yarn start` will stop all the running processes and start the server; No need of Procfile if running only the server.
 
 ## Folder Convention
 
@@ -88,7 +91,7 @@ Source Code is located at `src/main` and test code in `src/test`
 
 1. Each API is written in separate file in /controllers folder.
 2. During bootstraping the server
-   - routes are build by scanning all the files in /controllers folder
+   - routes are built by scanning all the files in /controllers folder
    - methods are dynamically decorated for server/request and are picked from /methods folder.
    - plugins are added to Hapi server, which give additional functionality like logging, listing all apis, monitoring server status, auth, etc.
    - policies are applied to each api. basically, used to control the data flow right from request to post-response. more details can be found at MrHorse project. The use cases are checking the permission, controlling the response, forcing https, etc.
@@ -101,12 +104,12 @@ const options = {
   description: 'Config Details - Access - ADMIN',
   tags: ['api'],
   validate: {
-    params: {
+    params: Joi.object({
       userId: Joi.number()
         .integer()
         .positive()
         .description('User Id'),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {
@@ -114,7 +117,7 @@ const options = {
     },
     policies: [isAuthorized('params.userId')],
   },
-  handler: async (request, reply) => reply(Config.toJS()),
+  handler: async (request, h) => Config.toJS(),
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -165,13 +168,14 @@ description and tags are used foe swagger doc generation.
 
 ```node
   validate: {
-    params: {
+    params: Joi.object({
       userId: Joi.number().integer().positive().description('User Id')
-    }
+    })
   },
 ```
 
 Validating the payload, param or query. Uses Joi library for validation.
+**NOTE** validation payloads must be wrapped inside a Joi object post Joi v16
 
 The following options can be used inside the validate block, to strip unknown fields. **NOTE:** Avoid Using it.
 
@@ -199,10 +203,10 @@ Policies can be used to in handling the pre- and post- operations.
 Modifying the request, response, validating roles, etc. Hapi provides various lifecycle methods, which can be used for controlling the flow. More details can be found at Mr.Horse project page.
 
 ```node
-handler: async (request, reply) => reply(Config.toJS());
+handler: async (request, h) => Config.toJS();
 ```
 
-Business logic, which returns the response. use `reply` for sending the response.
+**NOTE** reply callback has been removed post hapi v17. return the response directly from the handler.
 
 ### Models
 
@@ -222,11 +226,8 @@ Each model has to subclassed from BaseModel. Refer Objection.js/Knex for usage. 
 static entityFilteringScope() {
     return {
       admin: ['encryptedPassword', 'passwordSalt'], // fields hidden from admin
-      user: ['phoneToken', 'isPhoneVerified'
-      ], // fields hidden from user role.
-      guest: ['resetPasswordToken', 'resetPasswordSentAt',
-        'socialLogins'
-      ] // fields hidden from user role.
+      user: ['phoneToken', 'isPhoneVerified'], // fields hidden from user role.
+      guest: ['resetPasswordToken', 'resetPasswordSentAt','socialLogins'] // fields hidden from user role.
       // guest: 'all' -- Optionally this array be also be 'all' to hide all the fields from this model.
     };
   }
@@ -253,8 +254,7 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 
 ## Fail-Fast Approach
 
-- Wrong Config for email/database will fail  
-
+- Wrong Config for email/database will fail
 
 ## Adding Permissions
 
@@ -268,6 +268,12 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 ## Re-usable coding
 
 create modules
+
+##Code Formatting and Linting
+
+- Use prettier and delete any other plugins which may conflict with the rules.
+- Refer to the eslintrc and prettierrc for lint and formatting rules.
+- Uses husky and lint-staged in combination to lint staged files before committing. Fix lint errors before committing. **NOTE** Do not force commit
 
 ## Pending Items
 

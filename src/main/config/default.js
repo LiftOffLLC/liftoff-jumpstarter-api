@@ -11,8 +11,8 @@ module.exports = {
   env,
   // Server options used to start Hapi server
   server: {
-    name: 'Liftoff Jumpstart v1.0 Server',
-    version: '1.0.0',
+    name: 'Liftoff Jumpstart v2.0 Server',
+    version: '2.0.0',
     host: process.env.HOST || 'localhost',
     port: process.env.PORT || 3000,
     forceSSL: process.env.FORCE_SSL || 'false',
@@ -33,7 +33,7 @@ module.exports = {
   },
   // NewRelic Config
   newrelic: {
-    name: `Liftoff Jumpstart v4.0 Server -  ${env}`,
+    name: `Liftoff Jumpstart v2.0 Server -  ${env}`,
     key: process.env.NEW_RELIC_LICENSE_KEY || 'XXX',
     log_level: process.env.NEW_RELIC_LOG_LEVEL || 'info',
   },
