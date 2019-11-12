@@ -7,10 +7,10 @@ import SocialLoginModel from '../models/socialLogin';
 import Social from './social';
 import Constants from './constants';
 
-const inspect = Util.inspect;
+const { inspect } = Util;
 const validator = UserModel.validatorRules();
 
-async function handler(providerName, request, h) {
+async function handler(providerName, request, _h) {
   request.log(
     ['info', `${providerName}.connect`],
     `payload:: ${inspect(request.payload)}`,

@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import Logger from '../commons/logger';
 import DataObjectParser from 'dataobject-parser';
+import Logger from './logger';
 
 const selectFields = fieldsStr => _.compact(_.words(fieldsStr, /[^, ]+/g));
 
@@ -42,7 +42,7 @@ exports.buildOptions = (filters, options) => {
     testOptions[key] = _.zipObject(['columns'], [value]);
   });
 
-  for (const key of _.keys(testOptions)) {
+  _.each(_.keys(testOptions), key => {
     const prefix = key !== '_' ? `${key}.` : '';
     // Fix Limit Field
     const limitFieldKey = `${prefix}limit`;
@@ -82,7 +82,7 @@ exports.buildOptions = (filters, options) => {
       // && _.includes(['asc', 'desc'], sortOrder.value.toLowerCase())) {
       testOptions[key].sortOrder = sortOrder.value;
     }
-  }
+  });
 
   // knock off all the reserved keys; its needed for count* apis.
   _.each(['limit', 'offset', 'sortField', 'sortOrder'], key => {

@@ -6,8 +6,8 @@ module.exports = {
   description: 'Signs sessions',
   enabled: true,
   async: false,
-  method: (session) => {
+  method: session => {
     const jwtConfig = Config.get('auth').toJS();
     return JWT.sign(session, jwtConfig.key, jwtConfig.signOptions || {});
-  }
+  },
 };

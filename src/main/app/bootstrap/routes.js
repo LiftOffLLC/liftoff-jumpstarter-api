@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import requireDirs from 'require-dir';
 import Config from '../../config';
-import { traverseDeep } from '../commons/utils';
-
+import Utils from '../commons/utils';
 // configure routes - routes will be picked from ./controllers folder.
 module.exports = async server => {
   const routes = [];
@@ -11,14 +10,14 @@ module.exports = async server => {
   });
 
   const enabledRoutes = []; // _.filter(controllers, ['enabled', true]);
-  await traverseDeep(controllers, async obj => {
+  await Utils.traverseDeep(controllers, async obj => {
     if (obj.enabled === true) {
       enabledRoutes.push(obj);
     }
   });
 
   _.each(enabledRoutes, controller => {
-    const operation = controller.operation;
+    const { operation } = controller;
     if (_.isFunction(operation)) {
       const func = operation(server);
       let policies = _.get(func, 'options.plugins.policies');

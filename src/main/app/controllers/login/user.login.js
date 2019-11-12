@@ -6,7 +6,7 @@ import UserModel from '../../models/user';
 import Constants from '../../commons/constants';
 
 const validator = UserModel.validatorRules();
-const inspect = Util.inspect;
+const { inspect } = Util;
 
 const options = {
   auth: Constants.AUTH.ALL,
@@ -23,7 +23,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
     },
   },
-  handler: async (request, h) => {
+  handler: async (request, _h) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     let user = await UserModel.findOne(

@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this,newline-per-chained-call */
 import Bcrypt from 'bcrypt';
 import _ from 'lodash';
-import Logger from '../commons/logger';
 import Joi from '@hapi/joi';
 import Uuid from 'node-uuid';
+import Logger from '../commons/logger';
 import BaseModel from './base';
 import UserRole from './userRole';
 import RedisClient from '../commons/redisClient';
@@ -120,6 +120,7 @@ export default class User extends BaseModel {
         this.encryptedPassword.length === 60
       ) {
         // The password is already hashed. It can be the case when the instance is loaded from DB
+        // eslint-disable-next-line no-self-assign
         this.encryptedPassword = this.encryptedPassword;
       } else {
         this.passwordSalt = Bcrypt.genSaltSync(10);
@@ -169,10 +170,10 @@ export default class User extends BaseModel {
 
     // HAck to send back the social access/refresh token to self
     if (user.socialLogins) {
-      for (const socialLog of user.socialLogins) {
+      _.each(user.socialLogins, socialLog => {
         _.set(socialLog, '_accessToken', socialLog.accessToken);
         _.set(socialLog, '_refreshToken', socialLog.refreshToken);
-      }
+      });
     }
     return user;
   }

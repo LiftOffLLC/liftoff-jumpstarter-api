@@ -13,13 +13,16 @@ const pmConfig = {
   name: 'rest-api',
   exec_mode: 'cluster',
   instances,
-  max_memory_restart: `${maxMemory}M`
+  max_memory_restart: `${maxMemory}M`,
 };
 
 pm2.connect(() => {
-  pm2.start(pmConfig, (err) => {
+  pm2.start(pmConfig, err => {
     if (err) {
-      return console.error('Error while launching applications', err.stack || err);
+      return console.error(
+        'Error while launching applications',
+        err.stack || err,
+      );
     }
     console.log('PM2 and application has been succesfully started');
 

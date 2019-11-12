@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import Redis from 'redis';
 import Promise from 'bluebird';
-import Logger from '../commons/logger';
 import _ from 'lodash';
+import Logger from './logger';
 import Config from '../../config';
 
 Promise.promisifyAll(Redis.RedisClient.prototype);
@@ -45,13 +45,13 @@ class RedisClient {
 
     // If sessionId is not present, treat it all delete all user sessions.
     const keysToDelete = [];
-    for (const pattern of keyPatterns) {
+    _.each(keyPatterns, async pattern => {
       const keys = await this.redisClient.keysAsync(pattern);
-      for (const key of keys) {
+      _.each(keys, key => {
         Logger.info('redisClient: deleteKeys -- key :: ', key);
         keysToDelete.push(key);
-      }
-    }
+      });
+    });
 
     // Use Multi to delete all keys one-shot
     if (!_.isEmpty(keysToDelete)) {

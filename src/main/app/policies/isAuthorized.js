@@ -15,8 +15,8 @@ export default function isAuthorized(userPath) {
     const actualUserId = _.get(request, userPath);
 
     // allow if admin role is found in scope.
-    // eslint-disable-next-line eqeqeq
     const exists =
+      // eslint-disable-next-line eqeqeq
       UserRole.ADMIN == authScopeRole || authScopeUserId == actualUserId;
     Logger.info(`${__filename} entry :: (exists) :: `, exists);
 

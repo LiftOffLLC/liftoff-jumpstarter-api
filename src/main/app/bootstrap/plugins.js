@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import toposort from 'toposort';
 import requireDirs from 'require-dir';
-import Promise from 'bluebird';
 import Boom from '@hapi/boom';
 
 // const HapiAsyncHandler = (plugin, pOptions, next) => {
@@ -66,6 +65,7 @@ const HapiAsyncHandler = {
       return origRoute.apply(server, [options]);
     };
 
+    // eslint-disable-next-line no-param-reassign
     server.route = options => {
       if (Array.isArray(options)) {
         return options.map(option => innerRoute(option));

@@ -33,7 +33,7 @@ const options = {
       checkIfExists(UserModel, 'User', ['id'], ['params.userId']),
     ],
   },
-  handler: async (request, h) => {
+  handler: async (request, _h) => {
     const payload = _.cloneDeep(request.payload);
     payload.id = request.params.userId;
 

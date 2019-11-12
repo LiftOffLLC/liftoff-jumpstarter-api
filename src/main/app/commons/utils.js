@@ -22,9 +22,9 @@ export default {
   traverseDeep: async function traverseDeep(obj, fn) {
     if (_.isObject(obj)) {
       await fn(obj);
-      for (const o of Object.keys(obj)) {
+      _.each(_.keys(obj), async o => {
         await traverseDeep(obj[o], fn);
-      }
+      });
     }
   },
 
@@ -36,21 +36,27 @@ export default {
    * @return {float} a random floating point number
    */
   getRandom: (min, max) => {
-    const range = (max - min) + 1;
-    return Math.floor((Math.random() * (range)) + min);
+    const range = max - min + 1;
+    return Math.floor(Math.random() * range + min);
   },
 
   // Adds Mail to Queue for later processing.
-  addMailToQueue: async(templateName, from, to, message, variableOpts = {}) => {
+  addMailToQueue: async (
+    templateName,
+    from,
+    to,
+    message,
+    variableOpts = {},
+  ) => {
     const value = {
       templateName,
       from,
       to,
       message,
-      variableOpts
+      variableOpts,
     };
 
     await Worker.addJob('emails.dispatch', value);
     return true;
-  }
+  },
 };

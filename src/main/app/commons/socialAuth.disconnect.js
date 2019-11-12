@@ -24,7 +24,7 @@ export default function socialDisconnect(providerName) {
       },
       policies: [isAuthorized('params.userId')],
     },
-    handler: async (request, h) => {
+    handler: async (request, _h) => {
       const criteria = SocialLoginModel.buildCriteriaWithObject({
         provider: providerName,
         userId: request.params.userId,

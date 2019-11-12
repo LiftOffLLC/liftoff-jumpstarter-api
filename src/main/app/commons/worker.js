@@ -1,7 +1,7 @@
 import kue from 'kue';
 import _ from 'lodash';
 import requireDirs from 'require-dir';
-import Logger from '../commons/logger';
+import Logger from './logger';
 import Config from '../../config';
 
 class Worker {
@@ -68,7 +68,7 @@ class Worker {
   }
 
   handleJob(job, done) {
-    const data = job.data;
+    const { data } = job;
     Logger.info('HandleJob job', data);
     const currentJob = _.filter(this.jobs, ['name', data._name])[0]; // eslint-disable-line no-underscore-dangle
     if (typeof currentJob.handler !== 'function') {

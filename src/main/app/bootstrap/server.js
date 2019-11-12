@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 // export server module.
 module.exports = config => {
-  let cacheConfig = config
+  const cacheConfig = config
     .get('server')
     .get('cache')
     .toJS();
@@ -21,6 +21,7 @@ module.exports = config => {
   };
   const cors = _.zipObject(['cors', 'state'], [true, cookieState]);
 
+  // eslint-disable-next-line new-cap
   const server = new Hapi.server({
     app: config,
     cache: cacheConfig,

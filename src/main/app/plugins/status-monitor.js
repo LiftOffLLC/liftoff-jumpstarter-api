@@ -1,5 +1,4 @@
 import HapiStatusMonitor from 'hapijs-status-monitor';
-import Config from '../../config';
 
 const plugin = {
   enabled: false,

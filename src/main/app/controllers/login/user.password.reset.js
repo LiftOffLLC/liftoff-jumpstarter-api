@@ -6,7 +6,7 @@ import UserModel from '../../models/user';
 import Config from '../../../config';
 import Constants from '../../commons/constants';
 
-const inspect = Util.inspect;
+const { inspect } = Util;
 const validator = UserModel.validatorRules();
 const options = {
   auth: Constants.AUTH.ALL,
@@ -24,7 +24,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
   },
-  handler: async (request, h) => {
+  handler: async (request, _h) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     // Fetch user with provided email

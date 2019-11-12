@@ -10,7 +10,7 @@ const pingHandler = server => {
       description: 'Ping for Site Monitoring - Access - ALL',
       tags: ['api'],
     },
-    handler: async (request, h) => Constants.SUCCESS_RESPONSE,
+    handler: async (_request, _h) => Constants.SUCCESS_RESPONSE,
   };
   return details;
 };

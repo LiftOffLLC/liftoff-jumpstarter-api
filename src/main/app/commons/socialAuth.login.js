@@ -9,7 +9,7 @@ import Constants from './constants';
 
 const validator = UserModel.validatorRules();
 
-async function handler(providerName, request, h) {
+async function handler(providerName, request, _h) {
   request.log(
     ['info', `user.login.${providerName}`],
     `payload:: ${inspect(request.payload)}`,

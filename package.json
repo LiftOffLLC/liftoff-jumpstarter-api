@@ -5,7 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "format": "./bin/codeformat.sh",
-    "lint": "eslint src",
+    "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
+    "lint:fix": "npm run lint --fix",
     "inspect": "jsinspect -t 30 --ignore 'src/main/database/migrations/20161006232820_users.js' src/main",
     "dev": "./bin/dev.sh",
     "clean": "rm -rf build",
@@ -120,7 +121,6 @@
     "eslint-plugin-jsdoc": "^17.1.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-lodash": "^6.0.0",
-    "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.16.0",

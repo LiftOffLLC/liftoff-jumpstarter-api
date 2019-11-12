@@ -4,6 +4,7 @@ import Logger from '../commons/logger';
 /**
 Policy to verify that only https is supported.
 */
+// eslint-disable-next-line consistent-return
 const requireHTTPs = async (request, h) => {
   Logger.info(`${__filename} entry`);
   const protocol = request.headers['x-forwarded-proto'];

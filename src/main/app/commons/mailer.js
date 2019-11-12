@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import Logger from '../commons/logger';
 import nodemailer from 'nodemailer';
+import Logger from './logger';
 import Config from '../../config';
 import UserModel from '../models/user';
 import getMailTemplate from './mailTemplateHelper';

@@ -1,9 +1,9 @@
-import Logger from '../commons/logger';
+import Logger from './logger';
 import UserRoles from '../models/userRole';
 
 export default {
   // validate decoded token
-  validateToken: async (decoded, request) => {
+  validateToken: async (decoded, _request) => {
     try {
       // the request.server.methods.session is to obtain cached session in server
       // NOTE:: since this is getting called from config,
@@ -35,7 +35,7 @@ export default {
         if (user) {
           // eslint-disable-next-line eqeqeq
           session.subject.scope =
-            user.isAdmin == true ? UserRoles.ADMIN : UserRoles.USER;
+            user.isAdmin === true ? UserRoles.ADMIN : UserRoles.USER;
         } else {
           session.subject.scope = UserRoles.GUEST;
         }
@@ -48,13 +48,12 @@ export default {
           isValid: true,
           credentials: session.subject,
         };
-      } else {
-        Logger.error('validateToken err :: Invalid token found.');
-        // next(null, false);
-        return {
-          isValid: false,
-        };
       }
+      Logger.error('validateToken err :: Invalid token found.');
+      // next(null, false);
+      return {
+        isValid: false,
+      };
     } catch (err) {
       Logger.error('validateToken err :: Junk token found.');
       // next(null, false);

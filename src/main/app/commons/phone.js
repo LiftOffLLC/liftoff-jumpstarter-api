@@ -1,6 +1,6 @@
 import PhoneLib from 'google-libphonenumber';
 import _ from 'lodash';
-import Logger from '../commons/logger';
+import Logger from './logger';
 const Config = require('../../config');
 
 /**

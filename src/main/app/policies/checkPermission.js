@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Boom from '@hapi/boom';
 import Logger from '../commons/logger';
 import RBAC from '../commons/rbac';
 import UserModel from '../models/user';
@@ -45,7 +46,7 @@ const rbacRules = {
 };
 
 export default function checkPermission(permission, keysAndValuePaths = {}) {
-  const hasSpecificRole = async (request, h, next) => {
+  const hasSpecificRole = async (request, h) => {
     const rbac = new RBAC(rbacRules[permission]);
 
     // merge params with additionalParams

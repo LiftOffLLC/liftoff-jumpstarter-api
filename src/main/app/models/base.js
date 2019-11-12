@@ -7,7 +7,7 @@ import Logger from '../commons/logger';
 import Config from '../../config';
 import dbUtil from '../commons/dbUtil';
 
-const Model = require('objection').Model;
+const { Model } = require('objection');
 
 const dbConfig = Config.get('database')
   .get('postgres')
@@ -45,9 +45,9 @@ const setMiscAttributes = (
     const sortO = _.compact(_.words(sortOrder, /[^, ]+/g));
     const sortMapping = _.zipObject(sortF, sortO);
 
-    for (const key of _.keys(sortMapping)) {
+    _.each(_.keys(sortMapping), key => {
       queryBuilder.orderBy(key, sortMapping[key] || 'desc');
-    }
+    });
   }
 };
 
@@ -84,7 +84,8 @@ export default class BaseModel extends Model {
   */
   // eslint-disable-next-line no-unused-vars
   $beforeInsert(opt, queryContext) {
-    this.createdAt = this.updatedAt = new Date().toISOString();
+    this.createdAt = new Date().toISOString();
+    this.updatedAt = this.createdAt;
     this.presaveHook();
     return this.$validateHook();
   }
@@ -164,7 +165,7 @@ export default class BaseModel extends Model {
 
     // If it comes here, implies that it has id fields. and its okay to insert/update individually.
     const addedIds = [];
-    for (const body of models) {
+    _.each(models, async body => {
       if (body.id) {
         await this.query()
           .update(body)
@@ -174,7 +175,7 @@ export default class BaseModel extends Model {
         const newObj = await this.query().insert(body);
         addedIds.push(newObj.id);
       }
-    }
+    });
 
     if (fetchById === true) {
       // if its single object, return single object, else array.
@@ -258,7 +259,7 @@ export default class BaseModel extends Model {
     }
 
     const conditionArray = dbUtil.splitByConditionsField(tableCriteria.filters);
-    for (const condCriteria of conditionArray) {
+    _.each(conditionArray, condCriteria => {
       qb.where(builder => {
         // figure out which operator to apply for this block, based on condition field and value.
         const conditionOp = _.find(
@@ -272,24 +273,22 @@ export default class BaseModel extends Model {
           condCriteria,
           hash => hash.field === 'condition',
         );
-
-        for (const hash of tmpCondCriteria) {
+        _.each(tmpCondCriteria, hash => {
           if (condition === 'AND') {
             builder.where(hash.field, hash.criteria, hash.value);
           } else {
             builder.orWhere(hash.field, hash.criteria, hash.value);
           }
-        }
+        });
       });
-    }
+    });
 
     // Deal with all eager joins and associations.
     const columns = _.without(_.keys(optionOpts), '_');
     // TODO: BALL GAME CHANGES THE MOMENT LIMIT COMES INTO PICTURE...HANDLE IT.
     if (!_.isEmpty(columns)) {
       qb.eager(dbUtil.getEagerColumnString(columns));
-
-      for (const childKey of columns) {
+      _.each(columns, childKey => {
         const childCriteria = optionOpts[childKey];
 
         qb.filterEager(childKey, builder => {
@@ -297,7 +296,7 @@ export default class BaseModel extends Model {
           builder.whereIn('isActive', activeValues);
           setMiscAttributes(builder, childCriteria, true);
         });
-      }
+      });
     }
 
     Logger.info('base.findAll :: sql generated::', qb.toSql());

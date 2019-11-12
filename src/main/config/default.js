@@ -1,4 +1,4 @@
-/* eslint-disable import/imports-first */
+/* eslint-disable import/first */
 require('dotenv').config();
 import CatboxRedis from '@hapi/catbox-redis';
 import path from 'path';

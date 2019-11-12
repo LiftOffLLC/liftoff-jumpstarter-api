@@ -1,5 +1,5 @@
-import Logger from '../commons/logger';
 import _ from 'lodash';
+import Logger from '../commons/logger';
 
 /**
   Policy to handle boom response payload
@@ -7,7 +7,7 @@ import _ from 'lodash';
 const boomResponseHandler = async (request, h) => {
   try {
     Logger.info(`${__filename} entry`);
-    const response = request.response;
+    const { response } = request;
     if (response.isBoom) {
       Logger.info(`${__filename} request.response :: `, request.response);
       if (_.has(response, 'output.payload.validation')) {

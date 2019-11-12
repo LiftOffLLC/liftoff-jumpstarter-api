@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import Joi from '@hapi/joi';
-import Logger from '../../commons/logger';
 import Fs from 'fs';
 import Path from 'path';
+import Logger from '../logger';
 
 // Blacklist Email File has been copied from
 // https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blacklist.conf

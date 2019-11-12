@@ -2,5 +2,5 @@ import socialAuthConnect from '../../commons/socialAuth.connect';
 
 module.exports = {
   enabled: true,
-  operation: socialAuthConnect('facebook')
+  operation: socialAuthConnect('facebook'),
 };

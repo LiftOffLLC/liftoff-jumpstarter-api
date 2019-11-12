@@ -8,7 +8,7 @@ import UserRole from '../../models/userRole';
 import RedisClient from '../../commons/redisClient';
 import errorCodes from '../../commons/errors';
 import Constants from '../../commons/constants';
-import { addMailToQueue } from '../../commons/utils';
+import Utils from '../../commons/utils';
 import Config from '../../../config';
 
 const validator = UserModel.validatorRules();
@@ -70,7 +70,7 @@ const options = {
     const mailVariables = {
       webUrl: Config.get('webUrl'),
     };
-    await addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
+    await Utils.addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
 
     const response = h.response(result);
     result.code(201);

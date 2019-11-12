@@ -11,7 +11,7 @@ import Constants from '../../commons/constants';
 import UserRole from '../../models/userRole';
 
 const validator = UserModel.validatorRules();
-const inspect = Util.inspect;
+const { inspect } = Util;
 
 const options = {
   auth: Constants.AUTH.ADMIN_OR_USER,
@@ -28,7 +28,7 @@ const options = {
     },
     policies: [isAuthorized('params.userId')],
   },
-  handler: async (request, h) => {
+  handler: async (request, _h) => {
     request.log(
       ['info', __filename],
       `userId:: ${inspect(request.params.userId)}`,

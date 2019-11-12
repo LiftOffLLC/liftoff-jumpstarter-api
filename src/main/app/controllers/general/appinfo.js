@@ -11,7 +11,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
   },
-  handler: async (request, h) => Config.toJS(),
+  handler: async (_request, _h) => Config.toJS(),
 };
 
 // eslint-disable-next-line no-unused-vars

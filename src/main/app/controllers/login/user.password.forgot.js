@@ -7,10 +7,10 @@ import Uuid from 'node-uuid';
 import UserModel from '../../models/user';
 import Config from '../../../config';
 import Constants from '../../commons/constants';
-import { addMailToQueue } from '../../commons/utils';
+import Utils from '../../commons/utils';
 
 const validator = UserModel.validatorRules();
-const inspect = Util.inspect;
+const { inspect } = Util;
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Request for password reset - Access - ALL',
@@ -25,7 +25,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
   },
-  handler: async (request, h) => {
+  handler: async (request, _h) => {
     request.log(['info', __filename], `query:: ${inspect(request.query)}`);
 
     // Fetch user with provided email
@@ -60,7 +60,13 @@ const options = {
       tokenString,
     };
 
-    await addMailToQueue('password-reset', {}, user.id, {}, mailVariables);
+    await Utils.addMailToQueue(
+      'password-reset',
+      {},
+      user.id,
+      {},
+      mailVariables,
+    );
 
     // Update table with tokenId and time
     user.resetPasswordSentAt = new Date();

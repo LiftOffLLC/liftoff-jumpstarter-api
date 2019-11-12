@@ -6,9 +6,7 @@ import dbUtil from './dbUtil';
 import UserRole from '../models/userRole';
 import Constants from './constants';
 
-const inspect = Util.inspect;
-
-async function readHandler(model, request, h) {
+async function readHandler(model, request, _h) {
   const criteriaOpts = {
     limit: request.query.limit,
     offset: request.query.offset,

@@ -1,11 +1,11 @@
-import Joi from "@hapi/joi";
-import PhoneUtil from "../phone";
+import Joi from '@hapi/joi';
+import PhoneUtil from '../phone';
 
 const phoneJoiValidator = Joi.extend({
-  type: "phone",
+  type: 'phone',
   base: Joi.string().min(10),
   messages: {
-    "phone.e164format": "is invalid"
+    'phone.e164format': 'is invalid',
   },
   rules: {
     e164format: {
@@ -14,18 +14,18 @@ const phoneJoiValidator = Joi.extend({
         if (!phoneNumber) {
           // Generate an error, state and options need to be passed
           return helpers.error(
-            "phone.e164format",
+            'phone.e164format',
             {
-              v: value
+              v: value,
             },
             state,
-            options
+            options,
           );
         }
         return phoneNumber;
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 // usage : mobileNumber: phoneJoiValidator.phone().e164format().description('phone number'),

@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
 import _ from 'lodash';
 import Logger from '../commons/logger';
-import { traverseDeep } from '../commons/utils';
+import Utils from '../commons/utils';
 import UserRole from '../models/userRole';
 
 const omitEntities = async (items, scope) => {
-  await traverseDeep(items, async obj => {
+  await Utils.traverseDeep(items, async obj => {
     if (obj.ENTITY_FILTERING_SCOPE) {
       const omitFields = obj.ENTITY_FILTERING_SCOPE[scope];
       if (omitFields) {

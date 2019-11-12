@@ -33,24 +33,24 @@ export default class Social {
 
   getProfileDataFromFacebookProfile(profile) {
     return {
-      ...profile
+      ...profile,
     };
   }
 
   getProfileDataFromGoogleProfile(profile) {
     return {
       ...profile,
-      email: profile.emails[0].email
+      email: profile.emails[0].email,
     };
   }
 
   async getProfile(accesstToken, fields) {
-    const {
-      profileUrl
-    } = Config.get('social').get(this.provider).toJS();
+    const { profileUrl } = Config.get('social')
+      .get(this.provider)
+      .toJS();
 
     const queries = {
-      access_token: accesstToken
+      access_token: accesstToken,
     };
 
     if (!_.isEmpty(fields)) {

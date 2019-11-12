@@ -10,7 +10,7 @@ export default class SocialLogin extends BaseModel {
     return {
       admin: omitFields,
       user: omitFields,
-      guest: omitFields
+      guest: omitFields,
     };
   }
 
@@ -21,9 +21,9 @@ export default class SocialLogin extends BaseModel {
         modelClass: `${__dirname}/user`,
         join: {
           from: 'social_logins.userId',
-          to: 'users.id'
-        }
-      }
+          to: 'users.id',
+        },
+      },
     };
   }
 }
