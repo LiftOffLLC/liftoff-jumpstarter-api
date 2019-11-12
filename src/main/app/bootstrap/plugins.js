@@ -3,41 +3,6 @@ const toposort = require('toposort');
 const requireDirs = require('require-dir');
 const Boom = require('@hapi/boom');
 
-// const HapiAsyncHandler = (plugin, pOptions, next) => {
-//   const server = pOptions.server;
-//   const origRoute = server.route;
-
-//   const innerRoute = options => {
-//     const handler = _.get(options, 'config.handler');
-
-//     if (handler && handler instanceof Function) {
-//       const t = handler;
-
-//       const modifiedHandler = (request, reply) => {
-//         const p = t(request, reply);
-//         if (p && p.catch) {
-//           p.catch(err => {
-//             reply(Boom.wrap(err instanceof Error ? err : new Error(err), 417));
-//           });
-//         }
-//       };
-
-//       _.set(options, 'config.handler', modifiedHandler);
-//     }
-
-//     return origRoute.apply(server, [options]);
-//   };
-
-//   server.route = options => {
-//     if (Array.isArray(options)) {
-//       return options.map(option => innerRoute(option));
-//     }
-//     return innerRoute(options);
-//   };
-
-//   next();
-// };
-
 const HapiAsyncHandler = {
   name: 'hapi-async-handler',
   version: '1.0.0',
