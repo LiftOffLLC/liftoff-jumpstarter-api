@@ -1,11 +1,11 @@
 /* eslint-disable class-methods-use-this,promise/avoid-new */
-import querystring from 'querystring';
-import request from 'request';
-import Promise from 'bluebird';
-import _ from 'lodash';
-import Config from '../../config';
+const querystring = require('querystring');
+const request = require('request');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const Config = require('../../config');
 
-export default class Social {
+module.exports = class Social {
   constructor(provider) {
     this.provider = provider;
   }
@@ -68,4 +68,4 @@ export default class Social {
     }
     return profile;
   }
-}
+};

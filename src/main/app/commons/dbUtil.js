@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import DataObjectParser from 'dataobject-parser';
-import Logger from './logger';
+const _ = require('lodash');
+const DataObjectParser = require('dataobject-parser');
+const Logger = require('./logger');
 
 const selectFields = fieldsStr => _.compact(_.words(fieldsStr, /[^, ]+/g));
 

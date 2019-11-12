@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import Worker from './worker';
+const _ = require('lodash');
+const Worker = require('./worker');
 
-export default {
+module.exports = {
   /**
    * Traverse deep function
    * eg :

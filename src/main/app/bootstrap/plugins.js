@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import toposort from 'toposort';
-import requireDirs from 'require-dir';
-import Boom from '@hapi/boom';
+const _ = require('lodash');
+const toposort = require('toposort');
+const requireDirs = require('require-dir');
+const Boom = require('@hapi/boom');
 
 // const HapiAsyncHandler = (plugin, pOptions, next) => {
 //   const server = pOptions.server;
@@ -108,6 +108,11 @@ module.exports = async server => {
     },
     [],
   );
+
+  // const serverRegister = Promise.promisify(server.register, {
+  //   context: server,
+  //   multiArgs: true
+  // });
 
   // do topological sort to make sure the order is right and exports
   const enabledPluginsTmp = _.map(

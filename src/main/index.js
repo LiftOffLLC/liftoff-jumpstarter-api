@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
-import knexClass from 'knex';
-import Config from './config';
-import Bootstrap from './app/bootstrap';
+const knexClass = require('knex');
+const Config = require('./config');
+const Bootstrap = require('./app/bootstrap');
 // Configure Winston Logger for logging in utils, models, etc.
 // eslint-disable-next-line no-unused-vars
-import Logger from './app/commons/logger';
 
 require('newrelic');
 

@@ -1,9 +1,9 @@
-import Util from 'util';
-import Boom from '@hapi/boom';
-import Joi from '@hapi/joi';
-import _ from 'lodash';
-import UserModel from '../../models/user';
-import Constants from '../../commons/constants';
+const Util = require('util');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const UserModel = require('../../models/user');
+const Constants = require('../../commons/constants');
 
 const validator = UserModel.validatorRules();
 const { inspect } = Util;

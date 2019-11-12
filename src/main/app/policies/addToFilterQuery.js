@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import Logger from '../commons/logger';
-import dbUtil from '../commons/dbUtil';
+const _ = require('lodash');
+const Logger = require('../commons/logger');
+const dbUtil = require('../commons/dbUtil');
 
 const defaultCondition = () => true;
 
-export default function addToFilterQuery(
+module.exports = function addToFilterQuery(
   keysAndValuePaths,
   whenCondition = defaultCondition,
 ) {
@@ -78,4 +78,4 @@ export default function addToFilterQuery(
 
   addFilters.applyPoint = 'onPreHandler';
   return addFilters;
-}
+};

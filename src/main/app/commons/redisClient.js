@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this */
-import Redis from 'redis';
-import Promise from 'bluebird';
-import _ from 'lodash';
-import Logger from './logger';
-import Config from '../../config';
+const Redis = require('redis');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const Logger = require('./logger');
+const Config = require('../../config');
 
 Promise.promisifyAll(Redis.RedisClient.prototype);
 Promise.promisifyAll(Redis.Multi.prototype);
@@ -68,4 +68,4 @@ class RedisClient {
   }
 }
 
-export default new RedisClient();
+module.exports = new RedisClient();

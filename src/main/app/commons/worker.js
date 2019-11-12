@@ -1,8 +1,8 @@
-import kue from 'kue';
-import _ from 'lodash';
-import requireDirs from 'require-dir';
-import Logger from './logger';
-import Config from '../../config';
+const kue = require('kue');
+const _ = require('lodash');
+const requireDirs = require('require-dir');
+const Logger = require('./logger');
+const Config = require('../../config');
 
 class Worker {
   constructor() {
@@ -79,4 +79,4 @@ class Worker {
   }
 }
 
-export default new Worker();
+module.exports = new Worker();

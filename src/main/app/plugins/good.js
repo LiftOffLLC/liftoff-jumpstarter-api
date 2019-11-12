@@ -1,5 +1,5 @@
-import Good from '@hapi/good';
-import Config from '../../config';
+const Good = require('@hapi/good');
+const Config = require('../../config');
 
 const loggerOptions = {
   ops: {

@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import nodemailer from 'nodemailer';
-import Logger from './logger';
-import Config from '../../config';
-import UserModel from '../models/user';
-import getMailTemplate from './mailTemplateHelper';
+const _ = require('lodash');
+const nodemailer = require('nodemailer');
+const Logger = require('./logger');
+const Config = require('../../config');
+const UserModel = require('../models/user');
+const getMailTemplate = require('./mailTemplateHelper');
 
 class Mailer {
   constructor() {
@@ -74,10 +74,7 @@ class Mailer {
       const sesMessage = {
         from: from.address || template.from,
         // cc: from.address || template.cc,
-        to:
-          Config.get('env') !== 'production'
-            ? 'koantekoticinema@gmail.com'
-            : mailTo.address, // password is P@33w0rd
+        to: mailTo.address, // password is P@33w0rd
         subject: template.subject,
         text: template.text,
         html: template.html,
@@ -100,4 +97,4 @@ class Mailer {
   }
 }
 
-export default new Mailer();
+module.exports = new Mailer();

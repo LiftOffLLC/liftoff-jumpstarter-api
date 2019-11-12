@@ -1,11 +1,11 @@
-import Boom from '@hapi/boom';
-import Joi from '@hapi/joi';
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
 
-import { inspect } from 'util';
-import UserModel from '../models/user';
-import SocialLoginModel from '../models/socialLogin';
-import Social from './social';
-import Constants from './constants';
+const { inspect } = require('util');
+const UserModel = require('../models/user');
+const SocialLoginModel = require('../models/socialLogin');
+const Social = require('./social');
+const Constants = require('./constants');
 
 const validator = UserModel.validatorRules();
 
@@ -68,7 +68,7 @@ async function handler(providerName, request, _h) {
   return user;
 }
 
-export default function socialLoginFn(providerName) {
+module.exports = function socialLoginFn(providerName) {
   const options = {
     auth: Constants.AUTH.ALL,
     description: `Login ${providerName} - Access - ALL`,
@@ -111,4 +111,4 @@ export default function socialLoginFn(providerName) {
     path: `/api/users/login/${providerName}`,
     options,
   });
-}
+};

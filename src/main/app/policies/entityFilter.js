@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
-import _ from 'lodash';
-import Logger from '../commons/logger';
-import Utils from '../commons/utils';
-import UserRole from '../models/userRole';
+const _ = require('lodash');
+const Logger = require('../commons/logger');
+const Utils = require('../commons/utils');
+const UserRole = require('../models/userRole');
 
 const omitEntities = async (items, scope) => {
   await Utils.traverseDeep(items, async obj => {

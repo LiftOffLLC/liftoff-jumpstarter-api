@@ -1,5 +1,5 @@
-import Logger from '../commons/logger';
-import Mailer from '../commons/mailer';
+const Logger = require('../commons/logger');
+const Mailer = require('../commons/mailer');
 
 async function handler(job, done) {
   Logger.info('emails.dispatch job running %j', job.data);
@@ -10,7 +10,7 @@ async function handler(job, done) {
   done();
 }
 
-export default {
+module.exports = {
   name: 'emails.dispatch',
   description: 'Deliver emails',
   enabled: true,

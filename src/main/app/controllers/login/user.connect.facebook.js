@@ -1,4 +1,4 @@
-import socialAuthConnect from '../../commons/socialAuth.connect';
+const socialAuthConnect = require('../../commons/socialAuth.connect');
 
 module.exports = {
   enabled: true,

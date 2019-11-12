@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   userNotFound: 'The user id %s does not exist.',
   notFound: '%s not found.',
   userListNotFound: 'Unable to obtain user list.',

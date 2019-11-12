@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import Boom from '@hapi/boom';
-import Logger from '../commons/logger';
-import RBAC from '../commons/rbac';
-import UserModel from '../models/user';
-import UserRole from '../models/userRole';
+const _ = require('lodash');
+const Boom = require('@hapi/boom');
+const Logger = require('../commons/logger');
+const RBAC = require('../commons/rbac');
+const UserModel = require('../models/user');
+const UserRole = require('../models/userRole');
 
 const isAdmin = async params => {
   Logger.info(`${__filename} isAdmin :: entry :: params :: `, params);
@@ -45,7 +45,7 @@ const rbacRules = {
   'config.read': buildRules('config.read', isAdmin),
 };
 
-export default function checkPermission(permission, keysAndValuePaths = {}) {
+module.exports = function checkPermission(permission, keysAndValuePaths = {}) {
   const hasSpecificRole = async (request, h) => {
     const rbac = new RBAC(rbacRules[permission]);
 
@@ -112,4 +112,4 @@ export default function checkPermission(permission, keysAndValuePaths = {}) {
 
   hasSpecificRole.applyPoint = 'onPreHandler';
   return hasSpecificRole;
-}
+};

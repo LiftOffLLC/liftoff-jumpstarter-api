@@ -1,17 +1,18 @@
-import Boom from '@hapi/boom';
-import Uuid from 'node-uuid';
-import Joi from '@hapi/joi';
+const Boom = require('@hapi/boom');
+const Uuid = require('node-uuid');
+const Joi = require('@hapi/joi');
 
-import Util, { inspect } from 'util';
-import UserModel from '../models/user';
-import SocialLoginModel from '../models/socialLogin';
-import Social from './social';
-import errorCodes from './errors';
-import Constants from './constants';
-import Utils from './utils';
-import Config from '../../config';
+const Util = require('util');
+const UserModel = require('../models/user');
+const SocialLoginModel = require('../models/socialLogin');
+const Social = require('./social');
+const errorCodes = require('./errors');
+const Constants = require('./constants');
+const Utils = require('./utils');
+const Config = require('../../config');
 
 const validator = UserModel.validatorRules();
+const { inspect } = Util;
 
 async function handler(providerName, request, h) {
   request.log(
@@ -101,7 +102,7 @@ async function handler(providerName, request, h) {
   return response;
 }
 
-export default function socialSignUp(providerName) {
+module.exports = function socialSignUp(providerName) {
   const options = {
     auth: Constants.AUTH.ALL,
     description: `User create ${providerName} - Access - ALL`,
@@ -145,4 +146,4 @@ export default function socialSignUp(providerName) {
     path: `/api/users/signup/${providerName}`,
     options,
   });
-}
+};

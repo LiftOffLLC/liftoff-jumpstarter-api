@@ -1,13 +1,13 @@
-import Util from 'util';
-import Boom from '@hapi/boom';
-import Joi from '@hapi/joi';
-import _ from 'lodash';
-import JWT from 'jsonwebtoken';
-import Uuid from 'node-uuid';
-import UserModel from '../../models/user';
-import Config from '../../../config';
-import Constants from '../../commons/constants';
-import Utils from '../../commons/utils';
+const Util = require('util');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const JWT = require('jsonwebtoken');
+const Uuid = require('node-uuid');
+const UserModel = require('../../models/user');
+const Config = require('../../../config');
+const Constants = require('../../commons/constants');
+const Utils = require('../../commons/utils');
 
 const validator = UserModel.validatorRules();
 const { inspect } = Util;

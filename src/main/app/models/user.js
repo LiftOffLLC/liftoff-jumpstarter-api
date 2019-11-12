@@ -1,16 +1,16 @@
 /* eslint-disable class-methods-use-this,newline-per-chained-call */
-import Bcrypt from 'bcrypt';
-import _ from 'lodash';
-import Joi from '@hapi/joi';
-import Uuid from 'node-uuid';
-import Logger from '../commons/logger';
-import BaseModel from './base';
-import UserRole from './userRole';
-import RedisClient from '../commons/redisClient';
-import PhoneJoiValidator from '../commons/validators/phoneJoiValidator';
-import EmailBlackListValidator from '../commons/validators/emailBlackListValidator';
+const Bcrypt = require('bcrypt');
+const _ = require('lodash');
+const Joi = require('@hapi/joi');
+const Uuid = require('node-uuid');
+const Logger = require('../commons/logger');
+const BaseModel = require('./base');
+const UserRole = require('./userRole');
+const RedisClient = require('../commons/redisClient');
+const PhoneJoiValidator = require('../commons/validators/phoneJoiValidator');
+const EmailBlackListValidator = require('../commons/validators/emailBlackListValidator');
 
-export default class User extends BaseModel {
+module.exports = class User extends BaseModel {
   static get tableName() {
     return 'users';
   }
@@ -177,4 +177,4 @@ export default class User extends BaseModel {
     }
     return user;
   }
-}
+};

@@ -1,6 +1,6 @@
-import UserRole from '../models/userRole';
+const UserRole = require('../models/userRole');
 
-export default {
+module.exports = {
   SUCCESS_RESPONSE: {
     success: true,
   },

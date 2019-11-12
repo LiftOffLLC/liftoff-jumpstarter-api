@@ -1,4 +1,4 @@
-import Vision from '@hapi/vision';
+const Vision = require('@hapi/vision');
 
 // NOTE:: Required for swagger
 const plugin = {

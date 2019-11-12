@@ -1,10 +1,10 @@
-import Util from 'util';
-import _ from 'lodash';
-import Boom from '@hapi/boom';
-import Logger from '../commons/logger';
-import errorCodes from '../commons/errors';
+const Util = require('util');
+const _ = require('lodash');
+const Boom = require('@hapi/boom');
+const Logger = require('../commons/logger');
+const errorCodes = require('../commons/errors');
 
-export default function checkIfExists(model, modelName, keys, valuePaths) {
+module.exports = function checkIfExists(model, modelName, keys, valuePaths) {
   const testExistance = async (request, h) => {
     Logger.info(`${__filename} entry :: (modelName) :: `, modelName);
     Logger.info(`${__filename} entry :: (keys) :: `, keys);
@@ -64,4 +64,4 @@ export default function checkIfExists(model, modelName, keys, valuePaths) {
 
   testExistance.applyPoint = 'onPreHandler';
   return testExistance;
-}
+};

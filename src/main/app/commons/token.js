@@ -1,9 +1,9 @@
-import Logger from './logger';
-import UserRoles from '../models/userRole';
+const Logger = require('./logger');
+const UserRoles = require('../models/userRole');
 
-export default {
+module.exports = {
   // validate decoded token
-  validateToken: async (decoded, _request) => {
+  validateToken: async (decoded, _request, _h) => {
     try {
       // the request.server.methods.session is to obtain cached session in server
       // NOTE:: since this is getting called from config,

@@ -4,6 +4,6 @@
 // Enable newrelic for worker
 require('newrelic');
 
-import Worker from './app/commons/worker';
+const Worker = require('./app/commons/worker');
 
 Worker.processJobs();

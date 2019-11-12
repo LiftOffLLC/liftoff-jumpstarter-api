@@ -1,7 +1,7 @@
 // NOTE: This Code has been ported from
 // https://github.com/ramnique/rbac2/blob/master/index.js
-import _ from 'lodash';
-import Promise from 'bluebird';
+const _ = require('lodash');
+const Promise = require('bluebird');
 
 const toTree = (role, rules) => {
   const arr = [];
@@ -62,7 +62,7 @@ const checkPath = async (path, index, params, checkFullPath) => {
   throw new Error("rule didn't match");
 };
 
-export default class RBAC {
+module.exports = class RBAC {
   constructor(rules, checkFullPath) {
     this.rules = rules;
     this.checkFullPath = !!checkFullPath;
@@ -88,4 +88,4 @@ export default class RBAC {
       .then(_vals => true)
       .catch(_err => false);
   }
-}
+};

@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import Config from '../../../config';
-import Constants from '../../commons/constants';
+const _ = require('lodash');
+const Config = require('../../../config');
+const Constants = require('../../commons/constants');
 
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,

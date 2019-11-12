@@ -1,6 +1,6 @@
-import UserModel from '../models/user';
-import readAPI from '../commons/read.api';
-import Constants from '../commons/constants';
+const UserModel = require('../models/user');
+const readAPI = require('../commons/read.api');
+const Constants = require('../commons/constants');
 
 module.exports = {
   enabled: true,

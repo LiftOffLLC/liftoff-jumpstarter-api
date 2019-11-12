@@ -1,7 +1,7 @@
 /* eslint-disable no-console,consistent-return */
 // Code borrowed from
 // http://pm2.keymetrics.io/docs/usage/use-pm2-with-cloud-providers
-import pm2 from 'pm2';
+const pm2 = require('pm2');
 
 // Set by Heroku or -1 to scale to max cpu core -1
 const instances = process.env.WEB_CONCURRENCY || -1;

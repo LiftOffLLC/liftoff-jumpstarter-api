@@ -1,13 +1,12 @@
 /* eslint-disable class-methods-use-this */
-import Checkit from 'checkit';
-import _ from 'lodash';
-import Promise from 'bluebird';
-import knexClass from 'knex';
-import Logger from '../commons/logger';
-import Config from '../../config';
-import dbUtil from '../commons/dbUtil';
-
+const Checkit = require('checkit');
+const _ = require('lodash');
+const Promise = require('bluebird');
+const knexClass = require('knex');
 const { Model } = require('objection');
+const Logger = require('../commons/logger');
+const Config = require('../../config');
+const dbUtil = require('../commons/dbUtil');
 
 const dbConfig = Config.get('database')
   .get('postgres')
@@ -54,7 +53,7 @@ const setMiscAttributes = (
 /**
 Base model for database.
 */
-export default class BaseModel extends Model {
+module.exports = class BaseModel extends Model {
   static validatorRules() {
     return {};
   }
@@ -302,4 +301,4 @@ export default class BaseModel extends Model {
     Logger.info('base.findAll :: sql generated::', qb.toSql());
     return await qb;
   }
-}
+};

@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-require('babel-register')();
 const Code = require('code'); // assertion library
 const Lab = require('lab').script();
 

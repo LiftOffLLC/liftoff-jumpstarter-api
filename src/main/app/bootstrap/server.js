@@ -1,5 +1,5 @@
-import Hapi from '@hapi/hapi';
-import _ from 'lodash';
+const Hapi = require('@hapi/hapi');
+const _ = require('lodash');
 
 // export server module.
 module.exports = config => {

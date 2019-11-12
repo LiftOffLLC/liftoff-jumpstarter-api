@@ -1,14 +1,14 @@
-import Util from 'util';
-import _ from 'lodash';
-import JWT from 'jsonwebtoken';
-import Joi from '@hapi/joi';
-import Logger from '../../commons/logger';
-import UserModel from '../../models/user';
-import Config from '../../../config';
-import RedisClient from '../../commons/redisClient';
-import isAuthorized from '../../policies/isAuthorized';
-import Constants from '../../commons/constants';
-import UserRole from '../../models/userRole';
+const Util = require('util');
+const _ = require('lodash');
+const JWT = require('jsonwebtoken');
+const Joi = require('@hapi/joi');
+const Logger = require('../../commons/logger');
+const UserModel = require('../../models/user');
+const Config = require('../../../config');
+const RedisClient = require('../../commons/redisClient');
+const isAuthorized = require('../../policies/isAuthorized');
+const Constants = require('../../commons/constants');
+const UserRole = require('../../models/userRole');
 
 const validator = UserModel.validatorRules();
 const { inspect } = Util;

@@ -1,4 +1,4 @@
-import HapiSwagger from 'hapi-swagger';
+const HapiSwagger = require('hapi-swagger');
 
 const plugin = {
   enabled: true,

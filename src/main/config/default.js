@@ -1,12 +1,12 @@
 /* eslint-disable import/first */
 require('dotenv').config();
-import CatboxRedis from '@hapi/catbox-redis';
-import path from 'path';
-import token from '../app/commons/token';
+const CatboxRedis = require('@hapi/catbox-redis');
+const path = require('path');
+const token = require('../app/commons/token');
 
 const env = process.env.NODE_ENV || 'development';
 
-export default {
+module.exports = {
   // env info
   env,
   // Server options used to start Hapi server
@@ -80,7 +80,7 @@ export default {
   // auth-jwt strategy for sesssion.
   auth: {
     key: process.env.AUTH_JWT_KEY || 'NeverShareYourSecret', // Never Share your secret key
-    validateFunc: token.validateToken, // validate function defined above
+    validate: token.validateToken, // validate function defined above
     verifyOptions: {
       ignoreExpiration: true, // do not reject expired tokens
       algorithms: ['HS256'], // pick a strong algorithm

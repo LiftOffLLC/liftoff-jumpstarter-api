@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import requireDirs from 'require-dir';
-import Config from '../../config';
-import Utils from '../commons/utils';
+const _ = require('lodash');
+const requireDirs = require('require-dir');
+const Config = require('../../config');
+const Utils = require('../commons/utils');
 // configure routes - routes will be picked from ./controllers folder.
 module.exports = async server => {
   const routes = [];

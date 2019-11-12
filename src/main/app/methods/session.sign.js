@@ -1,5 +1,5 @@
-import JWT from 'jsonwebtoken';
-import Config from '../../config';
+const JWT = require('jsonwebtoken');
+const Config = require('../../config');
 
 module.exports = {
   name: 'sessionsSign',

@@ -1,4 +1,4 @@
-import Constants from '../../commons/constants';
+const Constants = require('../../commons/constants');
 
 // eslint-disable-next-line no-unused-vars
 const pingHandler = server => {

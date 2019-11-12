@@ -1,13 +1,13 @@
-import _ from 'lodash';
-import Boom from '@hapi/boom';
-import Logger from '../commons/logger';
-import UserRole from '../models/userRole';
+const _ = require('lodash');
+const Boom = require('@hapi/boom');
+const Logger = require('../commons/logger');
+const UserRole = require('../models/userRole');
 
 /**
 Policy to verify if the user is who he says to be or an admin.
 Criteria is -- scope.admin || 'params.userId' || 'payload.userId' === scope.userId
 */
-export default function isAuthorized(userPath) {
+module.exports = function isAuthorized(userPath) {
   const testIsAuthorized = async (request, h) => {
     Logger.info(`${__filename} entry :: (userPath) :: `, userPath);
     const authScopeRole = _.get(request, 'auth.credentials.scope');
@@ -28,4 +28,4 @@ export default function isAuthorized(userPath) {
 
   testIsAuthorized.applyPoint = 'onPreHandler';
   return testIsAuthorized;
-}
+};

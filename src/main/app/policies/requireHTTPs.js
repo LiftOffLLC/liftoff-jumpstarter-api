@@ -1,5 +1,5 @@
-import Boom from 'boom';
-import Logger from '../commons/logger';
+const Boom = require('boom');
+const Logger = require('../commons/logger');
 
 /**
 Policy to verify that only https is supported.

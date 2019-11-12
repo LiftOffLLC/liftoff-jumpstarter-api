@@ -1,5 +1,5 @@
-import MrHorse from 'mrhorse';
-import path from 'path';
+const MrHorse = require('mrhorse');
+const path = require('path');
 
 const plugin = {
   enabled: true,

@@ -1,4 +1,4 @@
-import Bcrypt from 'bcrypt';
+const Bcrypt = require('bcrypt');
 
 exports.seed = (knex, Promise) => {
   const passwordSalt = Bcrypt.genSaltSync(10);

@@ -1,4 +1,4 @@
-import HapiStatusMonitor from 'hapijs-status-monitor';
+const HapiStatusMonitor = require('hapijs-status-monitor');
 
 const plugin = {
   enabled: false,

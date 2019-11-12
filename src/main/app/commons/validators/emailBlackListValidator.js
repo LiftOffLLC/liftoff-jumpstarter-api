@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import Joi from '@hapi/joi';
-import Fs from 'fs';
-import Path from 'path';
-import Logger from '../logger';
+const _ = require('lodash');
+const Joi = require('@hapi/joi');
+const Fs = require('fs');
+const Path = require('path');
+const Logger = require('../logger');
 
 // Blacklist Email File has been copied from
 // https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blacklist.conf

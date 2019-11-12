@@ -1,6 +1,6 @@
-import PhoneLib from 'google-libphonenumber';
-import _ from 'lodash';
-import Logger from './logger';
+const PhoneLib = require('google-libphonenumber');
+const _ = require('lodash');
+const Logger = require('./logger');
 const Config = require('../../config');
 
 /**

@@ -1,5 +1,5 @@
-import Blipp from 'blipp';
-import Config from '../../config';
+const Blipp = require('blipp');
+const Config = require('../../config');
 
 const plugin = {
   enabled: Config.get('env') === 'development',

@@ -1,4 +1,4 @@
-import Config from './config';
+const Config = require('./config');
 
 /**
  * New Relic agent configuration.

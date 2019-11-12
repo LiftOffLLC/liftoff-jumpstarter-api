@@ -25,7 +25,7 @@ module.exports = {
     'import/no-unresolved': 2,
     'comma-dangle': [2, 'always-multiline'],
     'hapi/hapi-scope-start': 0,
-    'hapi/hapi-capitalize-modules': 2,
+    'hapi/hapi-capitalize-modules': 0,
     'hapi/hapi-for-you': 2,
     'hapi/no-arrowception': 2,
     indent: [

@@ -1,4 +1,4 @@
-import Nes from 'nes';
+const Nes = require('nes');
 
 const plugin = {
   enabled: false,

@@ -1,14 +1,14 @@
-import _ from 'lodash';
-import Joi from '@hapi/joi';
+const _ = require('lodash');
+const Joi = require('@hapi/joi');
 
-import UserModel from '../models/user';
-import SocialLoginModel from '../models/socialLogin';
-import isAuthorized from '../policies/isAuthorized';
-import Constants from './constants';
+const UserModel = require('../models/user');
+const SocialLoginModel = require('../models/socialLogin');
+const isAuthorized = require('../policies/isAuthorized');
+const Constants = require('./constants');
 
 const validator = UserModel.validatorRules();
 
-export default function socialDisconnect(providerName) {
+module.exports = function socialDisconnect(providerName) {
   const options = {
     auth: Constants.AUTH.ADMIN_OR_USER,
     description: `Disconnect ${providerName} - Access - ALL`,
@@ -39,4 +39,4 @@ export default function socialDisconnect(providerName) {
     path: `/api/users/{userId}/${providerName}/disconnect`,
     options,
   });
-}
+};

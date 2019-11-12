@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import Logger from '../commons/logger';
+const _ = require('lodash');
+const Logger = require('../commons/logger');
 
 /**
   Policy to handle boom response payload

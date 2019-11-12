@@ -1,5 +1,5 @@
-import Joi from '@hapi/joi';
-import PhoneUtil from '../phone';
+const Joi = require('@hapi/joi');
+const PhoneUtil = require('../phone');
 
 const phoneJoiValidator = Joi.extend({
   type: 'phone',

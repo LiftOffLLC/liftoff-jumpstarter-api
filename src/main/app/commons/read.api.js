@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import Util from 'util';
-import Joi from '@hapi/joi';
-import _ from 'lodash';
-import dbUtil from './dbUtil';
-import UserRole from '../models/userRole';
-import Constants from './constants';
+const Util = require('util');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const dbUtil = require('./dbUtil');
+const UserRole = require('../models/userRole');
+const Constants = require('./constants');
 
 async function readHandler(model, request, _h) {
   const criteriaOpts = {
@@ -25,7 +25,7 @@ async function readHandler(model, request, _h) {
   };
 }
 
-export default function readAPI(pathPrefix, params, model) {
+module.exports = function readAPI(pathPrefix, params, model) {
   const options = {
     auth: params.auth || false,
     description: `Get ${pathPrefix} - Access - ${
@@ -76,4 +76,4 @@ export default function readAPI(pathPrefix, params, model) {
     path: `/api/${pathPrefix}`,
     options,
   });
-}
+};

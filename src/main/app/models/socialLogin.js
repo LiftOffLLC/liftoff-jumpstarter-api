@@ -1,6 +1,6 @@
-import BaseModel from './base';
+const BaseModel = require('./base');
 
-export default class SocialLogin extends BaseModel {
+module.exports = class SocialLogin extends BaseModel {
   static get tableName() {
     return 'social_logins';
   }
@@ -26,4 +26,4 @@ export default class SocialLogin extends BaseModel {
       },
     };
   }
-}
+};
