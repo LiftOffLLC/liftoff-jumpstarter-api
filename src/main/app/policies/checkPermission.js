@@ -77,8 +77,7 @@ module.exports = function checkPermission(permission, keysAndValuePaths = {}) {
       );
       const isAllowed = await rbac.check(UserRole.USER, permission, parameters);
       Logger.info(
-        `${__filename}
-        'checkPermission.hasSpecificRole :: exit :: isAllowed :: `,
+        `${__filename} checkPermission.hasSpecificRole :: exit :: isAllowed :: `,
         isAllowed,
       );
 
