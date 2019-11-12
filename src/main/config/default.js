@@ -1,6 +1,5 @@
 /* eslint-disable import/imports-first */
 require('dotenv').config();
-
 import CatboxRedis from '@hapi/catbox-redis';
 import path from 'path';
 import token from '../app/commons/token';
@@ -15,17 +14,17 @@ export default {
     name: 'Liftoff Jumpstart v1.0 Server',
     version: '1.0.0',
     host: process.env.HOST || 'localhost',
-    port: process.env.PORT || 8080,
+    port: process.env.PORT || 3000,
     forceSSL: process.env.FORCE_SSL || 'false',
     cache: [
       {
         name: 'redis-cache',
         provider: {
-          constructor: CatboxRedis,
+          _constructor: CatboxRedis,
           options: {
             host: process.env.REDIS_HOST || '127.0.0.1',
             port: process.env.REDIS_PORT || 6379,
-            password: process.env.REDIS_PASS || false,
+            password: process.env.REDIS_PASS || '',
             partition: 'cache',
           },
         },
@@ -52,7 +51,7 @@ export default {
         port: process.env.DB_PORT || 5432,
         user: process.env.DB_USER || 'admin',
         password: process.env.DB_PASS || 'password',
-        database: process.env.DB_NAME || 'kicksnation',
+        database: process.env.DB_NAME || 'liftoff_dev',
         charset: 'utf8',
       },
       pool: {

@@ -1,4 +1,4 @@
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import UserRoles from '../models/userRole';
 
 export default {
@@ -46,6 +46,7 @@ export default {
         // next(null, true, session.subject);
         return {
           isValid: true,
+          credentials: session.subject,
         };
       } else {
         Logger.error('validateToken err :: Invalid token found.');

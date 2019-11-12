@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import Util from 'util';
 import UserModel from '../models/user';
@@ -63,10 +64,10 @@ export default function socialSignUp(providerName) {
     description: `User Social Connect ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      payload: {
+      payload: Joi.object({
         accessToken: validator.accessToken.required(),
         refreshToken: validator.refreshToken.required(),
-      },
+      }),
     },
     plugins: {
       'hapi-swagger': {

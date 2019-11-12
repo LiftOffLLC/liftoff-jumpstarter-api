@@ -1,4 +1,4 @@
-import Good from 'good';
+import Good from '@hapi/good';
 import Config from '../../config';
 
 const loggerOptions = {
@@ -12,7 +12,7 @@ const loggerOptions = {
   reporters: {
     console: [
       {
-        module: 'good-squeeze',
+        module: '@hapi/good-squeeze',
         name: 'Squeeze',
         args: [
           {
@@ -26,7 +26,7 @@ const loggerOptions = {
       },
       {
         // module: 'good-console'
-        module: 'good-squeeze',
+        module: '@hapi/good-squeeze',
         name: 'SafeJson',
       },
       'stdout',

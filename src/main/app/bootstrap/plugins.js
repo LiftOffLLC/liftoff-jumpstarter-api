@@ -2,7 +2,7 @@ import _ from 'lodash';
 import toposort from 'toposort';
 import requireDirs from 'require-dir';
 import Promise from 'bluebird';
-import Boom from 'boom';
+import Boom from '@hapi/boom';
 
 // const HapiAsyncHandler = (plugin, pOptions, next) => {
 //   const server = pOptions.server;

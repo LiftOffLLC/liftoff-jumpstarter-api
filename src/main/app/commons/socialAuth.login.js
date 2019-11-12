@@ -1,4 +1,6 @@
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
+
 import { inspect } from 'util';
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
@@ -72,11 +74,11 @@ export default function socialLoginFn(providerName) {
     description: `Login ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      payload: {
+      payload: Joi.object({
         accessToken: validator.accessToken.required(),
         refreshToken: validator.refreshToken.required(),
         email: validator.refreshToken.required(),
-      },
+      }),
     },
     plugins: {
       'hapi-swagger': {

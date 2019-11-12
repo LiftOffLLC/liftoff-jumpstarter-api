@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import Joi from '@hapi/joi';
+
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
 import isAuthorized from '../policies/isAuthorized';
@@ -12,9 +14,9 @@ export default function socialDisconnect(providerName) {
     description: `Disconnect ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      params: {
+      params: Joi.object({
         userId: validator.userId.required(),
-      },
+      }),
     },
     plugins: {
       'hapi-swagger': {

@@ -2,7 +2,6 @@
 import Util from 'util';
 import Joi from '@hapi/joi';
 import _ from 'lodash';
-import Boom from 'boom';
 import dbUtil from './dbUtil';
 import UserRole from '../models/userRole';
 import Constants from './constants';
@@ -40,7 +39,7 @@ export default function readAPI(pathPrefix, params, model) {
     tags: ['api'],
     validate: {
       params: params.pathParams,
-      query: {
+      query: Joi.object({
         offset: Joi.number()
           .integer()
           .min(0)
@@ -63,7 +62,7 @@ export default function readAPI(pathPrefix, params, model) {
           .trim()
           .description('Field filters')
           .optional(),
-      },
+      }),
     },
     plugins: {
       'hapi-swagger': {

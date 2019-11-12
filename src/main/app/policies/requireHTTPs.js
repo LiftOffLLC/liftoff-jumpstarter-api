@@ -1,14 +1,14 @@
 import Boom from 'boom';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 
 /**
 Policy to verify that only https is supported.
 */
-const requireHTTPs = async (request, h, next) => {
-  Logger.info(__filename, 'entry');
+const requireHTTPs = async (request, h) => {
+  Logger.info(`${__filename} entry`);
   const protocol = request.headers['x-forwarded-proto'];
   const supported = protocol === 'https';
-  Logger.info(__filename, 'exit');
+  Logger.info(`${__filename} exit`);
   if (supported) {
     return h.continue;
   }

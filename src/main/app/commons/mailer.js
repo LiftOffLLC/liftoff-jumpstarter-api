@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import nodemailer from 'nodemailer';
 import Config from '../../config';
 import UserModel from '../models/user';
@@ -9,7 +9,9 @@ class Mailer {
   constructor() {
     try {
       const transport = Config.get('mailer').get('transport');
-      const transportOptions = Config.get('mailer').get(transport).toJS();
+      const transportOptions = Config.get('mailer')
+        .get(transport)
+        .toJS();
       if (!_.isObject(transportOptions)) {
         throw new Error('No valid mailer transport found');
       }
@@ -18,7 +20,9 @@ class Mailer {
       transportOptions.transport = transport;
       this.transport = nodemailer.createTransport(transportOptions);
     } catch (err) {
-      Logger.error('Either Mail Config is incorrect or dependent package could not be loaded');
+      Logger.error(
+        'Either Mail Config is incorrect or dependent package could not be loaded',
+      );
       // FAIL FAST IF PACKAGE IS NOT FOUND.
       process.exit(1);
     }
@@ -47,13 +51,13 @@ class Mailer {
 
       if (_.toSafeInteger(to) !== 0) {
         const user = await UserModel.findOne(
-          UserModel.buildCriteria('id', _.toSafeInteger(to))
+          UserModel.buildCriteria('id', _.toSafeInteger(to)),
         );
 
         mailTo = {
           address: user.email,
           name: user.name,
-          userId: user.id
+          userId: user.id,
         };
 
         variables.user = user;
@@ -64,16 +68,19 @@ class Mailer {
       Logger.info('resulted subject', template.subject);
       Logger.info('resulted body', template.html);
       Logger.info('resulted text', template.text);
-      Logger.info('resulted from', (from.address || template.from));
-      Logger.info('resulted to', (mailTo.address));
+      Logger.info('resulted from', from.address || template.from);
+      Logger.info('resulted to', mailTo.address);
 
       const sesMessage = {
         from: from.address || template.from,
         // cc: from.address || template.cc,
-        to: (Config.get('env') !== 'production') ? 'koantekoticinema@gmail.com' : mailTo.address, // password is P@33w0rd
+        to:
+          Config.get('env') !== 'production'
+            ? 'koantekoticinema@gmail.com'
+            : mailTo.address, // password is P@33w0rd
         subject: template.subject,
         text: template.text,
-        html: template.html
+        html: template.html,
       };
 
       // to add attachments.

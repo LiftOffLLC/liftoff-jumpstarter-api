@@ -1,5 +1,6 @@
 import Util from 'util';
-import Boom from 'boom';
+import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import UserModel from '../../models/user';
 import Constants from '../../commons/constants';
@@ -12,10 +13,10 @@ const options = {
   description: 'Login User - Access - ALL',
   tags: ['api'],
   validate: {
-    payload: {
+    payload: Joi.object({
       email: validator.email.required(),
       password: validator.password.required(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {
@@ -28,6 +29,7 @@ const options = {
     let user = await UserModel.findOne(
       UserModel.buildCriteria('email', _.toLower(request.payload.email)),
     );
+
     if (!user) {
       throw Boom.notFound('User doesnot exists');
     }

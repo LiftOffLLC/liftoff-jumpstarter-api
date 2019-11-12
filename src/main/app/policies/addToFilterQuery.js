@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import dbUtil from '../commons/dbUtil';
 
 const defaultCondition = () => true;
@@ -10,22 +10,20 @@ export default function addToFilterQuery(
 ) {
   const addFilters = async (request, h) => {
     Logger.info(
-      __filename,
-      'entry :: (keysAndValuePaths) :: ',
+      `${__filename} entry :: (keysAndValuePaths) :: `,
       keysAndValuePaths,
     );
 
     const cond = await whenCondition(request);
-    Logger.info(__filename, 'entry :: (cond) :: ', cond);
+    Logger.info(`${__filename} entry :: (cond) :: `, cond);
     if (cond === false) {
-      Logger.info(__filename, 'exit :: skipping condition ');
+      Logger.info(`${__filename} exit :: skipping condition`);
       return h.continue;
     }
 
     try {
       Logger.info(
-        __filename,
-        'entry :: (request.query.filters) :: ',
+        `${__filename} entry :: (request.query.filters) :: `,
         request.query.filters,
       );
 
@@ -68,12 +66,11 @@ export default function addToFilterQuery(
 
       _.set(request.query, 'filters', serialized);
       Logger.info(
-        __filename,
-        'exit :: (request.query.filters) :: ',
+        `${__filename} exit :: (request.query.filters) :: `,
         request.query.filters,
       );
     } catch (err) {
-      Logger.error(__filename, 'exit :: ', err);
+      Logger.error(`${__filename} exit :: `, err);
     }
 
     return h.continue;

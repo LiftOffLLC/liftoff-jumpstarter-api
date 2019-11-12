@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
 import _ from 'lodash';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import { traverseDeep } from '../commons/utils';
 import UserRole from '../models/userRole';
 
@@ -32,13 +32,13 @@ const omitEntities = async (items, scope) => {
 */
 const entityFilter = async (request, h) => {
   try {
-    Logger.info(__filename, 'entry');
+    Logger.info(`${__filename} entry`);
     const response = request.response.source;
     const scope = _.get(request, 'auth.credentials.scope') || UserRole.GUEST;
     await omitEntities(response, scope);
-    Logger.info(__filename, 'exit');
+    Logger.info(`${__filename} exit`);
   } catch (err) {
-    Logger.error(__filename, 'exit :: ', err);
+    Logger.error(`${__filename} exit :: error `, err);
   }
 
   return h.continue;

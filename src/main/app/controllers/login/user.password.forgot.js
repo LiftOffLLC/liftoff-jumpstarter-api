@@ -1,5 +1,6 @@
 import Util from 'util';
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import JWT from 'jsonwebtoken';
 import Uuid from 'node-uuid';
@@ -15,9 +16,9 @@ const options = {
   description: 'Request for password reset - Access - ALL',
   tags: ['api'],
   validate: {
-    query: {
+    query: Joi.object({
       email: validator.email.required(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {

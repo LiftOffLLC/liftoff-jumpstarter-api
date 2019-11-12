@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Boom from '@hapi/boom';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import UserRole from '../models/userRole';
 
 /**
@@ -9,7 +9,7 @@ Criteria is -- scope.admin || 'params.userId' || 'payload.userId' === scope.user
 */
 export default function isAuthorized(userPath) {
   const testIsAuthorized = async (request, h) => {
-    Logger.info(__filename, 'entry :: (userPath) :: ', userPath);
+    Logger.info(`${__filename} entry :: (userPath) :: `, userPath);
     const authScopeRole = _.get(request, 'auth.credentials.scope');
     const authScopeUserId = _.get(request, 'auth.credentials.userId');
     const actualUserId = _.get(request, userPath);
@@ -18,7 +18,7 @@ export default function isAuthorized(userPath) {
     // eslint-disable-next-line eqeqeq
     const exists =
       UserRole.ADMIN == authScopeRole || authScopeUserId == actualUserId;
-    Logger.info(__filename, 'entry :: (exists) :: ', exists);
+    Logger.info(`${__filename} entry :: (exists) :: `, exists);
 
     if (exists) {
       return h.continue;

@@ -1,12 +1,18 @@
-import Hapi from 'hapi';
+import Hapi from '@hapi/hapi';
 import _ from 'lodash';
 
 // export server module.
 module.exports = config => {
-  const cacheConfig = config
+  let cacheConfig = config
     .get('server')
     .get('cache')
     .toJS();
+
+  _.each(cacheConfig, c => {
+    c.provider.constructor = c.provider._constructor;
+    delete c.provider._constructor;
+  }); // hack to prevent toJS() from breaking coz of constructor property in cache config
+
   const host = config.get('server').get('host');
   const port = config.get('server').get('port');
   const cookieState = {
@@ -14,17 +20,12 @@ module.exports = config => {
     failAction: 'ignore', // Action on bad cookie - 'error': return 400, 'log': log and continue, 'ignore': continue
   };
   const cors = _.zipObject(['cors', 'state'], [true, cookieState]);
-  // const server = new Hapi.Server(
-  //   _.zipObject(
-  //     ['app', 'cache', 'host', 'port', 'routes'],
-  //     [config, cacheConfig, host, port, cors],
-  //   ),
-  // );
+
   const server = new Hapi.server({
     app: config,
-    // cache: cacheConfig,
-    host: host,
-    port: port,
+    cache: cacheConfig,
+    host,
+    port,
     routes: cors,
   });
   return server;

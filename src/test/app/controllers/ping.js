@@ -2,18 +2,18 @@
 require('babel-register')();
 const Code = require('code'); // assertion library
 const Server = require('../../../main');
-const Lab = exports.Lab = require('lab').script();
+const Lab = (exports.Lab = require('lab').script());
 
 const expect = Code.expect;
 
 Lab.experiment('ping api test', () => {
-  Lab.test('returns pong', (done) => {
+  Lab.test('returns pong', done => {
     const options = {
       method: 'GET',
-      url: '/api/ping'
+      url: '/api/ping',
     };
 
-    Server.inject(options, (response) => {
+    Server.inject(options, response => {
       const result = response.result;
 
       expect(response.statusCode).to.equal(200);

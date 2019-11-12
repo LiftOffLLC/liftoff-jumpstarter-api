@@ -1,5 +1,7 @@
 import Boom from '@hapi/boom';
 import Uuid from 'node-uuid';
+import Joi from '@hapi/joi';
+
 import Util, { inspect } from 'util';
 import UserModel from '../models/user';
 import SocialLoginModel from '../models/socialLogin';
@@ -105,7 +107,7 @@ export default function socialSignUp(providerName) {
     description: `User create ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      payload: {
+      payload: Joi.object({
         name: validator.name.required(),
         email: validator.email.required(),
         accessToken: validator.accessToken.required(),
@@ -113,7 +115,7 @@ export default function socialSignUp(providerName) {
         phoneNumber: validator.phoneNumber.optional(),
         avatarUrl: validator.avatarUrl.optional(),
         rawBody: validator.rawBody.optional(),
-      },
+      }),
     },
     plugins: {
       'hapi-swagger': {

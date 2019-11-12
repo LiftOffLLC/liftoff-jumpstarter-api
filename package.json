@@ -36,12 +36,34 @@
     "url": "https://github.com/LiftOffLLC/liftoff-jumpstarter-api/issues"
   },
   "homepage": "https://github.com/LiftOffLLC/liftoff-jumpstarter-api#readme",
+  "lint-staged": {
+    "*.js": [
+      "npm run lint",
+      "prettier --write",
+      "git add"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "dependencies": {
     "@hapi/boom": "^8.0.1",
     "@hapi/catbox": "^10.2.3",
     "@hapi/catbox-redis": "^5.0.5",
+    "@hapi/good": "^8.2.4",
+    "@hapi/good-console": "^8.1.2",
+    "@hapi/good-squeeze": "^5.2.1",
+    "@hapi/hapi": "^18.4.0",
     "@hapi/hoek": "^8.5.0",
+    "@hapi/inert": "^5.2.2",
     "@hapi/joi": "^16.1.7",
+    "@hapi/vision": "^5.5.4",
     "bcrypt": "^3.0.6",
     "blipp": "^4.0.1",
     "bluebird": "^3.7.1",
@@ -50,16 +72,12 @@
     "dotenv": "^8.2.0",
     "ejs": "^2.7.1",
     "email-templates": "^6.0.3",
-    "good": "^8.1.2",
-    "good-console": "^8.0.0",
-    "good-squeeze": "^5.1.0",
     "google-libphonenumber": "^3.2.6",
-    "hapi": "^18.1.0",
     "hapi-auth-jwt2": "^8.8.0",
     "hapi-swagger": "^10.3.0",
     "hapijs-status-monitor": "^0.6.0",
+    "husky": "^3.0.9",
     "immutable": "^4.0.0-rc.12",
-    "inert": "^5.1.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.20.1",
     "kue": "^0.11.6",
@@ -81,7 +99,6 @@
     "require-dir": "^1.2.0",
     "toposort": "^2.0.2",
     "validator": "^12.0.0",
-    "vision": "^5.4.4",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -97,19 +114,22 @@
     "code": "^5.2.4",
     "eslint": "^6.6.0",
     "eslint-config-airbnb": "^18.0.1",
-    "eslint-config-eslint": "^5.0.1",
+    "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-hapi": "^4.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsdoc": "^17.1.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-lodash": "^6.0.0",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-security": "^1.3.0",
-    "js-beautify": "^1.10.2",
     "jsinspect": "^0.12.7",
     "lab": "^18.0.2",
-    "nodemon": "^1.19.4"
+    "lint-staged": "^9.4.2",
+    "nodemon": "^1.19.4",
+    "prettier": "^1.19.1"
   },
   "engines": {
     "node": "<=12"

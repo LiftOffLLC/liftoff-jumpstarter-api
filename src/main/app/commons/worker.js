@@ -1,14 +1,16 @@
 import kue from 'kue';
 import _ from 'lodash';
 import requireDirs from 'require-dir';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import Config from '../../config';
 
 class Worker {
   constructor() {
     const workerConfig = Config.get('worker').toJS();
     this.queue = kue.createQueue(workerConfig);
-    this.queue.on('error', err => Logger.info('queue.constructor - JOBWORKER :: ERROR:: ', err));
+    this.queue.on('error', err =>
+      Logger.info('queue.constructor - JOBWORKER :: ERROR:: ', err),
+    );
     this.registerJobs();
   }
 
@@ -28,13 +30,15 @@ class Worker {
    * worker name should be choosen wisely by considerining the curcurrnecy issues.
    */
   addJob(name, data) {
-    Logger.info('Worker Job Create:', name, ', data: ', data);
+    Logger.info(`Worker Job Create: ${name}, data: `, data);
     if (!this.jobs || !_.some(this.jobs, _.zipObject(['name'], [name]))) {
       throw new Error('Unknown job, Verify job enabled or not');
     }
 
     const jobName = _.split(name, '.', 1);
-    Logger.info('Worker Job, split nae actual=%s, parent=%s', name, jobName);
+    Logger.info(
+      `Worker Job, split nae actual=%s, parent=%s: ${name}, ${jobName}`,
+    );
     data._name = name; // eslint-disable-line no-underscore-dangle,no-param-reassign
 
     const job = this.queue.create(jobName, data);
@@ -43,8 +47,13 @@ class Worker {
     job.removeOnComplete(true);
 
     job.on('complete', () => Logger.info(`Create job ${name} success`));
-    job.on('failed attempt', (err, attempts) => Logger.error(`Create job ${name} failed ${err} ${attempts} times`));
-    job.on('failed', err => Logger.error(`Create job ${name} failed ${err}`));
+    job.on('failed attempt', (err, attempts) =>
+      Logger.error(
+        `Create job ${name} failed ${attempts} times, error :: `,
+        err,
+      ),
+    );
+    job.on('failed', err => Logger.error(`Create job ${name} failed: `, err));
 
     job.save();
   }
@@ -53,7 +62,9 @@ class Worker {
     /** Background worker will call this method to run jobs */
     const jobNames = _.map(this.jobs, job => _.split(job.name, '.', 1)[0]);
     Logger.info('Processing jobs', jobNames);
-    _.each(jobNames, jobName => this.queue.process(jobName, this.handleJob.bind(this)));
+    _.each(jobNames, jobName =>
+      this.queue.process(jobName, this.handleJob.bind(this)),
+    );
   }
 
   handleJob(job, done) {

@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import UserModel from '../models/user';
 import checkIfExists from '../policies/checkIfExists';
@@ -12,16 +13,16 @@ const options = {
   description: 'Update User - Access - admin,user',
   tags: ['api'],
   validate: {
-    params: {
+    params: Joi.object({
       userId: validator.userId.required(),
-    },
-    payload: {
+    }),
+    payload: Joi.object({
       name: validator.name.optional(),
       phoneNumber: validator.phoneNumber.optional(),
       avatarUrl: validator.avatarUrl.optional(),
       oldPassword: validator.password.optional(),
       password: validator.password.optional(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {

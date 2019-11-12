@@ -1,7 +1,8 @@
 import Util from 'util';
 import _ from 'lodash';
 import JWT from 'jsonwebtoken';
-import Logger from 'winston';
+import Joi from '@hapi/joi';
+import Logger from '../../commons/logger';
 import UserModel from '../../models/user';
 import Config from '../../../config';
 import RedisClient from '../../commons/redisClient';
@@ -17,9 +18,9 @@ const options = {
   description: 'Logout User - Access - admin,user',
   tags: ['api'],
   validate: {
-    params: {
+    params: Joi.object({
       userId: validator.userId.required(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {

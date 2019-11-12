@@ -1,5 +1,6 @@
 import Util from 'util';
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import UserModel from '../../models/user';
 import Config from '../../../config';
@@ -12,11 +13,11 @@ const options = {
   description: 'Reset password  - Access - ALL',
   tags: ['api'],
   validate: {
-    payload: {
+    payload: Joi.object({
       email: validator.email.required(),
       password: validator.password.required(),
       resetPasswordToken: validator.resetPasswordToken.required(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {

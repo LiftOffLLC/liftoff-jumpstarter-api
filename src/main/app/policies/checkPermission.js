@@ -1,11 +1,11 @@
 import _ from 'lodash';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import RBAC from '../commons/rbac';
 import UserModel from '../models/user';
 import UserRole from '../models/userRole';
 
 const isAdmin = async params => {
-  Logger.info(__filename, 'isAdmin :: entry :: params :: ', params);
+  Logger.info(`${__filename} isAdmin :: entry :: params :: `, params);
   // user must exist, project must exist and user should be the owner of the project.
   const count = await UserModel.count(
     UserModel.buildCriteriaWithObject({
@@ -15,7 +15,7 @@ const isAdmin = async params => {
   );
 
   const success = count > 0;
-  Logger.info(__filename, 'isAdmin :: exit :: success :: ', success);
+  Logger.info(`${__filename} isAdmin :: exit :: success :: `, success);
   return success;
 };
 
@@ -67,19 +67,17 @@ export default function checkPermission(permission, keysAndValuePaths = {}) {
       additionalParams.userId !== request.auth.credentials.userId
     ) {
       Logger.info(
-        __filename,
-        'checkPermission.hasSpecificRole :: impersonated user at play',
+        `${__filename} checkPermission.hasSpecificRole :: impersonated user at play`,
       );
       parameters.userId = additionalParams.userId;
       Logger.info(
-        __filename,
-        'checkPermission.hasSpecificRole :: entry :: parameters :: ',
+        `${__filename} checkPermission.hasSpecificRole :: entry :: parameters :: `,
         parameters,
       );
       const isAllowed = await rbac.check(UserRole.USER, permission, parameters);
       Logger.info(
-        __filename,
-        'checkPermission.hasSpecificRole :: exit :: isAllowed :: ',
+        `${__filename}
+        'checkPermission.hasSpecificRole :: exit :: isAllowed :: `,
         isAllowed,
       );
 
@@ -91,8 +89,7 @@ export default function checkPermission(permission, keysAndValuePaths = {}) {
     }
 
     Logger.info(
-      __filename,
-      'checkPermission.hasSpecificRole :: entry :: parameters :: ',
+      `${__filename} checkPermission.hasSpecificRole :: entry :: parameters :: `,
       parameters,
     );
     const isAllowed = await rbac.check(
@@ -101,8 +98,7 @@ export default function checkPermission(permission, keysAndValuePaths = {}) {
       parameters,
     );
     Logger.info(
-      __filename,
-      'checkPermission.hasSpecificRole :: exit :: isAllowed :: ',
+      `${__filename} checkPermission.hasSpecificRole :: exit :: isAllowed :: `,
       isAllowed,
     );
 

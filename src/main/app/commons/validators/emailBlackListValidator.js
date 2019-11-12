@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Joi from '@hapi/joi';
-import Logger from 'winston';
+import Logger from '../../commons/logger';
 import Fs from 'fs';
 import Path from 'path';
 
@@ -22,10 +22,7 @@ function isEmailBlacklisted(email) {
   const domain = emailArray[emailArray.length - 1];
   const isBlacklisted = _.includes(domains, domain);
   Logger.info(
-    'isEmailBlacklisted :: email :: ',
-    email,
-    ' - isBlacklisted :: ',
-    isBlacklisted,
+    `isEmailBlacklisted :: email :: ${email}, - isBlacklisted :: ${isBlacklisted}`,
   );
   return isBlacklisted;
 }
@@ -45,7 +42,7 @@ const emailBlackListValidator = Joi.extend({
         const isBlacklisted = isEmailBlacklisted(value);
         if (isBlacklisted) {
           // Generate an error, state and options need to be passed
-          return helpers.createError(
+          return helpers.error(
             'email.isBlacklisted',
             {
               v: value,

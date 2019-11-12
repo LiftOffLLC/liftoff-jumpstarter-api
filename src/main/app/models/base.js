@@ -3,20 +3,26 @@ import Checkit from 'checkit';
 import _ from 'lodash';
 import Promise from 'bluebird';
 import knexClass from 'knex';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import Config from '../../config';
 import dbUtil from '../commons/dbUtil';
 
 const Model = require('objection').Model;
 
-const dbConfig = Config.get('database').get('postgres').toJS();
+const dbConfig = Config.get('database')
+  .get('postgres')
+  .toJS();
 const knex = knexClass(dbConfig);
 Model.knex(knex);
 
 const defaultSortField = 'updatedAt';
 const defaultSortOrder = 'desc';
 
-const setMiscAttributes = (queryBuilder, criteria = {}, isAssnQuery = false) => {
+const setMiscAttributes = (
+  queryBuilder,
+  criteria = {},
+  isAssnQuery = false,
+) => {
   if (criteria.offset) {
     queryBuilder.offset(criteria.offset);
   }
@@ -29,7 +35,8 @@ const setMiscAttributes = (queryBuilder, criteria = {}, isAssnQuery = false) => 
   // Optimization:: No Point applying sort criteria if limit is 1.
   // Postgres uses sorting logic before applying index.
   // apply sorting if its assoicationQuery.
-  const applySort = isAssnQuery || (!criteria.limit) || (Number(criteria.limit) > 1);
+  const applySort =
+    isAssnQuery || !criteria.limit || Number(criteria.limit) > 1;
   if (applySort) {
     const sortField = criteria.sortField || defaultSortField;
     const sortOrder = criteria.sortOrder || defaultSortOrder;
@@ -43,7 +50,6 @@ const setMiscAttributes = (queryBuilder, criteria = {}, isAssnQuery = false) => 
     }
   }
 };
-
 
 /**
 Base model for database.
@@ -61,7 +67,7 @@ export default class BaseModel extends Model {
     return {
       field,
       criteria,
-      value
+      value,
     };
   }
 
@@ -113,8 +119,8 @@ export default class BaseModel extends Model {
           objectType: statsFields.objectType,
           objectId: this.id,
           voteTypes: statsFields.voteTypes,
-          computedVoteTypes: statsFields.computedVoteTypes || []
-        }
+          computedVoteTypes: statsFields.computedVoteTypes || [],
+        },
       };
 
       this.stats = stats;
@@ -145,7 +151,7 @@ export default class BaseModel extends Model {
     const models = _.isArray(model) ? _.cloneDeep(model) : [_.cloneDeep(model)];
 
     // remove stats object...if this is model has stats...
-    _.each(models, (body) => {
+    _.each(models, body => {
       delete body.stats; // eslint-disable-line no-param-reassign
       delete body.ENTITY_FILTERING_SCOPE; // eslint-disable-line no-param-reassign
     });
@@ -160,7 +166,9 @@ export default class BaseModel extends Model {
     const addedIds = [];
     for (const body of models) {
       if (body.id) {
-        await this.query().update(body).where('id', body.id);
+        await this.query()
+          .update(body)
+          .where('id', body.id);
         addedIds.push(body.id);
       } else {
         const newObj = await this.query().insert(body);
@@ -181,33 +189,50 @@ export default class BaseModel extends Model {
   static async findOne(filters = {}, options = {}) {
     const tmpOptions = _.cloneDeep(options);
     tmpOptions.limit = 1;
-    return await this.findAll(filters, tmpOptions).then(records => _.head(records));
+    return await this.findAll(filters, tmpOptions).then(records =>
+      _.head(records),
+    );
   }
 
   static async deleteAll(filters = {}, hardDeleteFlag = true) {
     const inactive = {
-      isActive: false
+      isActive: false,
     };
 
-    const records = await this.findAll(filters, _.zipObject(['columns'], ['id']));
+    const records = await this.findAll(
+      filters,
+      _.zipObject(['columns'], ['id']),
+    );
     if (!_.isEmpty(records)) {
       if (hardDeleteFlag === true) {
-        await this.query().delete().whereIn('id', _.map(records, 'id'));
+        await this.query()
+          .delete()
+          .whereIn('id', _.map(records, 'id'));
       } else {
-        await this.query().patch(inactive).whereIn('id', _.map(records, 'id'));
+        await this.query()
+          .patch(inactive)
+          .whereIn('id', _.map(records, 'id'));
       }
     }
     return true;
   }
 
   static async count(filters = {}) {
-    return await this.findAll(filters, _.zipObject(['columns', 'skipMiscFields'], ['id', true])).then(records => records.length);
+    return await this.findAll(
+      filters,
+      _.zipObject(['columns', 'skipMiscFields'], ['id', true]),
+    ).then(records => records.length);
   }
 
   static async findAll(filters = {}, options = {}) {
-    const filterOpts = _.isArray(filters) ? _.cloneDeep(filters) : [_.cloneDeep(filters)];
+    const filterOpts = _.isArray(filters)
+      ? _.cloneDeep(filters)
+      : [_.cloneDeep(filters)];
 
-    const activeCriteria = _.find(filterOpts, _.zipObject(['field'], ['isActive']));
+    const activeCriteria = _.find(
+      filterOpts,
+      _.zipObject(['field'], ['isActive']),
+    );
     const activeValues = activeCriteria ? activeCriteria.value : [true];
 
     // Update isActive criteria, if its missing from the filters.
@@ -234,12 +259,19 @@ export default class BaseModel extends Model {
 
     const conditionArray = dbUtil.splitByConditionsField(tableCriteria.filters);
     for (const condCriteria of conditionArray) {
-      qb.where((builder) => {
+      qb.where(builder => {
         // figure out which operator to apply for this block, based on condition field and value.
-        const conditionOp = _.find(condCriteria, _.zipObject(['field'], ['condition']));
-        const condition = (conditionOp && _.toLower(conditionOp.value) === 'or') ? 'OR' : 'AND';
+        const conditionOp = _.find(
+          condCriteria,
+          _.zipObject(['field'], ['condition']),
+        );
+        const condition =
+          conditionOp && _.toLower(conditionOp.value) === 'or' ? 'OR' : 'AND';
         // knock off condition criteria hash.
-        const tmpCondCriteria = _.reject(condCriteria, hash => hash.field === 'condition');
+        const tmpCondCriteria = _.reject(
+          condCriteria,
+          hash => hash.field === 'condition',
+        );
 
         for (const hash of tmpCondCriteria) {
           if (condition === 'AND') {
@@ -260,7 +292,7 @@ export default class BaseModel extends Model {
       for (const childKey of columns) {
         const childCriteria = optionOpts[childKey];
 
-        qb.filterEager(childKey, (builder) => {
+        qb.filterEager(childKey, builder => {
           builder.columns(childCriteria.columns);
           builder.whereIn('isActive', activeValues);
           setMiscAttributes(builder, childCriteria, true);

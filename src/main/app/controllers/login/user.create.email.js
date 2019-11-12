@@ -1,5 +1,6 @@
 import Util from 'util';
 import Boom from '@hapi/boom';
+import Joi from '@hapi/joi';
 import _ from 'lodash';
 import Uuid from 'node-uuid';
 import UserModel from '../../models/user';
@@ -16,13 +17,13 @@ const options = {
   description: 'Create User - Access - ALL',
   tags: ['api'],
   validate: {
-    payload: {
+    payload: Joi.object({
       name: validator.name.required(),
       password: validator.password.required(),
       email: validator.email.required(),
       avatarUrl: validator.avatarUrl.optional(),
       phoneNumber: validator.phoneNumber.optional(),
-    },
+    }),
   },
   plugins: {
     'hapi-swagger': {

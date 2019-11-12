@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import Redis from 'redis';
 import Promise from 'bluebird';
-import Logger from 'winston';
+import Logger from '../commons/logger';
 import _ from 'lodash';
 import Config from '../../config';
 
@@ -10,7 +10,9 @@ Promise.promisifyAll(Redis.Multi.prototype);
 
 class RedisClient {
   constructor() {
-    const redisConfig = Config.get('database').get('redis').toJS();
+    const redisConfig = Config.get('database')
+      .get('redis')
+      .toJS();
     this.redisClient = Redis.createClient(redisConfig);
   }
 
@@ -25,14 +27,14 @@ class RedisClient {
 
   async saveSession(userId, sessionId, object) {
     const key = this.getSessionKey(userId, sessionId);
-    Logger.info('redisClient: saveSession :', key, ', value : ', object);
+    Logger.info(`redisClient: saveSession : ${key}, value : `, object);
     return await this.redisClient.setAsync(key, JSON.stringify(object));
   }
 
   async getSession(userId, sessionId) {
     const key = this.getSessionKey(userId, sessionId);
     const val = await this.redisClient.getAsync(key);
-    Logger.info('redisClient: getSession :', key, ', value : ', val);
+    Logger.info(`redisClient: getSession : ${key}, value : `, val);
     return JSON.parse(val);
   }
 
