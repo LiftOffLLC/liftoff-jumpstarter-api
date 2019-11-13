@@ -45,7 +45,7 @@
   dependencies:
     "@hapi/hoek" "8.x.x"
 
-"@hapi/boom@7.x.x", "@hapi/boom@^7.1.1", "@hapi/boom@^7.4.3":
+"@hapi/boom@7.x.x", "@hapi/boom@^7.4.3":
   version "7.4.11"
   resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-7.4.11.tgz#37af8417eb9416aef3367aa60fa04a1a9f1fc262"
   dependencies:
@@ -183,10 +183,6 @@
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-8.5.0.tgz#2f9ce301c8898e1c3248b0a8564696b24d1a9a5a"
 
-"@hapi/hoek@^6.1.2":
-  version "6.2.4"
-  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-6.2.4.tgz#4b95fbaccbfba90185690890bdf1a2fbbda10595"
-
 "@hapi/inert@^5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@hapi/inert/-/inert-5.2.2.tgz#3ba4d93afc6d5b42e4bab19cd09556ddd49b5dac"
@@ -208,7 +204,7 @@
     "@hapi/cryptiles" "4.x.x"
     "@hapi/hoek" "8.x.x"
 
-"@hapi/joi@15.x.x", "@hapi/joi@^15.0.1":
+"@hapi/joi@15.x.x":
   version "15.1.1"
   resolved "https://registry.yarnpkg.com/@hapi/joi/-/joi-15.1.1.tgz#c675b8a71296f02833f8d6d243b34c57b8ce19d7"
   dependencies:
@@ -3039,7 +3035,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.2.2:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
 
-handlebars@4.x.x, handlebars@^4.3.3:
+handlebars@4.x.x, handlebars@^4.5.1:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.5.1.tgz#8a01c382c180272260d07f2d1aa3ae745715c7ba"
   dependencies:
@@ -3073,14 +3069,14 @@ hapi-scope-start@2.x.x:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/hapi-scope-start/-/hapi-scope-start-2.1.1.tgz#7495a726fe72b7bca8de2cdcc1d87cd8ce6ab4f2"
 
-hapi-swagger@^10.3.0:
-  version "10.3.0"
-  resolved "https://registry.yarnpkg.com/hapi-swagger/-/hapi-swagger-10.3.0.tgz#6ed365d8462cb6bc4e6227f748d444ec253824be"
+hapi-swagger@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/hapi-swagger/-/hapi-swagger-11.0.0.tgz#06bc5ff3594de2a96ed5c5260abcd61b319b02d6"
   dependencies:
-    "@hapi/boom" "^7.1.1"
-    "@hapi/hoek" "^6.1.2"
-    "@hapi/joi" "^15.0.1"
-    handlebars "^4.3.3"
+    "@hapi/boom" "^8.0.1"
+    "@hapi/hoek" "^8.2.4"
+    "@hapi/joi" "^16.1.7"
+    handlebars "^4.5.1"
     http-status "^1.0.1"
     json-schema-ref-parser "^6.1.0"
     swagger-parser "4.0.2"

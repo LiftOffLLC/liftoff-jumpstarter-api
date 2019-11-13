@@ -70,7 +70,7 @@
     "email-templates": "^6.0.3",
     "google-libphonenumber": "^3.2.6",
     "hapi-auth-jwt2": "^8.8.0",
-    "hapi-swagger": "^10.3.0",
+    "hapi-swagger": "^11.0.0",
     "hapijs-status-monitor": "^0.6.0",
     "husky": "^3.0.9",
     "immutable": "^4.0.0-rc.12",

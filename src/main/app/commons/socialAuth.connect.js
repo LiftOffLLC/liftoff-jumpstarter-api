@@ -64,6 +64,9 @@ module.exports = function socialSignUp(providerName) {
     description: `User Social Connect ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
+      params: Joi.object({
+        userId: validator.userId.required(),
+      }),
       payload: Joi.object({
         accessToken: validator.accessToken.required(),
         refreshToken: validator.refreshToken.required(),

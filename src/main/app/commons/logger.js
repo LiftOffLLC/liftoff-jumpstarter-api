@@ -4,15 +4,8 @@ const logger = winston.createLogger({
   level: 'info',
   colorize: true,
   timestamp: true,
-  format: winston.format.json(),
-  transports: [
-    //
-    // - Write to all logs with level `info` and below to `combined.log`
-    // - Write all logs error (and below) to `error.log`.
-    //
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
-  ],
+  format: winston.format.prettyPrint(),
+  transports: [new winston.transports.Console()],
 });
 
 //
