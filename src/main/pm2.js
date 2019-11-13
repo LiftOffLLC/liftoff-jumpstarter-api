@@ -9,7 +9,7 @@ const instances = process.env.WEB_CONCURRENCY || -1;
 const maxMemory = process.env.WEB_MEMORY || 512;
 
 const pmConfig = {
-  script: 'build/index.js',
+  script: 'src/main/index.js',
   name: 'rest-api',
   exec_mode: 'cluster',
   instances,
