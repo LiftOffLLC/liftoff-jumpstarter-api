@@ -269,7 +269,7 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 
 create modules
 
-##Code Formatting and Linting
+## Code Formatting and Linting
 
 - Use prettier and delete any other plugins which may conflict with the rules.
 - Refer to the eslintrc and prettierrc for lint and formatting rules.

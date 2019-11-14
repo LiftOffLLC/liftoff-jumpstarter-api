@@ -164,17 +164,20 @@ module.exports = class BaseModel extends Model {
 
     // If it comes here, implies that it has id fields. and its okay to insert/update individually.
     const addedIds = [];
-    _.each(models, async body => {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const body of models) {
       if (body.id) {
+        // eslint-disable-next-line no-await-in-loop
         await this.query()
           .update(body)
           .where('id', body.id);
         addedIds.push(body.id);
       } else {
+        // eslint-disable-next-line no-await-in-loop
         const newObj = await this.query().insert(body);
         addedIds.push(newObj.id);
       }
-    });
+    }
 
     if (fetchById === true) {
       // if its single object, return single object, else array.
@@ -233,7 +236,9 @@ module.exports = class BaseModel extends Model {
       filterOpts,
       _.zipObject(['field'], ['isActive']),
     );
-    const activeValues = activeCriteria ? activeCriteria.value : [true];
+    const activeValues = activeCriteria
+      ? _.castArray(activeCriteria.value)
+      : [true];
 
     // Update isActive criteria, if its missing from the filters.
     if (!activeCriteria) {

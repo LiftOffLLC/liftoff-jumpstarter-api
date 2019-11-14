@@ -24,6 +24,7 @@ const plugin = {
           in: 'header',
         },
       },
+      security: [{ jwt: [] }],
       pathPrefixSize: 2,
       payloadType: 'json',
       produces: ['application/vnd.companyName.v1+json', 'application/json'],

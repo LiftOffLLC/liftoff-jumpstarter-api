@@ -1,5 +1,5 @@
 const { createLogger, format, transports } = require('winston');
-const { splat, simple, combine, colorize, timestamp, json } = format;
+const { simple, combine, colorize, timestamp, json } = format;
 
 const logFormat = combine(
   format(info => {
@@ -8,8 +8,6 @@ const logFormat = combine(
   })(),
   colorize({ all: true }),
   timestamp(),
-  simple(),
-  splat(),
   json(),
   simple(),
 );
