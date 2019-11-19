@@ -6,4 +6,4 @@ require('newrelic');
 
 const Worker = require('./app/commons/worker');
 
-Worker.processJobs();
+Worker.listen();

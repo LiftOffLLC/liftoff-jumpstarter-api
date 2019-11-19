@@ -1,21 +1,48 @@
-const kue = require('kue');
 const _ = require('lodash');
 const requireDirs = require('require-dir');
+const Queue = require('bull');
 const Logger = require('./logger');
 const Config = require('../../config');
 
 class Worker {
   constructor() {
-    const workerConfig = Config.get('worker').toJS();
-    this.queue = kue.createQueue(workerConfig);
-    this.queue.on('error', err =>
-      Logger.info('queue.constructor - JOBWORKER :: ERROR:: ', err),
-    );
-    this.registerJobs();
+    const config = Config.get('worker').toJS();
+    /**
+     * Initialize the Queue
+     */
+    this.initQueue(config);
+
+    /**
+     * Uncomment the below code to test the test job.
+     */
+    // this.addJob(
+    //   'test',
+    //   {
+    //     foo: 'bar',
+    //     baz: {
+    //       'customer name': 'Bull',
+    //       baz: 'tk',
+    //     },
+    //   },
+    //   { delay: 1000 * 10 },
+    // );
   }
 
-  registerJobs() {
-    // Read and assign all enabled jobs from ../workers
+  /**
+   * Initialize the Queue
+   * @param Array config
+   */
+  initQueue(config) {
+    this.queue = new Queue(config.prefix, { redis: config.redis });
+    this.registerEnabledJobs();
+    this.registerHandlers();
+    this.registerEventListeners();
+  }
+
+  /**
+   * Parse and register all enabled jobs from `../workers` directory.
+   */
+  registerEnabledJobs() {
     Logger.info('Registering jobs');
     const jobs = requireDirs('../workers');
     const enabledJobs = _.filter(jobs, ['enabled', true]);
@@ -24,47 +51,56 @@ class Worker {
   }
 
   /**
+   * Register job handler.
+   */
+  registerHandlers() {
+    _.each(this.jobs, job => {
+      this.queue.process(job.name, job.handler);
+    });
+  }
+
+  /**
+   * Register various queue event listeners.
+   */
+  registerEventListeners() {
+    this.queue.on('completed', job => {
+      Logger.info(`Job Completed = ${job.name}`);
+    });
+
+    this.queue.on('failed', (job, error) => {
+      Logger.error(`Job Failed = ${job.name} with ${error}`);
+    });
+  }
+
+  /**
    * To reduce redis instance consumption, job is sheduled to run by parent name
    * parent name will be splited from worker name
    *  eg: woeker name : 'email.sendCampaignMessage' , job will be email
    * worker name should be choosen wisely by considerining the curcurrnecy issues.
    */
-  addJob(name, data) {
-    Logger.info(`Worker Job Create: ${name}, data: `, data);
+  addJob(name, data, jobOptions = {}) {
+    Logger.info(`Registering Job ${name}`);
+    Logger.info(data);
+
     if (!this.jobs || !_.some(this.jobs, _.zipObject(['name'], [name]))) {
-      throw new Error('Unknown job, Verify job enabled or not');
+      throw new Error(`Unknown job '${name}', Verify job enabled or not`);
     }
 
-    const jobName = _.split(name, '.', 1);
-    Logger.info(
-      `Worker Job, split nae actual=%s, parent=%s: ${name}, ${jobName}`,
-    );
+    const currentJob = _.filter(this.jobs, ['name', name])[0];
     data._name = name; // eslint-disable-line no-underscore-dangle,no-param-reassign
 
-    const job = this.queue.create(jobName, data);
-    job.priority(data.priority || 'low');
-    job.attempts(data.attempts || 5);
-    job.removeOnComplete(true);
-
-    job.on('complete', () => Logger.info(`Create job ${name} success`));
-    job.on('failed attempt', (err, attempts) =>
-      Logger.error(
-        `Create job ${name} failed ${attempts} times, error :: `,
-        err,
-      ),
-    );
-    job.on('failed', err => Logger.error(`Create job ${name} failed: `, err));
-
-    job.save();
+    /**
+     * Job Configurations.
+     */
+    let options = currentJob.options || {};
+    options = { ...options, ...jobOptions };
+    options.removeOnComplete = true;
+    this.queue.add(name, data, options);
   }
 
-  processJobs() {
-    /** Background worker will call this method to run jobs */
-    const jobNames = _.map(this.jobs, job => _.split(job.name, '.', 1)[0]);
-    Logger.info('Processing jobs', jobNames);
-    _.each(jobNames, jobName =>
-      this.queue.process(jobName, this.handleJob.bind(this)),
-    );
+  // eslint-disable-next-line class-methods-use-this
+  listen() {
+    Logger.info('Worker Started, Listening Queues');
   }
 
   handleJob(job, done) {
