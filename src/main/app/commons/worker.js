@@ -86,7 +86,7 @@ class Worker {
       throw new Error(`Unknown job '${name}', Verify job enabled or not`);
     }
 
-    const currentJob = _.filter(this.jobs, ['name', name])[0];
+    const currentJob = _.find(this.jobs, ['name', name]);
     data._name = name; // eslint-disable-line no-underscore-dangle,no-param-reassign
 
     /**
