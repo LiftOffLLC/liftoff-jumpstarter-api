@@ -53,6 +53,11 @@ class RedisClient {
       });
     });
 
+    /**
+     * Wait for the all the promises to resolve.
+     */
+    await Promise.all(keysToDelete);
+
     // Use Multi to delete all keys one-shot
     if (!_.isEmpty(keysToDelete)) {
       const transaction = this.redisClient.multi();
