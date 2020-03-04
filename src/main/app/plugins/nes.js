@@ -1,4 +1,4 @@
-const Nes = require('nes');
+const Nes = require('@hapi/nes');
 
 const plugin = {
   enabled: false,
