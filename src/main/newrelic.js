@@ -1,4 +1,4 @@
-import Config from './config';
+const Config = require('./config');
 
 /**
  * New Relic agent configuration.
@@ -20,6 +20,6 @@ exports.config = {
      * issues with the agent, 'info' and higher will impose the least overhead on
      * production applications.
      */
-    level: newrelicConfig.get('log_level')
-  }
+    level: newrelicConfig.get('log_level'),
+  },
 };

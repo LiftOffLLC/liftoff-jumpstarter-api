@@ -1,15 +1,15 @@
-import Logger from 'winston';
-import _ from 'lodash';
+const _ = require('lodash');
+const Logger = require('../commons/logger');
 
 /**
   Policy to handle boom response payload
 */
-const boomResponseHandler = async(request, reply, next) => {
+const boomResponseHandler = async (request, h) => {
   try {
-    Logger.info(__filename, 'entry');
-    const response = request.response;
+    Logger.info(`${__filename} entry`);
+    const { response } = request;
     if (response.isBoom) {
-      Logger.info(__filename, 'request.response :: ', request.response);
+      Logger.info(`${__filename} request.response :: `, request.response);
       if (_.has(response, 'output.payload.validation')) {
         const key = _.head(_.get(response, 'output.payload.validation.keys'));
         if (key) {
@@ -18,12 +18,12 @@ const boomResponseHandler = async(request, reply, next) => {
       }
     }
 
-    Logger.info(__filename, 'exit');
+    Logger.info(`${__filename} exit`);
   } catch (err) {
-    Logger.error(__filename, 'exit :: ', err);
+    Logger.error(`${__filename} exit`, err);
   }
 
-  return next(null, true);
+  return h.continue;
 };
 
 boomResponseHandler.applyPoint = 'onPreResponse';

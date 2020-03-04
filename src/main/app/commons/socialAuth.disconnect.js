@@ -1,42 +1,42 @@
-import _ from 'lodash';
-import UserModel from '../models/user';
-import SocialLoginModel from '../models/socialLogin';
-import isAuthorized from '../policies/isAuthorized';
-import Constants from './constants';
+const _ = require('lodash');
+const Joi = require('@hapi/joi');
+
+const UserModel = require('../models/user');
+const SocialLoginModel = require('../models/socialLogin');
+const isAuthorized = require('../policies/isAuthorized');
+const Constants = require('./constants');
 
 const validator = UserModel.validatorRules();
 
-export default function socialDisconnect(providerName) {
+module.exports = function socialDisconnect(providerName) {
   const options = {
     auth: Constants.AUTH.ADMIN_OR_USER,
     description: `Disconnect ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      params: {
-        userId: validator.userId.required()
-      }
+      params: Joi.object({
+        userId: validator.userId.required(),
+      }),
     },
     plugins: {
       'hapi-swagger': {
-        responses: _.omit(Constants.API_STATUS_CODES, [201, 403])
+        responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
       },
-      policies: [
-        isAuthorized('params.userId')
-      ]
+      policies: [isAuthorized('params.userId')],
     },
-    handler: async(request, reply) => {
+    handler: async (request, _h) => {
       const criteria = SocialLoginModel.buildCriteriaWithObject({
         provider: providerName,
-        userId: request.params.userId
+        userId: request.params.userId,
       });
       await SocialLoginModel.deleteAll(criteria, false);
-      return reply(Constants.SUCCESS_RESPONSE);
-    }
+      return Constants.SUCCESS_RESPONSE;
+    },
   };
 
   return () => ({
     method: ['DELETE'],
     path: `/api/users/{userId}/${providerName}/disconnect`,
-    config: options
+    options,
   });
-}
+};

@@ -1,9 +1,10 @@
-import Boom from 'boom';
-import _ from 'lodash';
-import UserModel from '../models/user';
-import checkIfExists from '../policies/checkIfExists';
-import isAuthorized from '../policies/isAuthorized';
-import Constants from '../commons/constants';
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const UserModel = require('../models/user');
+const checkIfExists = require('../policies/checkIfExists');
+const isAuthorized = require('../policies/isAuthorized');
+const Constants = require('../commons/constants');
 
 const validator = UserModel.validatorRules();
 
@@ -12,60 +13,62 @@ const options = {
   description: 'Update User - Access - admin,user',
   tags: ['api'],
   validate: {
-    params: {
-      userId: validator.userId.required()
-    },
-    payload: {
+    params: Joi.object({
+      userId: validator.userId.required(),
+    }),
+    payload: Joi.object({
       name: validator.name.optional(),
       phoneNumber: validator.phoneNumber.optional(),
       avatarUrl: validator.avatarUrl.optional(),
       oldPassword: validator.password.optional(),
-      password: validator.password.optional()
-    }
+      password: validator.password.optional(),
+    }),
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201])
+      responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
     policies: [
       isAuthorized('params.userId'),
-      checkIfExists(UserModel, 'User', ['id'], ['params.userId'])
-    ]
+      checkIfExists(UserModel, 'User', ['id'], ['params.userId']),
+    ],
   },
-  handler: async(request, reply) => {
+  handler: async (request, _h) => {
     const payload = _.cloneDeep(request.payload);
     payload.id = request.params.userId;
 
     // Update password.
     if (payload.oldPassword || payload.password) {
-      const user = await UserModel.findOne(UserModel.buildCriteria('id', payload.id));
+      const user = await UserModel.findOne(
+        UserModel.buildCriteria('id', payload.id),
+      );
 
       if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
         payload.encryptedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
-        return reply(Boom.unauthorized('Invalid credentials.'));
+        throw Boom.unauthorized('Invalid credentials.');
       }
     }
 
     delete payload.oldPassword;
     delete payload.password;
     const result = await UserModel.createOrUpdate(payload);
-    return reply(result);
-  }
+    return result;
+  },
 };
 
 // eslint-disable-next-line no-unused-vars
-const handler = (server) => {
+const handler = server => {
   const details = {
     method: ['PUT'],
     path: '/api/users/{userId}',
-    config: options
+    options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };

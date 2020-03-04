@@ -1,22 +1,24 @@
-import Boom from 'boom';
-import Uuid from 'node-uuid';
-import Util, {
-  inspect
-} from 'util';
-import UserModel from '../models/user';
-import SocialLoginModel from '../models/socialLogin';
-import Social from './social';
-import errorCodes from './errors';
-import Constants from './constants';
-import {
-  addMailToQueue
-} from '../commons/utils';
-import Config from '../../config';
+const Boom = require('@hapi/boom');
+const Uuid = require('node-uuid');
+const Joi = require('@hapi/joi');
+
+const Util = require('util');
+const UserModel = require('../models/user');
+const SocialLoginModel = require('../models/socialLogin');
+const Social = require('./social');
+const errorCodes = require('./errors');
+const Constants = require('./constants');
+const Utils = require('./utils');
+const Config = require('../../config');
 
 const validator = UserModel.validatorRules();
+const { inspect } = Util;
 
-async function handler(providerName, request, reply) {
-  request.log(['info', `${providerName}.signup`], `payload:: ${inspect(request.payload)}`);
+async function handler(providerName, request, h) {
+  request.log(
+    ['info', `${providerName}.signup`],
+    `payload:: ${inspect(request.payload)}`,
+  );
 
   const provider = new Social(providerName);
   let profile;
@@ -24,27 +26,32 @@ async function handler(providerName, request, reply) {
     profile = await provider.getProfile(request.payload.accessToken);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], `fetch profile${e.stack}`);
-    return reply(Boom.badRequest('Invalid social credentials'));
+    throw Boom.badRequest('Invalid social credentials');
   }
 
-  request.log(['info', `${providerName}.signup`], ` profile response:  ${inspect(profile)}`);
+  request.log(
+    ['info', `${providerName}.signup`],
+    ` profile response:  ${inspect(profile)}`,
+  );
 
   const socialLogin = await SocialLoginModel.findOne(
     SocialLoginModel.buildCriteriaWithObject({
       provider: providerName,
-      providerId: profile.id
-    }), {
-      columns: '*,user.*'
-    });
+      providerId: profile.id,
+    }),
+    {
+      columns: '*,user.*',
+    },
+  );
 
   // Is already registered with social login, error out.
   if (profile && socialLogin) {
-    return reply(Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName)));
+    throw Boom.forbidden(Util.format(errorCodes.socialDuplicate, providerName));
   }
 
   let user;
   const usersRegisteredUsingEmail = await UserModel.findOne(
-    UserModel.buildCriteria('email', request.payload.email.toLowerCase())
+    UserModel.buildCriteria('email', request.payload.email.toLowerCase()),
   );
 
   if (usersRegisteredUsingEmail) {
@@ -62,7 +69,7 @@ async function handler(providerName, request, reply) {
       user = await UserModel.createOrUpdate(userObject);
     } catch (e) {
       request.log(['error', `${providerName}.signup`], e);
-      return reply(Boom.forbidden(e.message, request.payload.email));
+      throw Boom.forbidden(e.message, request.payload.email);
     }
   }
 
@@ -74,64 +81,69 @@ async function handler(providerName, request, reply) {
       accessToken: request.payload.accessToken,
       refreshToken: request.payload.refreshToken,
       rawBody: request.payload.rawBody,
-      isPrimaryLogin: true
+      isPrimaryLogin: true,
     };
 
     await SocialLoginModel.createOrUpdate(socialObject);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], e);
-    return reply(Boom.forbidden(e.message, request.payload.email));
+    throw Boom.forbidden(e.message, request.payload.email);
   }
 
   const mailVariables = {
-    webUrl: Config.get('webUrl')
+    webUrl: Config.get('webUrl'),
   };
-  await addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
+  await Utils.addMailToQueue('welcome-msg', {}, user.id, {}, mailVariables);
   // on successful, create login_token for this user.
   user = await UserModel.signSession(request, user.id);
-  return reply(user).code(201);
+
+  const response = h.response(user);
+  response.code(201);
+  return response;
 }
 
-export default function socialSignUp(providerName) {
+module.exports = function socialSignUp(providerName) {
   const options = {
     auth: Constants.AUTH.ALL,
     description: `User create ${providerName} - Access - ALL`,
     tags: ['api'],
     validate: {
-      payload: {
+      payload: Joi.object({
         name: validator.name.required(),
         email: validator.email.required(),
         accessToken: validator.accessToken.required(),
         refreshToken: validator.refreshToken.required(),
         phoneNumber: validator.phoneNumber.optional(),
         avatarUrl: validator.avatarUrl.optional(),
-        rawBody: validator.rawBody.optional()
-      }
+        rawBody: validator.rawBody.optional(),
+      }),
     },
     plugins: {
       'hapi-swagger': {
         responses: {
           201: {
-            description: 'Created user successfully.'
+            description: 'Created user successfully.',
           },
           400: {
-            description: 'Malformed request, check email,userName,accessToken and refreshToken are provided.'
+            description:
+              'Malformed request, check email,userName,accessToken and refreshToken are provided.',
           },
           403: {
-            description: `Could not signup user because some of the fields (email or username, ${providerName}) already be added.`
+            description: `Could not signup user because some of the fields (email or username, ${providerName}) already be added.`,
           },
           500: {
-            description: 'The server encountered an unexpected condition which prevented it from fulfilling the request.'
-          }
-        }
-      }
+            description:
+              'The server encountered an unexpected condition which prevented it from fulfilling the request.',
+          },
+        },
+      },
     },
-    handler: async(request, reply) => await handler(providerName, request, reply)
+    handler: async (request, h) => await handler(providerName, request, h),
   };
 
   return () => ({
     method: ['POST'],
     path: `/api/users/signup/${providerName}`,
-    config: options
+    options,
   });
-}
+};

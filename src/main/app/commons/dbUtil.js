@@ -1,29 +1,31 @@
-import _ from 'lodash';
-import Logger from 'winston';
-import DataObjectParser from 'dataobject-parser';
+const _ = require('lodash');
+const DataObjectParser = require('dataobject-parser');
+const Logger = require('./logger');
 
 const selectFields = fieldsStr => _.compact(_.words(fieldsStr, /[^, ]+/g));
 
-const tableColumnMapping = (fields) => {
+const tableColumnMapping = fields => {
   const tableColumns = {};
   tableColumns['_'] = []; // eslint-disable-line dot-notation
   const fieldArray = selectFields(fields);
-  _.each(fieldArray, (str) => {
+  _.each(fieldArray, str => {
     const parts = str.split('.');
-    const tableName = (_.size(parts) === 1) ? '_' : _.take(parts, parts.length - 1).join('.');
+    const tableName =
+      _.size(parts) === 1 ? '_' : _.take(parts, parts.length - 1).join('.');
     tableColumns[tableName] = tableColumns[tableName] || [];
     tableColumns[tableName].push(_.last(parts));
   });
   return tableColumns;
 };
 
-exports.getEagerColumnString = (data) => {
+exports.getEagerColumnString = data => {
   const objData = _.zipObject(data, _.fill(Array(_.size(data)), true));
   const obj = DataObjectParser.transpose(objData);
   const string = JSON.stringify(obj.data());
   // Order is important, otherwise it may screw up the fetch..
   // DON'T SCREW AROUND, IF YOU"RE NOT SURE WHAT YOU"RE DEALING WITH...
-  const eagerString = string.replace(/:true/g, '')
+  const eagerString = string
+    .replace(/:true/g, '')
     .replace(/:{/g, '.[')
     .replace(/}/g, ']')
     .replace(/"/g, '')
@@ -40,18 +42,28 @@ exports.buildOptions = (filters, options) => {
     testOptions[key] = _.zipObject(['columns'], [value]);
   });
 
-  for (const key of _.keys(testOptions)) {
-    const prefix = ((key !== '_') ? `${key}.` : '');
+  _.each(_.keys(testOptions), key => {
+    const prefix = key !== '_' ? `${key}.` : '';
     // Fix Limit Field
     const limitFieldKey = `${prefix}limit`;
-    const limit = options[limitFieldKey] || _.get(_.find(filOpts, _.matchesProperty('field', limitFieldKey)), 'value');
+    const limit =
+      options[limitFieldKey] ||
+      _.get(
+        _.find(filOpts, _.matchesProperty('field', limitFieldKey)),
+        'value',
+      );
     if (Number(limit) > 0) {
       testOptions[key].limit = Number(limit);
     }
 
     // Fix Offset Field
     const offsetFieldKey = `${prefix}offset`;
-    const offset = options[offsetFieldKey] || _.get(_.find(filOpts, _.matchesProperty('field', offsetFieldKey)), 'value');
+    const offset =
+      options[offsetFieldKey] ||
+      _.get(
+        _.find(filOpts, _.matchesProperty('field', offsetFieldKey)),
+        'value',
+      );
     if (Number(offset) > 0) {
       testOptions[key].offset = Number(offset);
     }
@@ -66,13 +78,14 @@ exports.buildOptions = (filters, options) => {
     // Fix Sort Order
     const sortOrderKey = `${prefix}sortOrder`;
     const sortOrder = _.find(filOpts, _.matchesProperty('field', sortOrderKey));
-    if (sortOrder) { // && _.includes(['asc', 'desc'], sortOrder.value.toLowerCase())) {
+    if (sortOrder) {
+      // && _.includes(['asc', 'desc'], sortOrder.value.toLowerCase())) {
       testOptions[key].sortOrder = sortOrder.value;
     }
-  }
+  });
 
   // knock off all the reserved keys; its needed for count* apis.
-  _.each(['limit', 'offset', 'sortField', 'sortOrder'], (key) => {
+  _.each(['limit', 'offset', 'sortField', 'sortOrder'], key => {
     _.remove(filOpts, hash => _.endsWith(hash.field, key));
   });
 
@@ -135,28 +148,30 @@ function buildCriteria(key, value) {
     }
   }
 
-  const field = containsOperand ? _.slice(filterWords, 0, filterWords.length - 1).join('.') : filterWords.join('.');
+  const field = containsOperand
+    ? _.slice(filterWords, 0, filterWords.length - 1).join('.')
+    : filterWords.join('.');
 
   const criteria = {
     field,
     criteria: op,
-    value: tmpValue
+    value: tmpValue,
   };
   return criteria;
 }
 
-const parseQueryString = (queryString) => {
+const parseQueryString = queryString => {
   const params = [];
 
   // Split into key/value pairs
   const queries = _.compact(queryString.split('&'));
   // Convert the array of strings into an object
-  _.each(queries, (query) => {
+  _.each(queries, query => {
     const splitBy = query.split('=');
     if (_.size(splitBy) === 2) {
       params.push({
         key: decodeURIComponent(splitBy[0]),
-        value: decodeURIComponent(splitBy[1])
+        value: decodeURIComponent(splitBy[1]),
       });
     }
   });
@@ -165,24 +180,33 @@ const parseQueryString = (queryString) => {
 exports.parseQueryString = parseQueryString;
 
 exports.fetchFilterCriteria = (query, isAdmin = false) => {
-  Logger.info('dbUtil.fetchFilterCriteria - entry : filters received - ', query, 'isAdmin', isAdmin);
+  Logger.info(
+    'dbUtil.fetchFilterCriteria - entry : filters received - ',
+    query,
+  );
+  Logger.info('isAdmin', isAdmin);
 
   let returnVal = [];
   if (!_.isEmpty(query)) {
     try {
       const tryFilterAsString = parseQueryString(query);
-      _.each(tryFilterAsString, hash => returnVal.push(buildCriteria(hash.key, hash.value)));
+      _.each(tryFilterAsString, hash =>
+        returnVal.push(buildCriteria(hash.key, hash.value)),
+      );
     } catch (err) {
-      Logger.warn('dbUtil.fetchFilterCriteria - failed to parse filter :; ', query);
+      Logger.warn(
+        'dbUtil.fetchFilterCriteria - failed to parse filter :; ',
+        query,
+      );
       throw err;
     }
   }
 
   const hasActiveFlag = _.find(returnVal, ['field', 'isActive']);
-  const applyActiveFilter = (!isAdmin) || (isAdmin && !hasActiveFlag);
-  Logger.info('dbUtil.fetchFilterCriteria - returnVal :: ', returnVal,
-    ' hasActiveFlag :: ', hasActiveFlag,
-    ' applyActiveFilter :: ', applyActiveFilter);
+  const applyActiveFilter = !isAdmin || (isAdmin && !hasActiveFlag);
+  Logger.info('dbUtil.fetchFilterCriteria - returnVal :: ', returnVal);
+  Logger.info(' hasActiveFlag :: ', hasActiveFlag);
+  Logger.info(' applyActiveFilter :: ', applyActiveFilter);
 
   if (applyActiveFilter) {
     returnVal = _.reject(returnVal, hash => hash.field === 'isActive');
@@ -193,11 +217,11 @@ exports.fetchFilterCriteria = (query, isAdmin = false) => {
   return _.compact(returnVal);
 };
 
-const recursiveIteration = (object) => {
+const recursiveIteration = object => {
   const str = [];
 
   // for (const prop in object) {
-  _.each(_.keys(object), (prop) => {
+  _.each(_.keys(object), prop => {
     let value = prop;
     if (object[prop] && typeof object[prop] === 'object') {
       const t = recursiveIteration(object[prop]);
@@ -210,7 +234,7 @@ const recursiveIteration = (object) => {
   return str;
 };
 
-exports.prepareProjection = (str) => {
+exports.prepareProjection = str => {
   const hash = {};
   const strArray = _.words(str, /[^, ]+/g);
 
@@ -221,7 +245,7 @@ exports.prepareProjection = (str) => {
   return result;
 };
 
-exports.splitByConditionsField = (columns) => {
+exports.splitByConditionsField = columns => {
   const keys = _.map(columns, 'field');
   let allIndexes = [0, _.size(columns)];
 

@@ -1,15 +1,19 @@
-import Boom from 'boom';
-import Logger from 'winston';
+const Boom = require('boom');
+const Logger = require('../commons/logger');
 
 /**
 Policy to verify that only https is supported.
 */
-const requireHTTPs = async(request, reply, next) => {
-  Logger.info(__filename, 'entry');
+// eslint-disable-next-line consistent-return
+const requireHTTPs = async (request, h) => {
+  Logger.info(`${__filename} entry`);
   const protocol = request.headers['x-forwarded-proto'];
-  const supported = (protocol === 'https');
-  Logger.info(__filename, 'exit');
-  return next(supported ? null : Boom.create(505, 'protocol not supported'), supported);
+  const supported = protocol === 'https';
+  Logger.info(`${__filename} exit`);
+  if (supported) {
+    return h.continue;
+  }
+  Boom.create(505, 'protocol not supported');
 };
 
 requireHTTPs.applyPoint = 'onPreAuth';

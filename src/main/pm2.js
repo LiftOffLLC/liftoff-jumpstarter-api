@@ -1,7 +1,7 @@
 /* eslint-disable no-console,consistent-return */
 // Code borrowed from
 // http://pm2.keymetrics.io/docs/usage/use-pm2-with-cloud-providers
-import pm2 from 'pm2';
+const pm2 = require('pm2');
 
 // Set by Heroku or -1 to scale to max cpu core -1
 const instances = process.env.WEB_CONCURRENCY || -1;
@@ -9,17 +9,20 @@ const instances = process.env.WEB_CONCURRENCY || -1;
 const maxMemory = process.env.WEB_MEMORY || 512;
 
 const pmConfig = {
-  script: 'build/index.js',
+  script: 'src/main/index.js',
   name: 'rest-api',
   exec_mode: 'cluster',
   instances,
-  max_memory_restart: `${maxMemory}M`
+  max_memory_restart: `${maxMemory}M`,
 };
 
 pm2.connect(() => {
-  pm2.start(pmConfig, (err) => {
+  pm2.start(pmConfig, err => {
     if (err) {
-      return console.error('Error while launching applications', err.stack || err);
+      return console.error(
+        'Error while launching applications',
+        err.stack || err,
+      );
     }
     console.log('PM2 and application has been succesfully started');
 

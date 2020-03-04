@@ -1,13 +1,13 @@
-import Nes from 'nes';
+const Nes = require('@hapi/nes');
 
 const plugin = {
   enabled: false,
   name: 'nes',
   plugin: {
-    register: Nes,
-    options: {}
+    plugin: Nes,
+    options: {},
   },
-  require: ['good', 'hapi-auth-jwt2']
+  require: ['good', 'hapi-auth-jwt2'],
 };
 
 module.exports = plugin;

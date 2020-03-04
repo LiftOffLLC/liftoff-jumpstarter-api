@@ -1,14 +1,14 @@
-import Vision from 'vision';
+const Vision = require('@hapi/vision');
 
 // NOTE:: Required for swagger
 const plugin = {
   enabled: true,
   name: 'vision',
   plugin: {
-    register: Vision,
-    options: {}
+    plugin: Vision,
+    options: {},
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

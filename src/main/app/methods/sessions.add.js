@@ -6,14 +6,14 @@ module.exports = {
   description: 'Adds the object to sessions',
   enabled: true,
   async: true,
-  method: async(id, subject) => {
+  method: async (id, subject) => {
     const returnValue = {
       id,
-      subject
+      subject,
     };
     return returnValue;
   },
   options: {
-    generateKey: id => id
-  }
+    generateKey: id => id,
+  },
 };

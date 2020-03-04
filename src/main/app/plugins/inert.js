@@ -1,14 +1,14 @@
-import Inert from 'inert';
+const Inert = require('@hapi/inert');
 
 // NOTE:: Required for swagger
 const plugin = {
   enabled: true,
   name: 'inert',
   plugin: {
-    register: Inert,
-    options: {}
+    plugin: Inert,
+    options: {},
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

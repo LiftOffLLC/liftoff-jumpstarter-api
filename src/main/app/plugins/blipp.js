@@ -1,14 +1,14 @@
-import Blipp from 'blipp';
-import Config from '../../config';
+const Blipp = require('blipp');
+const Config = require('../../config');
 
 const plugin = {
-  enabled: (Config.get('env') === 'development'),
+  enabled: Config.get('env') === 'development',
   name: 'blipp',
   plugin: {
-    register: Blipp,
-    options: {}
+    plugin: Blipp,
+    options: {},
   },
-  require: ['good']
+  require: ['good'],
 };
 
 module.exports = plugin;

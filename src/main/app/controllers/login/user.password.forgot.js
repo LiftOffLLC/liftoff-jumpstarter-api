@@ -1,40 +1,39 @@
-import Util from 'util';
-import Boom from 'boom';
-import _ from 'lodash';
-import JWT from 'jsonwebtoken';
-import Uuid from 'node-uuid';
-import UserModel from '../../models/user';
-import Config from '../../../config';
-import Constants from '../../commons/constants';
-import {
-  addMailToQueue
-} from '../../commons/utils';
+const Util = require('util');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const JWT = require('jsonwebtoken');
+const Uuid = require('node-uuid');
+const UserModel = require('../../models/user');
+const Config = require('../../../config');
+const Constants = require('../../commons/constants');
+const Utils = require('../../commons/utils');
 
 const validator = UserModel.validatorRules();
-const inspect = Util.inspect;
+const { inspect } = Util;
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Request for password reset - Access - ALL',
   tags: ['api'],
   validate: {
-    query: {
-      email: validator.email.required()
-    }
+    query: Joi.object({
+      email: validator.email.required(),
+    }),
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201])
-    }
+      responses: _.omit(Constants.API_STATUS_CODES, [201]),
+    },
   },
-  handler: async(request, reply) => {
+  handler: async (request, _h) => {
     request.log(['info', __filename], `query:: ${inspect(request.query)}`);
 
     // Fetch user with provided email
     const user = await UserModel.findOne(
-      UserModel.buildCriteria('email', request.query.email)
+      UserModel.buildCriteria('email', request.query.email),
     );
     if (!user) {
-      return reply(Boom.notFound('User Not Found'));
+      throw Boom.notFound('User Not Found');
     }
 
     // Generate random id
@@ -43,10 +42,13 @@ const options = {
 
     // Create JWT string for tokenId
     const tokenSecretkey = Config.get('passwordReset').get('tokenSecretkey');
-    const tokenString = JWT.sign({
-      email: user.email,
-      tokenId
-    }, tokenSecretkey);
+    const tokenString = JWT.sign(
+      {
+        email: user.email,
+        tokenId,
+      },
+      tokenSecretkey,
+    );
 
     // Construct web app url for email redirection
     const redirectUrl = Config.get('passwordReset').get('forgotUrl');
@@ -55,30 +57,39 @@ const options = {
     const redirect = `${redirectUrl}?auth=${tokenString}`;
     const mailVariables = {
       forgotPasswordURL: redirect,
-      tokenString
+      tokenString,
     };
 
-    await addMailToQueue('password-reset', {}, user.id, {}, mailVariables);
+    await Utils.addMailToQueue(
+      'password-reset',
+      {},
+      user.id,
+      {},
+      mailVariables,
+    );
 
     // Update table with tokenId and time
     user.resetPasswordSentAt = new Date();
     user.resetPasswordToken = tokenId;
     const updatedUser = await UserModel.createOrUpdate(user);
-    request.log(['info', __filename], `updated response - ${inspect(updatedUser)}`);
-    return reply(Constants.SUCCESS_RESPONSE);
-  }
+    request.log(
+      ['info', __filename],
+      `updated response - ${inspect(updatedUser)}`,
+    );
+    throw Constants.SUCCESS_RESPONSE;
+  },
 };
 
 const handler = () => {
   const details = {
     method: ['GET'],
     path: '/api/users/forgot_password',
-    config: options
+    options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };

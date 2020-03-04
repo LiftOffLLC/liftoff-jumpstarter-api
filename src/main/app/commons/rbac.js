@@ -1,16 +1,16 @@
 // NOTE: This Code has been ported from
 // https://github.com/ramnique/rbac2/blob/master/index.js
-import _ from 'lodash';
-import Promise from 'bluebird';
+const _ = require('lodash');
+const Promise = require('bluebird');
 
 const toTree = (role, rules) => {
   const arr = [];
-  _.each(rules, (rule) => {
+  _.each(rules, rule => {
     if (rule.a === role) {
       const condition = {
         value: rule.can,
         when: rule.when,
-        children: toTree(rule.can, rules)
+        children: toTree(rule.can, rules),
       };
       arr.push(condition);
     }
@@ -25,10 +25,10 @@ const findPaths = (root, permission) => {
   if (root.value === permission) {
     paths.push([root]);
   } else {
-    _.each(root.children, (child) => {
+    _.each(root.children, child => {
       const childpaths = findPaths(child, permission);
 
-      _.each(childpaths, (childpath) => {
+      _.each(childpaths, childpath => {
         const path = [root];
         path.push(...childpath);
         paths.push(path);
@@ -39,7 +39,7 @@ const findPaths = (root, permission) => {
   return paths;
 };
 
-const checkPath = async(path, index, params, checkFullPath) => {
+const checkPath = async (path, index, params, checkFullPath) => {
   // check if this is leaf node -- reached end
   if (index >= path.length) {
     return true;
@@ -59,10 +59,10 @@ const checkPath = async(path, index, params, checkFullPath) => {
   if (val) {
     return await checkPath(path, index + 1, params, checkFullPath);
   }
-  throw new Error('rule didn\'t match');
+  throw new Error("rule didn't match");
 };
 
-export default class RBAC {
+module.exports = class RBAC {
   constructor(rules, checkFullPath) {
     this.rules = rules;
     this.checkFullPath = !!checkFullPath;
@@ -72,7 +72,7 @@ export default class RBAC {
     // Create a rbac tree from the current role
     const tree = {
       value: role,
-      children: toTree(role, this.rules)
+      children: toTree(role, this.rules),
     };
 
     // Find all paths from root to permission
@@ -81,7 +81,11 @@ export default class RBAC {
     const paths = _.sortBy(allPaths, path => path.length);
 
     // Check each path serially
-    return Promise.each(paths, async path => await checkPath(path, 1, params, this.checkFullPath))
-      .then(vals => true).catch(err => false); // eslint-disable-line no-unused-vars
+    return Promise.each(
+      paths,
+      async path => await checkPath(path, 1, params, this.checkFullPath),
+    )
+      .then(_vals => true)
+      .catch(_err => false);
   }
-}
+};

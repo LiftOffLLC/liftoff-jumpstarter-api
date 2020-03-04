@@ -1,6 +1,6 @@
-import socialAuthDisconnect from '../../commons/socialAuth.disconnect';
+const socialAuthDisconnect = require('../../commons/socialAuth.disconnect');
 
 module.exports = {
   enabled: true,
-  operation: socialAuthDisconnect('facebook')
+  operation: socialAuthDisconnect('facebook'),
 };

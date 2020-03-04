@@ -1,16 +1,16 @@
 /* eslint-disable class-methods-use-this,newline-per-chained-call */
-import Bcrypt from 'bcrypt';
-import _ from 'lodash';
-import Logger from 'winston';
-import Joi from 'joi';
-import Uuid from 'node-uuid';
-import BaseModel from './base';
-import UserRole from './userRole';
-import RedisClient from '../commons/redisClient';
-import PhoneJoiValidator from '../commons/validators/phoneJoiValidator';
-import EmailBlackListValidator from '../commons/validators/emailBlackListValidator';
+const Bcrypt = require('bcrypt');
+const _ = require('lodash');
+const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
+const Uuid = require('node-uuid');
+const Logger = require('../commons/logger');
+const BaseModel = require('./base');
+const UserRole = require('./userRole');
+const RedisClient = require('../commons/redisClient');
+const PhoneJoiValidator = require('../commons/validators/phoneJoiValidator');
+const EmailBlackListValidator = require('../commons/validators/emailBlackListValidator');
 
-export default class User extends BaseModel {
+module.exports = class User extends BaseModel {
   static get tableName() {
     return 'users';
   }
@@ -18,30 +18,74 @@ export default class User extends BaseModel {
   static entityFilteringScope() {
     return {
       admin: ['encryptedPassword', 'passwordSalt'],
-      user: ['phoneToken', 'isPhoneVerified', 'emailToken', 'isEmailVerified',
-        'encryptedPassword', 'passwordSalt', 'resetPasswordToken', 'resetPasswordSentAt'
+      user: [
+        'phoneToken',
+        'isPhoneVerified',
+        'emailToken',
+        'isEmailVerified',
+        'encryptedPassword',
+        'passwordSalt',
+        'resetPasswordToken',
+        'resetPasswordSentAt',
       ],
-      guest: ['phoneToken', 'isPhoneVerified', 'emailToken', 'isEmailVerified',
-        'encryptedPassword', 'passwordSalt', 'resetPasswordToken', 'resetPasswordSentAt',
-        'socialLogins'
-      ]
+      guest: [
+        'phoneToken',
+        'isPhoneVerified',
+        'emailToken',
+        'isEmailVerified',
+        'encryptedPassword',
+        'passwordSalt',
+        'resetPasswordToken',
+        'resetPasswordSentAt',
+        'socialLogins',
+      ],
     };
   }
 
   static validatorRules() {
     const rules = {
-      userId: Joi.number().integer().positive().description('User Id'),
-      userName: Joi.string().trim().alphanum().min(3).max(30).description('User Name'),
-      name: Joi.string().trim().min(3).max(255).description('Name'),
-      password: Joi.string().trim().regex(/^[a-zA-Z0-9]{8,30}$/).description('Password'),
-      email: EmailBlackListValidator.email().isBlacklisted().description('Email'),
-      phoneNumber: PhoneJoiValidator.phone().e164format().description('phone number'),
-      isAdmin: Joi.boolean().default(false).description('Admin?'),
-      accessToken: Joi.string().trim().description('Access token'),
-      refreshToken: Joi.string().trim().description('Refresh token'),
+      userId: Joi.number()
+        .integer()
+        .positive()
+        .description('User Id'),
+      userName: Joi.string()
+        .trim()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .description('User Name'),
+      name: Joi.string()
+        .trim()
+        .min(3)
+        .max(255)
+        .description('Name'),
+      password: Joi.string()
+        .trim()
+        .regex(/^[a-zA-Z0-9]{8,30}$/)
+        .description('Password'),
+      email: EmailBlackListValidator.email()
+        .isBlacklisted()
+        .description('Email'),
+      phoneNumber: PhoneJoiValidator.phone()
+        .e164format()
+        .description('phone number'),
+      isAdmin: Joi.boolean()
+        .default(false)
+        .description('Admin?'),
+      accessToken: Joi.string()
+        .trim()
+        .description('Access token'),
+      refreshToken: Joi.string()
+        .trim()
+        .description('Refresh token'),
       rawBody: Joi.string().description('raw social data'),
-      resetPasswordToken: Joi.string().trim().uuid().description('Reset password token'),
-      avatarUrl: Joi.string().trim().description('Avatar URL')
+      resetPasswordToken: Joi.string()
+        .trim()
+        .uuid()
+        .description('Reset password token'),
+      avatarUrl: Joi.string()
+        .trim()
+        .description('Avatar URL'),
     };
     return rules;
   }
@@ -63,27 +107,37 @@ export default class User extends BaseModel {
         modelClass: `${__dirname}/socialLogin`,
         join: {
           from: 'users.id',
-          to: 'social_logins.userId'
-        }
-      }
+          to: 'social_logins.userId',
+        },
+      },
     };
   }
 
   hashPassword() {
     if (this.encryptedPassword) {
-      if (this.encryptedPassword.indexOf('$2a$') === 0 && this.encryptedPassword.length === 60) {
+      if (
+        this.encryptedPassword.indexOf('$2a$') === 0 &&
+        this.encryptedPassword.length === 60
+      ) {
         // The password is already hashed. It can be the case when the instance is loaded from DB
+        // eslint-disable-next-line no-self-assign
         this.encryptedPassword = this.encryptedPassword;
       } else {
         this.passwordSalt = Bcrypt.genSaltSync(10);
-        this.encryptedPassword = this.encryptPassword(this.encryptedPassword, this.passwordSalt);
+        this.encryptedPassword = this.encryptPassword(
+          this.encryptedPassword,
+          this.passwordSalt,
+        );
       }
     }
     Logger.info('afteer hashPassword');
   }
 
   verifyPassword(password) {
-    return this.encryptPassword(password, this.passwordSalt) === this.encryptedPassword;
+    return (
+      this.encryptPassword(password, this.passwordSalt) ===
+      this.encryptedPassword
+    );
   }
 
   encryptPassword(pwd, passwordSalt) {
@@ -91,17 +145,15 @@ export default class User extends BaseModel {
   }
 
   static async signSession(request, userId) {
-    const user = await this.findOne(
-      this.buildCriteria('id', userId), {
-        columns: '*,socialLogins.*'
-      }
-    );
+    const user = await this.findOne(this.buildCriteria('id', userId), {
+      columns: '*,socialLogins.*',
+    });
 
     const sessionId = Uuid.v4();
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: user.id,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
     });
     await RedisClient.saveSession(user.id, sessionId, session);
     const sessionToken = request.server.methods.sessionsSign(session);
@@ -110,15 +162,19 @@ export default class User extends BaseModel {
 
     // allow entity filtering to happen here.
     _.set(request, 'auth.credentials.userId', user.id);
-    _.set(request, 'auth.credentials.scope', user.isAdmin ? UserRole.ADMIN : UserRole.USER);
+    _.set(
+      request,
+      'auth.credentials.scope',
+      user.isAdmin ? UserRole.ADMIN : UserRole.USER,
+    );
 
     // HAck to send back the social access/refresh token to self
     if (user.socialLogins) {
-      for (const socialLog of user.socialLogins) {
+      _.each(user.socialLogins, socialLog => {
         _.set(socialLog, '_accessToken', socialLog.accessToken);
         _.set(socialLog, '_refreshToken', socialLog.refreshToken);
-      }
+      });
     }
     return user;
   }
-}
+};

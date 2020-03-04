@@ -1,6 +1,6 @@
-import BaseModel from './base';
+const BaseModel = require('./base');
 
-export default class SocialLogin extends BaseModel {
+module.exports = class SocialLogin extends BaseModel {
   static get tableName() {
     return 'social_logins';
   }
@@ -10,7 +10,7 @@ export default class SocialLogin extends BaseModel {
     return {
       admin: omitFields,
       user: omitFields,
-      guest: omitFields
+      guest: omitFields,
     };
   }
 
@@ -21,9 +21,9 @@ export default class SocialLogin extends BaseModel {
         modelClass: `${__dirname}/user`,
         join: {
           from: 'social_logins.userId',
-          to: 'users.id'
-        }
-      }
+          to: 'users.id',
+        },
+      },
     };
   }
-}
+};

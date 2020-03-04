@@ -1,13 +1,11 @@
 /* eslint-disable no-unused-vars,no-underscore-dangle */
-import _ from 'lodash';
-import Logger from 'winston';
-import {
-  traverseDeep
-} from '../commons/utils';
-import UserRole from '../models/userRole';
+const _ = require('lodash');
+const Logger = require('../commons/logger');
+const Utils = require('../commons/utils');
+const UserRole = require('../models/userRole');
 
-const omitEntities = async(items, scope) => {
-  await traverseDeep(items, async(obj) => {
+const omitEntities = async (items, scope) => {
+  await Utils.traverseDeep(items, async obj => {
     if (obj.ENTITY_FILTERING_SCOPE) {
       const omitFields = obj.ENTITY_FILTERING_SCOPE[scope];
       if (omitFields) {
@@ -32,18 +30,18 @@ const omitEntities = async(items, scope) => {
 /**
   Policy to filter entities/properties from response payload
 */
-const entityFilter = async(request, reply, next) => {
+const entityFilter = async (request, h) => {
   try {
-    Logger.info(__filename, 'entry');
+    Logger.info(`${__filename} entry`);
     const response = request.response.source;
     const scope = _.get(request, 'auth.credentials.scope') || UserRole.GUEST;
     await omitEntities(response, scope);
-    Logger.info(__filename, 'exit');
+    Logger.info(`${__filename} exit`);
   } catch (err) {
-    Logger.error(__filename, 'exit :: ', err);
+    Logger.error(`${__filename} exit :: error `, err);
   }
 
-  return next(null, true);
+  return h.continue;
 };
 
 entityFilter.applyPoint = 'onPostHandler';

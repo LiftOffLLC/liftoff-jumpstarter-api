@@ -1,16 +1,15 @@
-import Util from 'util';
-import Boom from 'boom';
-import _ from 'lodash';
-import Uuid from 'node-uuid';
-import UserModel from '../../models/user';
-import UserRole from '../../models/userRole';
-import RedisClient from '../../commons/redisClient';
-import errorCodes from '../../commons/errors';
-import Constants from '../../commons/constants';
-import {
-  addMailToQueue
-} from '../../commons/utils';
-import Config from '../../../config';
+const Util = require('util');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const Uuid = require('node-uuid');
+const UserModel = require('../../models/user');
+const UserRole = require('../../models/userRole');
+const RedisClient = require('../../commons/redisClient');
+const errorCodes = require('../../commons/errors');
+const Constants = require('../../commons/constants');
+const Utils = require('../../commons/utils');
+const Config = require('../../../config');
 
 const validator = UserModel.validatorRules();
 const options = {
@@ -18,27 +17,29 @@ const options = {
   description: 'Create User - Access - ALL',
   tags: ['api'],
   validate: {
-    payload: {
+    payload: Joi.object({
       name: validator.name.required(),
       password: validator.password.required(),
       email: validator.email.required(),
       avatarUrl: validator.avatarUrl.optional(),
-      phoneNumber: validator.phoneNumber.optional()
-    }
+      phoneNumber: validator.phoneNumber.optional(),
+    }),
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [200])
-    }
+      responses: _.omit(Constants.API_STATUS_CODES, [200]),
+    },
   },
-  handler: async(request, reply) => {
+  handler: async (request, h) => {
     const userCount = await UserModel.count(
-      UserModel.buildCriteria('email', request.payload.email)
+      UserModel.buildCriteria('email', request.payload.email),
     );
 
     // Error out if email already exists.
     if (userCount > 0) {
-      return reply(Boom.forbidden(Util.format(errorCodes.emailDuplicate, request.payload.email)));
+      throw Boom.forbidden(
+        Util.format(errorCodes.emailDuplicate, request.payload.email),
+      );
     }
 
     const userObject = _.clone(request.payload);
@@ -51,7 +52,7 @@ const options = {
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: result.id,
-      isAdmin: result.isAdmin
+      isAdmin: result.isAdmin,
     });
 
     await RedisClient.saveSession(result.id, sessionId, session);
@@ -60,27 +61,34 @@ const options = {
 
     // allow entity filtering to happen here.
     _.set(request, 'auth.credentials.userId', result.id);
-    _.set(request, 'auth.credentials.scope', result.isAdmin ? UserRole.ADMIN : UserRole.USER);
+    _.set(
+      request,
+      'auth.credentials.scope',
+      result.isAdmin ? UserRole.ADMIN : UserRole.USER,
+    );
 
     const mailVariables = {
-      webUrl: Config.get('webUrl')
+      webUrl: Config.get('webUrl'),
     };
-    await addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
-    return reply(result).code(201);
-  }
+    await Utils.addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
+
+    const response = h.response(result);
+    result.code(201);
+    return response;
+  },
 };
 
 // eslint-disable-next-line no-unused-vars
-const handler = (server) => {
+const handler = server => {
   const details = {
     method: ['POST'],
     path: '/api/users',
-    config: options
+    options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };

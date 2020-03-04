@@ -1,16 +1,16 @@
 /* eslint-disable arrow-body-style,promise/avoid-new */
-import _ from 'lodash';
-import requireDirs from 'require-dir';
-import Promise from 'bluebird';
+const _ = require('lodash');
+const requireDirs = require('require-dir'); // eslint-disable-line hapi/hapi-capitalize-modules
+const Promise = require('bluebird');
 
 // This plugin is used to make hapi support handler as async function
-const registerAsyncMethods = async(server, methodInstance) => {
+const registerAsyncMethods = async (server, methodInstance) => {
   const methodsAsync = {};
 
   const obj = _.cloneDeep(methodInstance);
   if (!_.isUndefined(obj)) {
     const methods = _.isArray(obj) ? obj : [obj];
-    for (const method of methods) {
+    _.each(methods, method => {
       if (_.isObject(method) && _.isFunction(method.method)) {
         const instance = _.clone(method);
         // store the original method
@@ -20,7 +20,7 @@ const registerAsyncMethods = async(server, methodInstance) => {
         delete instance.async;
         delete instance.enabled;
         // convert async function to normal thunky function
-        instance.method = async(...args) => {
+        instance.method = async (...args) => {
           // the handler after function is called
           const after = args[args.length - 1];
           try {
@@ -34,7 +34,7 @@ const registerAsyncMethods = async(server, methodInstance) => {
         };
         server.method(instance);
       }
-    }
+    });
   }
 
   _.each(server.methods, (method, name) => {
@@ -45,10 +45,15 @@ const registerAsyncMethods = async(server, methodInstance) => {
       return new Promise((resolve, reject) => {
         // call the thunky function
         // eslint-disable-next-line prefer-spread
-        server.methods[name].apply(server.methods, args.concat([(err, result) => {
-          // reject if error exists, resolve if error not exists
-          return (err) ? reject(err) : resolve(result);
-        }]));
+        server.methods[name].apply(
+          server.methods,
+          args.concat([
+            (err, result) => {
+              // reject if error exists, resolve if error not exists
+              return err ? reject(err) : resolve(result);
+            },
+          ]),
+        );
       });
     };
     // drop cache should also support async
@@ -60,10 +65,10 @@ const registerAsyncMethods = async(server, methodInstance) => {
 };
 
 // configure routes - routes will be picked from ./controllers folder.
-module.exports = async(server) => {
+module.exports = async server => {
   const methods = requireDirs('../methods');
   const enabledMethods = _.filter(methods, ['enabled', true]);
-  for (const method of enabledMethods) {
+  _.each(enabledMethods, async method => {
     server.log(['info', 'bootup'], `registering method - ${method.name}`);
     const methodInfo = _.pick(method, ['name', 'method', 'options']);
     if (method.async) {
@@ -72,6 +77,9 @@ module.exports = async(server) => {
       // will be available as methods.xxx
       server.method(methodInfo);
     }
-    server.log(['info', 'bootup'], `finished registering method - ${method.name}`);
-  }
+    server.log(
+      ['info', 'bootup'],
+      `finished registering method - ${method.name}`,
+    );
+  });
 };

@@ -1,16 +1,18 @@
 /* eslint-disable class-methods-use-this */
-import Redis from 'redis';
-import Promise from 'bluebird';
-import Logger from 'winston';
-import _ from 'lodash';
-import Config from '../../config';
+const Redis = require('redis');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const Logger = require('./logger');
+const Config = require('../../config');
 
 Promise.promisifyAll(Redis.RedisClient.prototype);
 Promise.promisifyAll(Redis.Multi.prototype);
 
 class RedisClient {
   constructor() {
-    const redisConfig = Config.get('database').get('redis').toJS();
+    const redisConfig = Config.get('database')
+      .get('redis')
+      .toJS();
     this.redisClient = Redis.createClient(redisConfig);
   }
 
@@ -25,14 +27,14 @@ class RedisClient {
 
   async saveSession(userId, sessionId, object) {
     const key = this.getSessionKey(userId, sessionId);
-    Logger.info('redisClient: saveSession :', key, ', value : ', object);
+    Logger.info(`redisClient: saveSession : ${key}, value : `, object);
     return await this.redisClient.setAsync(key, JSON.stringify(object));
   }
 
   async getSession(userId, sessionId) {
     const key = this.getSessionKey(userId, sessionId);
     const val = await this.redisClient.getAsync(key);
-    Logger.info('redisClient: getSession :', key, ', value : ', val);
+    Logger.info(`redisClient: getSession : ${key}, value : `, val);
     return JSON.parse(val);
   }
 
@@ -43,13 +45,18 @@ class RedisClient {
 
     // If sessionId is not present, treat it all delete all user sessions.
     const keysToDelete = [];
-    for (const pattern of keyPatterns) {
+    _.each(keyPatterns, async pattern => {
       const keys = await this.redisClient.keysAsync(pattern);
-      for (const key of keys) {
+      _.each(keys, key => {
         Logger.info('redisClient: deleteKeys -- key :: ', key);
         keysToDelete.push(key);
-      }
-    }
+      });
+    });
+
+    /**
+     * Wait for the all the promises to resolve.
+     */
+    await Promise.all(keysToDelete);
 
     // Use Multi to delete all keys one-shot
     if (!_.isEmpty(keysToDelete)) {
@@ -66,4 +73,4 @@ class RedisClient {
   }
 }
 
-export default new RedisClient();
+module.exports = new RedisClient();

@@ -1,10 +1,20 @@
-import logger from 'winston';
+const { createLogger, format, transports } = require('winston');
+const { simple, combine, colorize, timestamp, json } = format;
 
-logger.remove(logger.transports.Console);
-logger.add(logger.transports.Console, {
-  level: 'debug', // (process.env.NODE_ENV === 'development') ? 'debug' : 'warn',
-  colorize: true,
-  timestamp: true
+const logFormat = combine(
+  format(info => {
+    info.level = info.level.toUpperCase();
+    return info;
+  })(),
+  colorize({ all: true }),
+  timestamp(),
+  json(),
+  simple(),
+);
+
+const logger = createLogger({
+  level: 'info',
+  format: logFormat,
+  transports: [new transports.Console()],
 });
-
 module.exports = logger;

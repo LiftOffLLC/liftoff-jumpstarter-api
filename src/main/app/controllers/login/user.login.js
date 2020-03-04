@@ -1,58 +1,60 @@
-import Util from 'util';
-import Boom from 'boom';
-import _ from 'lodash';
-import UserModel from '../../models/user';
-import Constants from '../../commons/constants';
+const Util = require('util');
+const Boom = require('@hapi/boom');
+const Joi = require('@hapi/joi');
+const _ = require('lodash');
+const UserModel = require('../../models/user');
+const Constants = require('../../commons/constants');
 
 const validator = UserModel.validatorRules();
-const inspect = Util.inspect;
+const { inspect } = Util;
 
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Login User - Access - ALL',
   tags: ['api'],
   validate: {
-    payload: {
+    payload: Joi.object({
       email: validator.email.required(),
-      password: validator.password.required()
-    }
+      password: validator.password.required(),
+    }),
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201, 403])
-    }
+      responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
+    },
   },
-  handler: async(request, reply) => {
+  handler: async (request, _h) => {
     request.log(['info', __filename], `payload:: ${inspect(request.payload)}`);
 
     let user = await UserModel.findOne(
-      UserModel.buildCriteria('email', _.toLower(request.payload.email))
+      UserModel.buildCriteria('email', _.toLower(request.payload.email)),
     );
+
     if (!user) {
-      return reply(Boom.notFound('User doesnot exists'));
+      throw Boom.notFound('User doesnot exists');
     }
 
     if (user.verifyPassword(request.payload.password)) {
       // on successful, create login_token for this user.
       user = await UserModel.signSession(request, user.id);
-      return reply(user);
+      return user;
     }
 
-    return reply(Boom.unauthorized('Invalid credentials.'));
-  }
+    throw Boom.unauthorized('Invalid credentials.');
+  },
 };
 
 // eslint-disable-next-line no-unused-vars
-const handler = (server) => {
+const handler = server => {
   const details = {
     method: ['POST'],
     path: '/api/users/login',
-    config: options
+    options,
   };
   return details;
 };
 
 module.exports = {
   enabled: true,
-  operation: handler
+  operation: handler,
 };
