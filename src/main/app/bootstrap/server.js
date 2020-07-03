@@ -3,10 +3,7 @@ const _ = require('lodash');
 
 // export server module.
 module.exports = config => {
-  const cacheConfig = config
-    .get('server')
-    .get('cache')
-    .toJS();
+  const cacheConfig = config.get('server').get('cache').toJS();
 
   _.each(cacheConfig, c => {
     c.provider.constructor = c.provider._constructor;
@@ -15,11 +12,7 @@ module.exports = config => {
 
   const host = config.get('server').get('host');
   const port = config.get('server').get('port');
-  const cookieState = {
-    parse: false, // Parse content of req.headers.cookie
-    failAction: 'ignore', // Action on bad cookie - 'error': return 400, 'log': log and continue, 'ignore': continue
-  };
-  const cors = _.zipObject(['cors', 'state'], [true, cookieState]);
+  const routes = config.get('server').get('routes').toJS();
 
   // eslint-disable-next-line new-cap
   const server = new Hapi.server({
@@ -27,7 +20,7 @@ module.exports = config => {
     cache: cacheConfig,
     host,
     port,
-    routes: cors,
+    routes,
   });
   return server;
 };

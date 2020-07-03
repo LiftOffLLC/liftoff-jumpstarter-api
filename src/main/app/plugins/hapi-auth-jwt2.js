@@ -13,6 +13,7 @@ const plugin = {
       server.log(['error'], 'Fail to install plugin: hapi-auth-jwt2...');
     }
     server.auth.strategy('jwt', 'jwt', Config.get('auth').toJS());
+    server.auth.default('jwt');
     server.log(['info', 'bootup'], 'Installed plugin: hapi-auth-jwt2');
   },
   require: ['good'],

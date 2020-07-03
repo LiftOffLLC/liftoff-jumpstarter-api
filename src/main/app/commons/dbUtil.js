@@ -143,6 +143,12 @@ function buildCriteria(key, value) {
         tmpValue = `%${value}%`;
         containsOperand = true;
         break;
+      case 'nil':
+        op = 'nil';
+        containsOperand = true;
+        tmpValue = !!+value;
+        break;
+
       default:
         break;
     }

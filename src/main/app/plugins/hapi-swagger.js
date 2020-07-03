@@ -8,13 +8,13 @@ const plugin = {
     options: {
       basePath: '/api/',
       info: {
-        title: 'Liftoff Jumpstart v1.0 REST API Docs',
+        title: 'Liftoff Jumpstart v2.1 REST API Docs',
         description: `NOTE: Top-level user roles are classified as ADMIN, USER or GUEST. 
         <br> <strong>ADMIN</strong> is registered super user, <strong>USER</strong> is registered User,
         where as <strong>GUEST</strong> is not a registered user.
         <br> Model based roles are defined per endpoint, like FAN, CREATOR, etc.
         <br> Watch out for each endpoint description for appropriate access.`,
-        version: '1.0.0',
+        version: '2.1.0',
       },
       securityDefinitions: {
         jwt: {

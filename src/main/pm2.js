@@ -4,9 +4,9 @@
 const pm2 = require('pm2');
 
 // Set by Heroku or -1 to scale to max cpu core -1
-const instances = process.env.WEB_CONCURRENCY || -1;
+const instances = parseInt(process.env.WEB_CONCURRENCY, 10);
 // Max Memory per core
-const maxMemory = process.env.WEB_MEMORY || 512;
+const maxMemory = parseInt(process.env.WEB_MEMORY, 10);
 
 const pmConfig = {
   script: 'src/main/index.js',

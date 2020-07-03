@@ -75,3 +75,4 @@ nes_client.js
 artifacts
 https://github.com/serverless/serverless
 NOTES.md
+dump.rdb

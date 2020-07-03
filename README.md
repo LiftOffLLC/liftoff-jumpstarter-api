@@ -1,4 +1,4 @@
-# Liftoff Jumpstart Server Kit v2.0
+# Liftoff Jumpstart Server Kit v2.1
 
 Aimed to provide jumpstart kit for building REST APIs.
 
@@ -35,28 +35,26 @@ Aimed to provide jumpstart kit for building REST APIs.
    2.5. Modify company_name and user_name in views/mail-templates folder.
 3. After adding your project dependencies, use `yarn` to lock dependencies.
 
-**NOTE** hapi-swagger is broken since Joi v16 because of a lot of breaking changes. Swagger documentation will not work until a new release for the plugin comes out. Downgrade joi to v15 and make the necessary syntax changes if swagger is an absolute necessity.
-
 ## Project Practices
 
 #### Code Formating and Linting
 
-`$:> npm run format` -- to format the code  
-`$:> npm run lint` -- to Check lint issues  
-`$:> npm run lint:fix` -- to fix possible lint issues  
-`$:> npm run inspect` -- to Detect copied code  
-`$:> npm run test` -- to run test cases
+`$:> yarn format` -- to format the code  
+`$:> yarn lint` -- to Check lint issues  
+`$:> yarn lint:fix` -- to fix possible lint issues  
+`$:> yarn inspect` -- to Detect copied code  
+`$:> yarn test` -- to run test cases
 
 #### Database Related Scripts
 
-`$:> npm run db:migrate` -- to apply database migration  
-`$:> npm run db:rollback` -- to rollback database migration  
-`$:> npm run db:seed` -- to run the seed data
+`$:> yarn db:migrate` -- to apply database migration  
+`$:> yarn db:rollback` -- to rollback database migration  
+`$:> yarn db:seed` -- to run the seed data
 
 #### Running Dev Server
 
-`$:> npm run dev` -- to run the development server; also watches the files using nodemon; also runs worker.  
-`$:> npm run worker` -- to run the worker thread
+`$:> yarn dev` -- to run the development server; also watches the files using nodemon; also runs worker.  
+`$:> yarn worker` -- to run the worker thread
 
 #### Running Prod Server on Heroku.
 
@@ -249,8 +247,8 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 
 ### Gotchas
 
-1. polymorphic association
-2. paging for inner associations
+1. Polymorphic association
+2. Paging for inner associations
 
 ## Fail-Fast Approach
 
@@ -293,24 +291,23 @@ create modules
    b. pagination/ordering doesnt work for inner associations.  
    c. polymorphic associations issue.  
    d. caching responses.
-5. chat server jumpstarter kit
-6. microservices support  
+5. Chat server jumpstarter kit
+6. Microservices support  
    a. create microservices for pdf generation; image upload; image transformation.
-7. sync project  
+7. Sync project  
    a. ability to sync project once jumpstarter kit is updated
 8. Need elaboration on how to cache responses.
-9. rate-limit for critical apis. like login/signup.
-10. docker image and deployment steps for aws.
-11. strict header versioning check for vendor-specific headers.
+9. Rate-limit for critical apis. like login/signup.
+10. Docker image and deployment steps for aws.
+11. Strict header versioning check for vendor-specific headers.
 12. Generic CRUD for all models. Scaffolding.
 13. APIs to support unique constraints in path /userIdOruserName/update
 14. Update dependencies and yarn lock file regularly.
 15. Pass server context in all hapi plugins.
 16. Extract error Handler plugin to plugins folder (depends on 15).
-17. Remove all default values from config/default.js, so that developers are forced to provide all these parameters.
 
 ## Contribute back
 
-[ ] create an issue, submit PR for review and once reviewed, will be merged into the master branch.
-[ ] increment version  
+[ ] Create an issue, submit PR for review and once reviewed, will be merged into the master branch.  
+[ ] Increment version  
 [ ] Teams to provide their product name so that they can inform about updates.

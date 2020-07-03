@@ -5,8 +5,9 @@ const _ = require('lodash');
 const dbUtil = require('./dbUtil');
 const UserRole = require('../models/userRole');
 const Constants = require('./constants');
+const { throwError } = require('./error.parser');
 
-async function readHandler(model, request, _h) {
+const readHandler = async (model, request, _h) => {
   const criteriaOpts = {
     limit: request.query.limit,
     offset: request.query.offset,
@@ -23,17 +24,17 @@ async function readHandler(model, request, _h) {
     count,
     items,
   };
-}
+};
 
-module.exports = function readAPI(pathPrefix, params, model) {
+const readAPI = (pathPrefix, params, model, fromCache = false) => {
   const options = {
     auth: params.auth || false,
     description: `Get ${pathPrefix} - Access - ${
       params.auth ? params.auth.scope : 'ALL'
     }`,
-    notes: `Get ${pathPrefix} - Allowed Access - ${
-      params.auth ? params.auth.scope : 'ALL'
-    }`,
+    notes: `Allowed Access - ${params.auth ? params.auth.scope : 'ALL'}
+    <br>
+    Relations - ${_.join(_.keys(model.relationMappings), ', ')}`,
     tags: ['api'],
     validate: {
       params: params.pathParams,
@@ -48,18 +49,13 @@ module.exports = function readAPI(pathPrefix, params, model) {
           .integer()
           .positive()
           .min(1)
-          .max(50)
+          .max(100)
           .default(20)
           .description('Limit')
           .optional(),
-        fields: Joi.string()
-          .trim()
-          .description('Fields')
-          .optional(),
-        filters: Joi.string()
-          .trim()
-          .description('Field filters')
-          .optional(),
+        fields: Joi.string().trim().description('Fields').optional(),
+        filters: Joi.string().trim().description('Field filters').optional(),
+        ...params.query,
       }),
     },
     plugins: {
@@ -68,7 +64,16 @@ module.exports = function readAPI(pathPrefix, params, model) {
       },
       policies: params.policies || [],
     },
-    handler: async (request, h) => await readHandler(model, request, h),
+    handler: async (request, h) => {
+      try {
+        if (fromCache) {
+          return await request.server.methods.modelCache(model, request, h);
+        }
+        return await readHandler(model, request, h);
+      } catch (err) {
+        return throwError(err);
+      }
+    },
   };
 
   return () => ({
@@ -76,4 +81,9 @@ module.exports = function readAPI(pathPrefix, params, model) {
     path: `/api/${pathPrefix}`,
     options,
   });
+};
+
+module.exports = {
+  readAPI,
+  readHandler,
 };
