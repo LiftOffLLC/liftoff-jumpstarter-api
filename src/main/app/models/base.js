@@ -1,16 +1,20 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 const Checkit = require('checkit');
 const _ = require('lodash');
 const Promise = require('bluebird');
 const knexClass = require('knex');
 const { Model } = require('objection');
+const {
+  isModelCached,
+  purgeModelCache,
+} = require('../commons/model_cache_helper');
+
 const Logger = require('../commons/logger');
 const Config = require('../../config');
 const dbUtil = require('../commons/dbUtil');
 
-const dbConfig = Config.get('database')
-  .get('postgres')
-  .toJS();
+const dbConfig = Config.get('database').get('postgres').toJS();
 const knex = knexClass(dbConfig);
 Model.knex(knex);
 
@@ -34,20 +38,27 @@ const setMiscAttributes = (
   // Optimization:: No Point applying sort criteria if limit is 1.
   // Postgres uses sorting logic before applying index.
   // apply sorting if its assoicationQuery.
-  const applySort =
-    isAssnQuery || !criteria.limit || Number(criteria.limit) > 1;
-  if (applySort) {
-    const sortField = criteria.sortField || defaultSortField;
-    const sortOrder = criteria.sortOrder || defaultSortOrder;
 
-    const sortF = _.compact(_.words(sortField, /[^, ]+/g));
-    const sortO = _.compact(_.words(sortOrder, /[^, ]+/g));
-    const sortMapping = _.zipObject(sortF, sortO);
+  // TODO: Check this
+  // const applySort =
+  //   isAssnQuery || !criteria.limit || Number(criteria.limit) > 1;
+  // const applySort = true;
 
-    _.each(_.keys(sortMapping), key => {
-      queryBuilder.orderBy(key, sortMapping[key] || 'desc');
-    });
-  }
+  // if (applySort) {
+  const sortField = criteria.sortField || defaultSortField;
+  const sortOrder = criteria.sortOrder || defaultSortOrder;
+
+  const sortF = _.compact(_.words(sortField, /[^, ]+/g));
+  const sortO = _.compact(_.words(sortOrder, /[^, ]+/g));
+  const sortMapping = _.zipObject(sortF, sortO);
+
+  _.each(_.keys(sortMapping), key => {
+    queryBuilder.orderBy(
+      `${queryBuilder.modelClass().tableName}.${key}`,
+      sortMapping[key] || 'desc',
+    );
+  });
+  // }
 };
 
 /**
@@ -75,6 +86,13 @@ module.exports = class BaseModel extends Model {
   */
   validations() {
     return {};
+  }
+
+  async $afterUpdate() {
+    // Not worrying about specific dependent cached models. Deleting all cached models even if one of these are updated
+    if (isModelCached(this.constructor)) {
+      await purgeModelCache();
+    }
   }
 
   /**
@@ -147,9 +165,8 @@ module.exports = class BaseModel extends Model {
     return new Checkit(this.validations()).run(this);
   }
 
-  static async createOrUpdate(model, fetchById = true) {
+  static async createOrUpdate(model, fetchById = true, trx) {
     const models = _.isArray(model) ? _.cloneDeep(model) : [_.cloneDeep(model)];
-
     // remove stats object...if this is model has stats...
     _.each(models, body => {
       delete body.stats; // eslint-disable-line no-param-reassign
@@ -159,22 +176,19 @@ module.exports = class BaseModel extends Model {
     // See if any of the array has id field, if no bulk insert and return.
     if (!_.find(models, 'id')) {
       // if its single object, return single object, else array.
-      return await this.query().insertAndFetch(_.cloneDeep(model));
+      return await this.query(trx).insertAndFetch(_.cloneDeep(model));
     }
 
     // If it comes here, implies that it has id fields. and its okay to insert/update individually.
     const addedIds = [];
-    // eslint-disable-next-line no-restricted-syntax
     for (const body of models) {
       if (body.id) {
         // eslint-disable-next-line no-await-in-loop
-        await this.query()
-          .update(body)
-          .where('id', body.id);
+        await this.query(trx).update(body).where('id', body.id);
         addedIds.push(body.id);
       } else {
         // eslint-disable-next-line no-await-in-loop
-        const newObj = await this.query().insert(body);
+        const newObj = await this.query(trx).insert(body);
         addedIds.push(newObj.id);
       }
     }
@@ -182,22 +196,30 @@ module.exports = class BaseModel extends Model {
     if (fetchById === true) {
       // if its single object, return single object, else array.
       if (_.isArray(model)) {
-        return await this.findAll(this.buildCriteria('id', addedIds, 'in'));
+        return await this.findAll(
+          this.buildCriteria('id', addedIds, 'in'),
+          {},
+          trx,
+        );
       }
-      return await this.findOne(this.buildCriteria('id', _.head(addedIds)));
+      return await this.findOne(
+        this.buildCriteria('id', _.head(addedIds)),
+        {},
+        trx,
+      );
     }
     return true;
   }
 
-  static async findOne(filters = {}, options = {}) {
+  static async findOne(filters = {}, options = {}, trx) {
     const tmpOptions = _.cloneDeep(options);
     tmpOptions.limit = 1;
-    return await this.findAll(filters, tmpOptions).then(records =>
+    return await this.findAll(filters, tmpOptions, trx).then(records =>
       _.head(records),
     );
   }
 
-  static async deleteAll(filters = {}, hardDeleteFlag = true) {
+  static async deleteAll(filters = {}, hardDeleteFlag = true, trx) {
     const inactive = {
       isActive: false,
     };
@@ -205,14 +227,13 @@ module.exports = class BaseModel extends Model {
     const records = await this.findAll(
       filters,
       _.zipObject(['columns'], ['id']),
+      trx,
     );
     if (!_.isEmpty(records)) {
       if (hardDeleteFlag === true) {
-        await this.query()
-          .delete()
-          .whereIn('id', _.map(records, 'id'));
+        await this.query(trx).delete().whereIn('id', _.map(records, 'id'));
       } else {
-        await this.query()
+        await this.query(trx)
           .patch(inactive)
           .whereIn('id', _.map(records, 'id'));
       }
@@ -220,18 +241,18 @@ module.exports = class BaseModel extends Model {
     return true;
   }
 
-  static async count(filters = {}) {
+  static async count(filters = {}, trx) {
     return await this.findAll(
       filters,
       _.zipObject(['columns', 'skipMiscFields'], ['id', true]),
+      trx,
     ).then(records => records.length);
   }
 
-  static async findAll(filters = {}, options = {}) {
+  static async findAll(filters = {}, options = {}, trx) {
     const filterOpts = _.isArray(filters)
       ? _.cloneDeep(filters)
       : [_.cloneDeep(filters)];
-
     const activeCriteria = _.find(
       filterOpts,
       _.zipObject(['field'], ['isActive']),
@@ -250,10 +271,9 @@ module.exports = class BaseModel extends Model {
     const skipMiscFields = options.skipMiscFields === true;
     _.set(options, 'skipMiscFields', null);
     const optionOpts = dbUtil.buildOptions(filterOpts, _.cloneDeep(options));
-
     Logger.info('base.findAll :: optionOpts :: ', optionOpts);
     Logger.info('base.findAll :: filterOpts :: ', filterOpts);
-    const qb = this.query();
+    const qb = this.query(trx);
 
     // First deal with top-most table
     const tableCriteria = _.get(optionOpts, '_') || {};
@@ -279,9 +299,28 @@ module.exports = class BaseModel extends Model {
         );
         _.each(tmpCondCriteria, hash => {
           if (condition === 'AND') {
-            builder.where(hash.field, hash.criteria, hash.value);
+            // Handle null values
+            if (hash.criteria === 'nil') {
+              if (hash.value === true) {
+                builder.whereNull(hash.field);
+              } else {
+                builder.whereNotNull(hash.field);
+              }
+            } else {
+              builder.where(hash.field, hash.criteria, hash.value);
+            }
           } else {
-            builder.orWhere(hash.field, hash.criteria, hash.value);
+            // Handle null values
+            // eslint-disable-next-line no-lonely-if
+            if (hash.criteria === 'nil') {
+              if (hash.value === true) {
+                builder.orWhereNull(hash.field);
+              } else {
+                builder.orWhereNotNull(hash.field);
+              }
+            } else {
+              builder.orWhere(hash.field, hash.criteria, hash.value);
+            }
           }
         });
       });
@@ -294,16 +333,16 @@ module.exports = class BaseModel extends Model {
       qb.eager(dbUtil.getEagerColumnString(columns));
       _.each(columns, childKey => {
         const childCriteria = optionOpts[childKey];
-
         qb.filterEager(childKey, builder => {
+          const { tableName } = builder.modelClass();
           builder.columns(childCriteria.columns);
-          builder.whereIn('isActive', activeValues);
+          builder.whereIn(`${tableName}.isActive`, activeValues);
           setMiscAttributes(builder, childCriteria, true);
         });
       });
     }
 
-    Logger.info('base.findAll :: sql generated::', qb.toSql());
+    Logger.info('base.findAll :: sql generated::', qb.toKnexQuery().toSQL());
     return await qb;
   }
 };

@@ -7,9 +7,7 @@ require('dotenv').config({
 
 const Config = require('./config');
 
-const databaseConfig = Config.get('database')
-  .get('postgres')
-  .toJS();
+const databaseConfig = Config.get('database').get('postgres').toJS();
 
 module.exports = {
   development: databaseConfig,

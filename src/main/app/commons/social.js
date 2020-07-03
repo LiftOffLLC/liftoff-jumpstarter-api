@@ -45,9 +45,7 @@ module.exports = class Social {
   }
 
   async getProfile(accesstToken, fields) {
-    const { profileUrl } = Config.get('social')
-      .get(this.provider)
-      .toJS();
+    const { profileUrl } = Config.get('social').get(this.provider).toJS();
 
     const queries = {
       access_token: accesstToken,

@@ -44,21 +44,14 @@ module.exports = class User extends BaseModel {
 
   static validatorRules() {
     const rules = {
-      userId: Joi.number()
-        .integer()
-        .positive()
-        .description('User Id'),
+      userId: Joi.number().integer().positive().description('User Id'),
       userName: Joi.string()
         .trim()
         .alphanum()
         .min(3)
         .max(30)
         .description('User Name'),
-      name: Joi.string()
-        .trim()
-        .min(3)
-        .max(255)
-        .description('Name'),
+      name: Joi.string().trim().min(3).max(255).description('Name'),
       password: Joi.string()
         .trim()
         .regex(/^[a-zA-Z0-9]{8,30}$/)
@@ -69,23 +62,15 @@ module.exports = class User extends BaseModel {
       phoneNumber: PhoneJoiValidator.phone()
         .e164format()
         .description('phone number'),
-      isAdmin: Joi.boolean()
-        .default(false)
-        .description('Admin?'),
-      accessToken: Joi.string()
-        .trim()
-        .description('Access token'),
-      refreshToken: Joi.string()
-        .trim()
-        .description('Refresh token'),
+      isAdmin: Joi.boolean().default(false).description('Admin?'),
+      accessToken: Joi.string().trim().description('Access token'),
+      refreshToken: Joi.string().trim().description('Refresh token'),
       rawBody: Joi.string().description('raw social data'),
       resetPasswordToken: Joi.string()
         .trim()
         .uuid()
         .description('Reset password token'),
-      avatarUrl: Joi.string()
-        .trim()
-        .description('Avatar URL'),
+      avatarUrl: Joi.string().trim().description('Avatar URL'),
     };
     return rules;
   }

@@ -54,8 +54,18 @@ class Worker {
    * Register job handler.
    */
   registerHandlers() {
-    _.each(this.jobs, job => {
-      this.queue.process(job.name, job.handler);
+    // eslint-disable-next-line prefer-const
+    let registeredJobs = {};
+    _.each(this.jobs, _job => {
+      let job = _.split(_job.name, '.', 1);
+      job = _.first(job);
+      /**
+       * register only non registered jobs.
+       */
+      if (!_.has(registeredJobs, job)) {
+        this.queue.process(job, this.dispatchJobToHandler.bind(this));
+        registeredJobs[job] = true;
+      }
     });
   }
 
@@ -63,13 +73,42 @@ class Worker {
    * Register various queue event listeners.
    */
   registerEventListeners() {
-    this.queue.on('completed', job => {
-      Logger.info(`Job Completed = ${job.name}`);
+    this.queue.on('completed', (job, result) => {
+      Logger.info(`Job Completed = ${job.name}`, result);
     });
 
     this.queue.on('failed', (job, error) => {
       Logger.error(`Job Failed = ${job.name} with ${error}`);
     });
+
+    this.queue.on('waiting', jobId => {
+      Logger.info(`Job Waiting = ${jobId}`);
+    });
+
+    this.queue.on('active', job => {
+      Logger.info(`Job Active = ${job.name}`);
+    });
+
+    this.queue.on('stalled', job => {
+      Logger.info(`Job Stalled = ${job.name}`);
+    });
+  }
+
+  /**
+   * Dispatch job to actual handler.
+   * @param {*} job
+   * @param {*} done
+   */
+  dispatchJobToHandler(job, done) {
+    let worker = null;
+
+    _.each(this.jobs, availableJob => {
+      if (availableJob.name === job.data._name) {
+        worker = availableJob;
+      }
+    });
+
+    return worker.handler(job, done);
   }
 
   /**
@@ -78,7 +117,7 @@ class Worker {
    *  eg: woeker name : 'email.sendCampaignMessage' , job will be email
    * worker name should be choosen wisely by considerining the curcurrnecy issues.
    */
-  addJob(name, data, jobOptions = {}) {
+  async addJob(name, data = {}, jobOptions = {}) {
     Logger.info(`Registering Job ${name}`);
     Logger.info(data);
 
@@ -88,6 +127,8 @@ class Worker {
 
     const currentJob = _.find(this.jobs, ['name', name]);
     data._name = name; // eslint-disable-line no-underscore-dangle,no-param-reassign
+    let jobName = _.split(name, '.', 1);
+    jobName = _.first(jobName);
 
     /**
      * Job Configurations.
@@ -95,7 +136,7 @@ class Worker {
     let options = currentJob.options || {};
     options = { ...options, ...jobOptions };
     options.removeOnComplete = true;
-    this.queue.add(name, data, options);
+    return await this.queue.add(jobName, data, options);
   }
 
   // eslint-disable-next-line class-methods-use-this

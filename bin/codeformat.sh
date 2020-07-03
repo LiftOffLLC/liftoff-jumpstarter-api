@@ -1,1 +1,0 @@
-find ./src -type f -name "*.js" -exec sh -c './node_modules/.bin/js-beautify -r {}' \;

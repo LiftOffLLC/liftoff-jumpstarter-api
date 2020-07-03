@@ -10,31 +10,33 @@ const registerAsyncMethods = async (server, methodInstance) => {
   const obj = _.cloneDeep(methodInstance);
   if (!_.isUndefined(obj)) {
     const methods = _.isArray(obj) ? obj : [obj];
-    _.each(methods, method => {
-      if (_.isObject(method) && _.isFunction(method.method)) {
-        const instance = _.clone(method);
-        // store the original method
-        const asyncMethod = method.method;
+    await Promise.all(
+      _.each(methods, method => {
+        if (_.isObject(method) && _.isFunction(method.method)) {
+          const instance = _.clone(method);
+          // store the original method
+          const asyncMethod = method.method;
 
-        delete instance.description;
-        delete instance.async;
-        delete instance.enabled;
-        // convert async function to normal thunky function
-        instance.method = async (...args) => {
-          // the handler after function is called
-          const after = args[args.length - 1];
-          try {
-            // call the async method, since asyn function return promise,
-            // use then and catch to handle result and error by handler
-            const result = await asyncMethod.apply(this, args);
-            after(null, result);
-          } catch (err) {
-            after(err);
-          }
-        };
-        server.method(instance);
-      }
-    });
+          delete instance.description;
+          delete instance.async;
+          delete instance.enabled;
+          // convert async function to normal thunky function
+          instance.method = async (...args) => {
+            // the handler after function is called
+            const after = args[args.length - 1];
+            try {
+              // call the async method, since asyn function return promise,
+              // use then and catch to handle result and error by handler
+              const result = await asyncMethod.apply(this, args);
+              after(null, result);
+            } catch (err) {
+              after(err);
+            }
+          };
+          server.method(instance);
+        }
+      }),
+    );
   }
 
   _.each(server.methods, (method, name) => {
@@ -68,18 +70,20 @@ const registerAsyncMethods = async (server, methodInstance) => {
 module.exports = async server => {
   const methods = requireDirs('../methods');
   const enabledMethods = _.filter(methods, ['enabled', true]);
-  _.each(enabledMethods, async method => {
-    server.log(['info', 'bootup'], `registering method - ${method.name}`);
-    const methodInfo = _.pick(method, ['name', 'method', 'options']);
-    if (method.async) {
-      await registerAsyncMethods(server, methodInfo);
-    } else {
-      // will be available as methods.xxx
-      server.method(methodInfo);
-    }
-    server.log(
-      ['info', 'bootup'],
-      `finished registering method - ${method.name}`,
-    );
-  });
+  await Promise.all(
+    _.each(enabledMethods, async method => {
+      server.log(['info', 'bootup'], `registering method - ${method.name}`);
+      const methodInfo = _.pick(method, ['name', 'method', 'options']);
+      if (method.async) {
+        await registerAsyncMethods(server, methodInfo);
+      } else {
+        // will be available as methods.xxx
+        server.method(methodInfo);
+      }
+      server.log(
+        ['info', 'bootup'],
+        `finished registering method - ${method.name}`,
+      );
+    }),
+  );
 };

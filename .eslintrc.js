@@ -1,12 +1,7 @@
 const prettierOptions = require('./.prettierrc');
 
 module.exports = {
-  extends: [
-    'airbnb',
-    'prettier',
-    // 'plugin:lodash/recommended',
-    'plugin:promise/recommended',
-  ],
+  extends: ['airbnb', 'prettier', 'plugin:promise/recommended'],
   plugins: ['prettier', 'jsx-a11y', 'import', 'security', 'promise', 'hapi'],
   parserOptions: {
     ecmaVersion: 2020,

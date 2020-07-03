@@ -15,10 +15,7 @@ exports.up = function up(knex, Promise) {
           .index()
           .unique()
           .comment('User name; for permalink.');
-        table
-          .string('name', 255)
-          .notNullable()
-          .comment('Name');
+        table.string('name', 255).notNullable().comment('Name');
         table.text('bio').comment('Bio');
         table.string('avatarUrl').comment('Avatar Image Url');
 
@@ -49,10 +46,7 @@ exports.up = function up(knex, Promise) {
           .string('encryptedPassword')
           .notNullable()
           .comment('Encrypted password');
-        table
-          .string('passwordSalt')
-          .notNullable()
-          .comment('Password Salt');
+        table.string('passwordSalt').notNullable().comment('Password Salt');
 
         // Reset Password
         table
@@ -65,24 +59,12 @@ exports.up = function up(knex, Promise) {
           .comment('Reset Password Sent At TimeStamps');
 
         // is admin role
-        table
-          .boolean('isAdmin')
-          .defaultTo(false)
-          .comment('Admin flag');
+        table.boolean('isAdmin').defaultTo(false).comment('Admin flag');
 
         // TimeStamps
-        table
-          .boolean('isActive')
-          .defaultTo(true)
-          .comment('Active?');
-        table
-          .timestamp('createdAt')
-          .notNullable()
-          .defaultTo(knex.fn.now());
-        table
-          .timestamp('updatedAt')
-          .notNullable()
-          .defaultTo(knex.fn.now());
+        table.boolean('isActive').defaultTo(true).comment('Active?');
+        table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+        table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
       })
       .then(() => {
         console.log('Created Table: users table');
@@ -97,10 +79,7 @@ exports.up = function up(knex, Promise) {
           .notNullable()
           .references('users.id')
           .comment('User table id');
-        table
-          .string('providerId')
-          .notNullable()
-          .comment('User table id');
+        table.string('providerId').notNullable().comment('User table id');
         table
           .string('provider')
           .notNullable()
@@ -120,18 +99,9 @@ exports.up = function up(knex, Promise) {
         table.text('rawBody').comment('social data of user');
 
         // TimeStamps
-        table
-          .boolean('isActive')
-          .defaultTo(true)
-          .comment('Active?');
-        table
-          .timestamp('createdAt')
-          .notNullable()
-          .defaultTo(knex.fn.now());
-        table
-          .timestamp('updatedAt')
-          .notNullable()
-          .defaultTo(knex.fn.now());
+        table.boolean('isActive').defaultTo(true).comment('Active?');
+        table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+        table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
       })
       .then(() => {
         console.log('Created Table: social_logins table');

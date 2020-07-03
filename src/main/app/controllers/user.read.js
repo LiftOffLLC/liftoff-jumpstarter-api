@@ -1,5 +1,5 @@
 const UserModel = require('../models/user');
-const readAPI = require('../commons/read.api');
+const { readAPI } = require('../commons/read.api');
 const Constants = require('../commons/constants');
 
 module.exports = {

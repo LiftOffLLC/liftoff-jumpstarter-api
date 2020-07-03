@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
+require('newrelic');
 const knexClass = require('knex');
 const Config = require('./config');
 const Bootstrap = require('./app/bootstrap');
 // Configure Winston Logger for logging in utils, models, etc.
 // eslint-disable-next-line no-unused-vars
-
-require('newrelic');
 
 // NOTE: event name is camelCase as per node convention
 process.on('unhandledRejection', (reason, promise) => {
@@ -30,9 +29,7 @@ const server = Bootstrap.server(Config);
 
 const configureDatabase = async () => {
   try {
-    const dbConfig = Config.get('database')
-      .get('postgres')
-      .toJS();
+    const dbConfig = Config.get('database').get('postgres').toJS();
     const knex = knexClass(dbConfig);
 
     await knex.raw(dbConfig.validateQuery);
@@ -71,6 +68,18 @@ const start = async () => {
     // eslint-disable-next-line global-require
     require('./app/commons/worker');
 
+    if (Config.get('server').get('startScheduler')) {
+      // eslint-disable-next-line global-require
+      const Scheduler = require('./app/schedulers');
+      const config = Config.get('worker').toJS();
+      config.prefix = 'scheduler';
+      /**
+       * Initialize the Queue
+       */
+      console.log(Date.now(), ':::: loading cron jobs ::::');
+      await Scheduler.initQueue(config);
+    }
+
     // load all necessary plugins.
     console.log(Date.now(), ':::: loading server plugins ::::');
     await Bootstrap.plugins(server);
@@ -87,6 +96,8 @@ const start = async () => {
     if (Config.get('env') !== 'production') {
       require('./worker'); // eslint-disable-line global-require
     }
+
+    // eslint-disable-next-line global-require
 
     // NOTE: works only if Nes is installed.
     // TODO: See if we can move inside nes-plugin callback.

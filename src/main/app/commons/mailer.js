@@ -9,9 +9,7 @@ class Mailer {
   constructor() {
     try {
       const transport = Config.get('mailer').get('transport');
-      const transportOptions = Config.get('mailer')
-        .get(transport)
-        .toJS();
+      const transportOptions = Config.get('mailer').get(transport).toJS();
       if (!_.isObject(transportOptions)) {
         throw new Error('No valid mailer transport found');
       }

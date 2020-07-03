@@ -81,9 +81,7 @@ module.exports = async server => {
 
   // do topological sort to make sure the order is right and exports
   const enabledPluginsTmp = _.map(
-    _(toposort.array(nodes, edges))
-      .reverse()
-      .value(),
+    _(toposort.array(nodes, edges)).reverse().value(),
     name => modules[name],
   );
 

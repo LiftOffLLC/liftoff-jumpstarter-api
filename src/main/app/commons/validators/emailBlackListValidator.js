@@ -7,9 +7,7 @@ const Logger = require('../logger');
 // Blacklist Email File has been copied from
 // https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blacklist.conf
 const blackListFile = Path.join(__dirname, 'disposable_email_blacklist.conf');
-const domains = Fs.readFileSync(blackListFile)
-  .toString()
-  .split('\n');
+const domains = Fs.readFileSync(blackListFile).toString().split('\n');
 
 /**
  * Check if the email is whitelisted.
@@ -29,10 +27,7 @@ function isEmailBlacklisted(email) {
 
 const emailBlackListValidator = Joi.extend({
   type: 'email',
-  base: Joi.string()
-    .trim()
-    .lowercase()
-    .email(),
+  base: Joi.string().trim().lowercase().email(),
   messages: {
     'email.isBlacklisted': 'is blacklisted',
   },
