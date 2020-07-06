@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "yzhang.markdown-all-in-one",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "letrieu.expand-region",
+    "mgmcdermott.vscode-language-babel",
+    "PKief.material-icon-theme",
+    "coenraads.bracket-pair-colorizer",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "eamodio.gitlens"
+  ]
+}
