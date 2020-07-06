@@ -58,10 +58,6 @@ TODO.md
 tt.js
 ngrok
 
-#vscode
-.vscode
-test.js
-
 # Test Files
 src/main/modules/stripe/test.js
 env_dev_config.txt

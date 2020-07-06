@@ -1,6 +1,6 @@
-# Liftoff Jumpstart Server Kit v2.1
+# Liftoff Jumpstarter Server Kit v2.1
 
-Aimed to provide jumpstart kit for building REST APIs.
+Aimed to provide Jumpstarter kit for building REST APIs.
 
 ## Packages Used
 
@@ -24,7 +24,8 @@ Aimed to provide jumpstart kit for building REST APIs.
 
 1. Download the latest zip file or clone the repo with depth=1 using below command -  
    `git clone --depth=1 git@github.com:LiftOffLLC/liftoff-jumpstarter-api.git`
-2. Modify the config details
+2. Install PostgreSQL and Redis
+3. Modify the config details
    2.1 Copy .env.development as .env file in project folder and modify the relevant properties for the project  
     2.1.1. Database Config  
     2.1.2. Redis Config (Login auth tokens are stored)  
@@ -33,7 +34,16 @@ Aimed to provide jumpstart kit for building REST APIs.
    2.3. Fix plugins/hapi-swagger.js for swagger documentation  
    2.4. Fix plugins/status-monitor.js for monitoring  
    2.5. Modify company_name and user_name in views/mail-templates folder.
-3. After adding your project dependencies, use `yarn` to lock dependencies.
+4. After adding your project dependencies, use `yarn` to lock dependencies.
+
+## Pulling changes from Jumpstarter repository into your project's repository
+
+1. Set Jumpstarter as a remote in your project  
+`git remote add jumpstarter https://github.com/LiftOffLLC/liftoff-jumpstarter-api.git`
+2. Configure push URL as some invalid URL to prevent pushing to Jumpstarter repository by mistake  
+`git config remote.jumpstarter.pushurl invalid-url`
+3. Pull latest changes from Jumpstarter master into your repository's current branch  
+`git pull --allow-unrelated-histories jumpstarter master`
 
 ## Project Practices
 
@@ -276,7 +286,7 @@ create modules
 ## Pending Items
 
 1. Generalize social.js to pull send standardized output.
-2. Document Preparation Guide for jumpstart  
+2. Document Preparation Guide for Jumpstarter  
    a. create .env file and modify accordingly.  
    b. replace **company_name** and **user_name** in email templates.  
    c. versioning header/ plugins/hapi-swagger.js  
@@ -291,11 +301,11 @@ create modules
    b. pagination/ordering doesnt work for inner associations.  
    c. polymorphic associations issue.  
    d. caching responses.
-5. Chat server jumpstarter kit
+5. Chat server Jumpstarter kit
 6. Microservices support  
    a. create microservices for pdf generation; image upload; image transformation.
 7. Sync project  
-   a. ability to sync project once jumpstarter kit is updated
+   a. ability to sync project once Jumpstarter kit is updated
 8. Need elaboration on how to cache responses.
 9. Rate-limit for critical apis. like login/signup.
 10. Docker image and deployment steps for aws.
