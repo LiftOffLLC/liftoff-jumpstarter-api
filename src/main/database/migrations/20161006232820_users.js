@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-exports.up = function up(knex, Promise) {
-  return Promise.all([
+exports.up = knex =>
+  Promise.all([
     /**
     Table:  Users
     Purpose: Store User's Profile data.
@@ -110,10 +110,9 @@ exports.up = function up(knex, Promise) {
         );
       }),
   ]);
-};
 
-exports.down = function down(knex, Promise) {
-  return Promise.all([
+exports.down = knex =>
+  Promise.all([
     knex.raw('drop table if exists social_logins cascade'),
     knex.raw('drop table if exists users cascade'),
     knex.raw('truncate table knex_migrations_lock'),
@@ -127,4 +126,3 @@ exports.down = function down(knex, Promise) {
       console.log('failed to rollback db : ', reason);
     },
   );
-};

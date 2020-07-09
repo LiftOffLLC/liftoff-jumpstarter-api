@@ -76,7 +76,7 @@ const options = {
       ['info', __filename],
       `updated response - ${inspect(updatedUser)}`,
     );
-    throw Constants.SUCCESS_RESPONSE;
+    return Constants.SUCCESS_RESPONSE;
   },
 };
 

@@ -101,7 +101,7 @@ module.exports = class User extends BaseModel {
   hashPassword() {
     if (this.encryptedPassword) {
       if (
-        this.encryptedPassword.indexOf('$2a$') === 0 &&
+        this.encryptedPassword.indexOf('$2b$') === 0 &&
         this.encryptedPassword.length === 60
       ) {
         // The password is already hashed. It can be the case when the instance is loaded from DB
@@ -119,10 +119,7 @@ module.exports = class User extends BaseModel {
   }
 
   verifyPassword(password) {
-    return (
-      this.encryptPassword(password, this.passwordSalt) ===
-      this.encryptedPassword
-    );
+    return Bcrypt.compareSync(password, this.encryptedPassword);
   }
 
   encryptPassword(pwd, passwordSalt) {
