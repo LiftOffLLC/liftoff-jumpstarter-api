@@ -3,7 +3,11 @@ const nodemailer = require('nodemailer');
 const Logger = require('./logger');
 const Config = require('../../config');
 const UserModel = require('../models/user');
-const getMailTemplate = require('./mailTemplateHelper');
+
+// *** ATTENTION ***
+// This file is broken
+// The mailer implementation is purposely left blank
+// Update this file as per your email service provider's sdk
 
 class Mailer {
   constructor() {
@@ -17,6 +21,7 @@ class Mailer {
       require(transportOptions.package);
       transportOptions.transport = transport;
       this.transport = nodemailer.createTransport(transportOptions);
+      this.dummy_response = true;
     } catch (err) {
       Logger.error(
         'Either Mail Config is incorrect or dependent package could not be loaded',
@@ -41,7 +46,7 @@ class Mailer {
    */
   async dispatchMail(templateName, from, to, message, variableOpts = {}) {
     try {
-      let mailTo = _.cloneDeep(to);
+      // let mailTo = _.cloneDeep(to);
       const variables = _.cloneDeep(variableOpts);
       // Update common variables..here
       variables.webUrl = Config.get('webUrl');
@@ -52,31 +57,33 @@ class Mailer {
           UserModel.buildCriteria('id', _.toSafeInteger(to)),
         );
 
-        mailTo = {
-          address: user.email,
-          name: user.name,
-          userId: user.id,
-        };
+        // mailTo = {
+        //   address: user.email,
+        //   name: user.name,
+        //   userId: user.id,
+        // };
 
         variables.user = user;
       }
       Logger.info(' variables:: ', variables);
-      const template = await getMailTemplate(templateName, variables);
 
-      Logger.info('resulted subject', template.subject);
-      Logger.info('resulted body', template.html);
-      Logger.info('resulted text', template.text);
-      Logger.info('resulted from', from.address || template.from);
-      Logger.info('resulted to', mailTo.address);
+      // this file has been deleted because templates are no longer on the backend, but on the email service provider's end
+      // const template = await getMailTemplate(templateName, variables);
 
-      const sesMessage = {
-        from: from.address || template.from,
-        // cc: from.address || template.cc,
-        to: mailTo.address, // password is P@33w0rd
-        subject: template.subject,
-        text: template.text,
-        html: template.html,
-      };
+      // Logger.info('resulted subject', template.subject);
+      // Logger.info('resulted body', template.html);
+      // Logger.info('resulted text', template.text);
+      // Logger.info('resulted from', from.address || template.from);
+      // Logger.info('resulted to', mailTo.address);
+
+      // const sesMessage = {
+      //   from: from.address || template.from,
+      //   // cc: from.address || template.cc,
+      //   to: mailTo.address, // password is P@33w0rd
+      //   subject: template.subject,
+      //   text: template.text,
+      //   html: template.html,
+      // };
 
       // to add attachments.
       // sesMessage.attachments = [{
@@ -84,7 +91,9 @@ class Mailer {
       //   path: variables.evalForm.mouFileLocation
       // }];
 
-      const response = await this.transport.sendMail(sesMessage);
+      // const response = await this.transport.sendMail(sesMessage);
+
+      const response = this.dummy_response;
 
       return response;
     } catch (err) {

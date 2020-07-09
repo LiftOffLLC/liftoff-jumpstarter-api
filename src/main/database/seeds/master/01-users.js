@@ -1,6 +1,6 @@
 const Bcrypt = require('bcrypt');
 
-exports.seed = (knex, Promise) => {
+exports.seed = knex => {
   const passwordSalt = Bcrypt.genSaltSync(10);
   const encryptedPassword = Bcrypt.hashSync('admin123456', passwordSalt);
 
