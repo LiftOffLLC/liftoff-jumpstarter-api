@@ -73,7 +73,7 @@ const options = {
     await Utils.addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
 
     const response = h.response(result);
-    result.code(201);
+    response.code(201);
     return response;
   },
 };

@@ -13,7 +13,8 @@
     "db:migrate": "knex --knexfile ./src/main/knexfile.js migrate:latest",
     "db:rollback": "knex --knexfile ./src/main/knexfile.js migrate:rollback",
     "db:seed": "knex --knexfile ./src/main/knexfile.js seed:run",
-    "test": "NODE_ENV=test lab src/test -c -r console -v -I '__core-js_shared__'",
+    "test:verbose": "NODE_ENV=test jest src/test --verbose",
+    "test": "yarn test:verbose --silent",
     "format": "prettier --write '**/*.{ts,js,css,html}'"
   },
   "repository": {
@@ -93,7 +94,6 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "code": "^5.2.4",
     "eslint": "7.2.0",
     "eslint-config-airbnb": "18.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -106,8 +106,8 @@
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "4.0.0",
     "eslint-plugin-security": "^1.3.0",
+    "jest": "^26.1.0",
     "jsinspect": "^0.12.7",
-    "lab": "^18.0.2",
     "lint-staged": "^10.2.4",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5"

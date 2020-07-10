@@ -3,6 +3,7 @@ require('newrelic');
 const knexClass = require('knex');
 const Config = require('./config');
 const Bootstrap = require('./app/bootstrap');
+const Worker = require('./app/commons/worker');
 // Configure Winston Logger for logging in utils, models, etc.
 // eslint-disable-next-line no-unused-vars
 
@@ -23,15 +24,15 @@ process.on('rejectionHandled', promise => {
   console.log('Possibly Unhandled Rejection at: Promise ', promise);
 });
 
+const dbConfig = Config.get('database').get('postgres').toJS();
+const knex = knexClass(dbConfig);
+
 console.log(Date.now(), '::: bootstraping ::::: ');
 // create server instance
-const server = Bootstrap.server(Config);
+const Server = Bootstrap.server(Config);
 
 const configureDatabase = async () => {
   try {
-    const dbConfig = Config.get('database').get('postgres').toJS();
-    const knex = knexClass(dbConfig);
-
     await knex.raw(dbConfig.validateQuery);
 
     if (dbConfig.recreateDatabase === 'true') {
@@ -57,8 +58,10 @@ const configureDatabase = async () => {
   }
 };
 
-const start = async () => {
+const configure = async () => {
   try {
+    console.log(Date.now(), '::: booting up ::::: ');
+
     // configure database.
     console.log(Date.now(), ':::: about to configure database ::::');
     await configureDatabase();
@@ -82,15 +85,15 @@ const start = async () => {
 
     // load all necessary plugins.
     console.log(Date.now(), ':::: loading server plugins ::::');
-    await Bootstrap.plugins(server);
+    await Bootstrap.plugins(Server);
 
     // configure routes.
     console.log(Date.now(), ':::: loading server routes ::::');
-    await Bootstrap.routes(server);
+    await Bootstrap.routes(Server);
 
     // configure methods.
     console.log(Date.now(), ':::: loading server methods ::::');
-    await Bootstrap.methods(server);
+    await Bootstrap.methods(Server);
 
     // Start the worker threads.
     if (Config.get('env') !== 'production') {
@@ -115,32 +118,51 @@ const start = async () => {
     //     });
     //     this.server.publish('/socket/notifications', finalData);
     //   });
-
-    /**
-    start the server
-    The if (!module.parent) {…} conditional makes sure that if the script is being
-    required as a module by another script, we don’t start the server. This is done
-    to prevent the server from starting when we’re testing it; with Hapi, we don’t
-    need to have the server listening to test it.
-    */
-    if (!module.parent) {
-      console.log(Date.now(), ':::: starting server ::::');
-
-      await server.start();
-
-      console.log(
-        Date.now(),
-        `${server.settings.app.get('server').get('name')} started at ${
-          server.info.uri
-        }`,
-      );
-    }
   } catch (e) {
-    console.error('could not start server: ', e);
+    console.error('could not configure server: ', e);
     throw e;
   }
 };
 
-console.log(Date.now(), '::: booting up ::::: ');
-start();
-module.exports = server;
+const init = async () => {
+  await configure();
+  console.log(Date.now(), ':::: initializing server ::::');
+  await Server.initialize();
+  console.log(Date.now(), 'initialized server');
+};
+
+const start = async () => {
+  await configure();
+  console.log(Date.now(), ':::: starting server ::::');
+  await Server.start();
+  console.log(
+    Date.now(),
+    `${Server.settings.app.get('server').get('name')} started at ${
+      Server.info.uri
+    }`,
+  );
+};
+
+const stop = async () => {
+  await knex.destroy();
+  await Worker.stop();
+  console.log(Date.now(), ':::: stopping server ::::');
+  await Server.stop();
+  console.log(
+    Date.now(),
+    `${Server.settings.app.get('server').get('name')} stopped`,
+  );
+};
+
+/**
+  Start the server
+  The 'if (!module.parent) {…}' conditional makes sure that if the script is being
+  required as a module by another script, we don’t start the server. This is done
+  to prevent the server from starting when we’re testing it with Hapi, we don’t
+  need to have the server listening to test it.
+*/
+if (!module.parent) {
+  start();
+}
+
+module.exports = { init, start, stop, Server };
