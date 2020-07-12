@@ -1,13 +1,11 @@
 const _ = require('lodash');
-const requireDirs = require('require-dir');
+const requireDirs = require('require-directory');
 const Config = require('../../config');
 const Utils = require('../commons/utils');
 // configure routes - routes will be picked from ./controllers folder.
 module.exports = async server => {
   const routes = [];
-  const controllers = requireDirs('../controllers', {
-    recurse: true,
-  });
+  const controllers = requireDirs(module, '../controllers');
 
   const enabledRoutes = []; // _.filter(controllers, ['enabled', true]);
   await Utils.traverseDeep(controllers, async obj => {

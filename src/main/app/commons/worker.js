@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const requireDirs = require('require-dir');
+const requireDirs = require('require-directory');
 const Queue = require('bull');
 const Logger = require('./logger');
 const Config = require('../../config');
@@ -44,7 +44,7 @@ class Worker {
    */
   registerEnabledJobs() {
     Logger.info('Registering jobs');
-    const jobs = requireDirs('../workers');
+    const jobs = requireDirs(module, '../workers');
     const enabledJobs = _.filter(jobs, ['enabled', true]);
     this.jobs = enabledJobs;
     Logger.info(`${this.jobs.length} job(s) registered`);

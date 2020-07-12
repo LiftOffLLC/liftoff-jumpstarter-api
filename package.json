@@ -13,7 +13,7 @@
     "db:migrate": "knex --knexfile ./src/main/knexfile.js migrate:latest",
     "db:rollback": "knex --knexfile ./src/main/knexfile.js migrate:rollback",
     "db:seed": "knex --knexfile ./src/main/knexfile.js seed:run",
-    "test:verbose": "NODE_ENV=test jest src/test --verbose",
+    "test:verbose": "jest src/test --verbose --forceExit --detectOpenHandles",
     "test": "yarn test:verbose --silent",
     "format": "prettier --write '**/*.{ts,js,css,html}'"
   },
@@ -89,7 +89,7 @@
     "pm2": "^4.4.0",
     "redis": "^3.0.2",
     "request": "^2.88.2",
-    "require-dir": "^1.2.0",
+    "require-directory": "^2.1.1",
     "toposort": "^2.0.2",
     "winston": "^3.2.1"
   },
