@@ -84,9 +84,6 @@ Source Code is located at `src/main` and test code in `src/test`
 	/models --> database model
 	/plugins --> HAPI plugins
 	/schedulers --> schedulers files; comes handy when deploying on heroku scheduler.
-	/views --> mail and pdf templates
-		/mail-templates
-		/pdf-templates
 	/workers --> worker files; dot notation is used to bucket the worker
 /config --> configuration file;
 /migrations --> migrations files
