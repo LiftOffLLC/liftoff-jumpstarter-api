@@ -15,7 +15,7 @@ module.exports = function socialDisconnect(providerName) {
     tags: ['api'],
     validate: {
       params: Joi.object({
-        userId: validator.userId.required(),
+        userId: validator.id.required(),
       }),
     },
     plugins: {
