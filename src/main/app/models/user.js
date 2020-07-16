@@ -44,7 +44,7 @@ module.exports = class User extends BaseModel {
 
   static validatorRules() {
     const rules = {
-      userId: Joi.number().integer().positive().description('User Id'),
+      id: Joi.number().integer().positive().description('User Id'),
       userName: Joi.string()
         .trim()
         .alphanum()

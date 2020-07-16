@@ -14,7 +14,7 @@ const options = {
   tags: ['api'],
   validate: {
     params: Joi.object({
-      userId: validator.userId.required(),
+      userId: validator.id.required(),
     }),
     payload: Joi.object({
       name: validator.name.optional(),
