@@ -31,15 +31,17 @@ const options = {
     },
   },
   handler: async (request, h) => {
-    const userCount = await UserModel.count(
+    const user = await UserModel.findOne([
       UserModel.buildCriteria('email', request.payload.email),
-    );
+      UserModel.buildCriteria('isActive', [true, false], 'in'),
+    ]);
 
     // Error out if email already exists.
-    if (userCount > 0) {
-      throw Boom.forbidden(
-        Util.format(errorCodes.emailDuplicate, request.payload.email),
-      );
+    if (!_.isEmpty(user)) {
+      const errorCode = user.isActive
+        ? errorCodes.emailDuplicate
+        : errorCodes.userDisabled;
+      throw Boom.forbidden(Util.format(errorCode, request.payload.email));
     }
 
     const userObject = _.clone(request.payload);
