@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const UserModel = require('../../models/user');
-const isAuthorized = require('../../policies/isAuthorized');
 const Constants = require('../../commons/constants');
 
 const options = {
@@ -11,7 +10,6 @@ const options = {
     'hapi-swagger': {
       responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
     },
-    policies: [isAuthorized('auth.credentials.userId')],
   },
   handler: async (request, _h) => {
     const userID = _.get(request, 'auth.credentials.userId');

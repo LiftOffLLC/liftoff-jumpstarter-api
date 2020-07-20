@@ -2,11 +2,12 @@ const Util = require('util');
 const _ = require('lodash');
 const JWT = require('jsonwebtoken');
 const Joi = require('@hapi/joi');
+const Boom = require('@hapi/boom');
 const Logger = require('../../commons/logger');
 const UserModel = require('../../models/user');
+const errorCodes = require('../../commons/errors');
 const Config = require('../../../config');
 const RedisClient = require('../../commons/redisClient');
-const isAuthorized = require('../../policies/isAuthorized');
 const Constants = require('../../commons/constants');
 const UserRole = require('../../models/userRole');
 
@@ -18,29 +19,31 @@ const options = {
   description: 'Logout User - Access - admin,user',
   tags: ['api'],
   validate: {
-    params: Joi.object({
-      userId: validator.id.required(),
+    query: Joi.object({
+      userId: validator.id.optional(),
     }),
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
+      responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
-    policies: [isAuthorized('params.userId')],
   },
   handler: async (request, _h) => {
     request.log(
       ['info', __filename],
-      `userId:: ${inspect(request.params.userId)}`,
+      `userId:: ${inspect(request.query.userId)}`,
+      `authScopeUserId:: ${inspect(request.auth.credentials.userId)}`,
     );
-    const decoded = JWT.decode(
-      request.headers.authorization,
-      Config.get('auth').get('key'),
-    );
-    const isAdmin = _.get(request, 'auth.credentials.scope') === UserRole.ADMIN;
 
     const authScopeUserId = _.get(request, 'auth.credentials.userId');
-    const isSelf = authScopeUserId == request.params.userId; // eslint-disable-line eqeqeq
+    const userId = _.get(request, 'query.userId');
+    const isUserIdDefined = !_.isUndefined(userId);
+    const isAdmin = _.get(request, 'auth.credentials.scope') === UserRole.ADMIN;
+    const isSelf = authScopeUserId == userId; // eslint-disable-line eqeqeq
+
+    if (!isAdmin && isUserIdDefined && !isSelf) {
+      throw Boom.forbidden(errorCodes.unableToLogoutOtherUser);
+    }
 
     /**
     Admin should be able to knock-out a particular users sessions
@@ -51,12 +54,25 @@ const options = {
     ADMIN      1             1       sessions:1:"token"
     ADMIN      1             2       sessions:2:*
     USER       2             2       sessions:2:"token"
-    USER       2             1       ***DEVELOPER BUG; EVER WONDER HOW HE MADE IT SO FAR***
+    USER       2             1       forbidden (403)
     ---------------------------------------------
     */
-    const sessionId = isAdmin && !isSelf ? '' : decoded.id;
+
+    let sessionId;
+    let logoutUserId;
+    if (isAdmin && isUserIdDefined && !isSelf) {
+      sessionId = '';
+      logoutUserId = userId;
+    } else {
+      const decoded = JWT.decode(
+        request.headers.authorization,
+        Config.get('auth').get('key'),
+      );
+      sessionId = decoded.id;
+      logoutUserId = authScopeUserId;
+    }
     Logger.info('logout :: deleting sessionId :: ', sessionId);
-    await RedisClient.deleteSession(request.params.userId, sessionId);
+    await RedisClient.deleteSession(logoutUserId, sessionId);
 
     return Constants.SUCCESS_RESPONSE;
   },
@@ -66,7 +82,7 @@ const options = {
 const handler = server => {
   const details = {
     method: ['DELETE'],
-    path: '/api/users/{userId}/logout',
+    path: '/api/users/logout',
     options,
   };
   return details;
