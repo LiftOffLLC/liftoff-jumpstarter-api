@@ -5,7 +5,6 @@ const Joi = require('@hapi/joi');
 const Boom = require('@hapi/boom');
 const Logger = require('../../commons/logger');
 const UserModel = require('../../models/user');
-const errorCodes = require('../../commons/errors');
 const Config = require('../../../config');
 const RedisClient = require('../../commons/redisClient');
 const Constants = require('../../commons/constants');
@@ -40,30 +39,30 @@ const options = {
     const isUserIdDefined = !_.isUndefined(userId);
     const isAdmin =
       _.get(request, 'auth.credentials.scope') === UserRoleEnum.ADMIN;
-    const isSelf = authScopeUserId == userId; // eslint-disable-line eqeqeq
 
-    if (!isAdmin && isUserIdDefined && !isSelf) {
-      throw Boom.forbidden(errorCodes.unableToLogoutOtherUser);
+    if (!isAdmin && isUserIdDefined) {
+      throw Boom.badRequest();
     }
 
     /**
-    Admin should be able to knock-out a particular users sessions
-    If user Is admin and is trying to logout other user.
+    Admin always logs himself out from all sessions
+    Admin can log out a particular user's all sessions using userId optional parameter
+    User cannot pass userId parameter, he can only logout his current session
     ---------------------------------------------
-    userRole  adminUserId userId  session_to_delete
+    userRole  authUserId userId  session_to_delete
     ---------------------------------------------
-    ADMIN      1             1       sessions:1:"token"
-    ADMIN      1             2       sessions:2:*
-    USER       2             2       sessions:2:"token"
-    USER       2             1       forbidden (403)
+    ADMIN      1                     sessions:1:*
+    ADMIN      1             N       sessions:N:*
+    USER       2                     sessions:2:"token"
+    USER       2             N       bad request (400)
     ---------------------------------------------
     */
 
     let sessionId;
     let logoutUserId;
-    if (isAdmin && isUserIdDefined && !isSelf) {
+    if (isAdmin) {
       sessionId = '';
-      logoutUserId = userId;
+      logoutUserId = isUserIdDefined ? userId : authScopeUserId;
     } else {
       const decoded = JWT.decode(
         request.headers.authorization,

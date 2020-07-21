@@ -2,7 +2,6 @@ module.exports = {
   userNotFound: 'The user id %s does not exist.',
   notFound: '%s not found.',
   userListNotFound: 'Unable to obtain user list.',
-  unableToLogoutOtherUser: 'You cannot logout other user.',
   unableToUpdateOtherUser: 'You are unable to update other user.',
   emailDuplicate: 'The email address %s is already in use.',
   userDisabled: 'The user with the email address %s has been disabled.',
