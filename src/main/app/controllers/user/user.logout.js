@@ -9,7 +9,7 @@ const errorCodes = require('../../commons/errors');
 const Config = require('../../../config');
 const RedisClient = require('../../commons/redisClient');
 const Constants = require('../../commons/constants');
-const UserRole = require('../../models/userRole');
+const UserRoleEnum = require('../../models/userRole').loginRoles();
 
 const validator = UserModel.validatorRules();
 const { inspect } = Util;
@@ -38,7 +38,8 @@ const options = {
     const authScopeUserId = _.get(request, 'auth.credentials.userId');
     const userId = _.get(request, 'query.userId');
     const isUserIdDefined = !_.isUndefined(userId);
-    const isAdmin = _.get(request, 'auth.credentials.scope') === UserRole.ADMIN;
+    const isAdmin =
+      _.get(request, 'auth.credentials.scope') === UserRoleEnum.ADMIN;
     const isSelf = authScopeUserId == userId; // eslint-disable-line eqeqeq
 
     if (!isAdmin && isUserIdDefined && !isSelf) {

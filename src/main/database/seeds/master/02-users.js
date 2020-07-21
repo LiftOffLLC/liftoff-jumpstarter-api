@@ -9,9 +9,9 @@ exports.seed = knex => {
       name: 'admin',
       userName: 'admin',
       email: 'admin@dummy.com',
+      roleId: 1,
       encryptedPassword,
       passwordSalt,
-      isAdmin: true,
     },
   ];
 
