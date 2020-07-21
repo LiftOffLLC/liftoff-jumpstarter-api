@@ -1,8 +1,7 @@
 const Bcrypt = require('bcrypt');
 
 exports.seed = knex => {
-  const passwordSalt = Bcrypt.genSaltSync(10);
-  const encryptedPassword = Bcrypt.hashSync('admin123456', passwordSalt);
+  const hashedPassword = Bcrypt.hashSync('admin123456', 10);
 
   const records = [
     {
@@ -10,8 +9,7 @@ exports.seed = knex => {
       userName: 'admin',
       email: 'admin@dummy.com',
       roleId: 1,
-      encryptedPassword,
-      passwordSalt,
+      hashedPassword,
     },
   ];
 

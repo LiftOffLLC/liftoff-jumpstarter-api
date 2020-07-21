@@ -18,14 +18,13 @@ module.exports = class User extends BaseModel {
 
   static entityFilteringScope() {
     return {
-      admin: ['encryptedPassword', 'passwordSalt'],
+      admin: ['hashedPassword'],
       user: [
         'phoneToken',
         'isPhoneVerified',
         'emailToken',
         'isEmailVerified',
-        'encryptedPassword',
-        'passwordSalt',
+        'hashedPassword',
         'resetPasswordToken',
         'resetPasswordSentAt',
       ],
@@ -34,8 +33,7 @@ module.exports = class User extends BaseModel {
         'isPhoneVerified',
         'emailToken',
         'isEmailVerified',
-        'encryptedPassword',
-        'passwordSalt',
+        'hashedPassword',
         'resetPasswordToken',
         'resetPasswordSentAt',
         'socialLogins',
@@ -103,31 +101,29 @@ module.exports = class User extends BaseModel {
   }
 
   hashPassword() {
-    if (this.encryptedPassword) {
+    if (this.hashedPassword) {
       if (
-        this.encryptedPassword.indexOf('$2b$') === 0 &&
-        this.encryptedPassword.length === 60
+        this.hashedPassword.indexOf('$2b$') === 0 &&
+        this.hashedPassword.length === 60
       ) {
+        // Don't know why this condition exists, please report if you figure out.
+        // Following is a failed attempt of explanation
         // The password is already hashed. It can be the case when the instance is loaded from DB
         // eslint-disable-next-line no-self-assign
-        this.encryptedPassword = this.encryptedPassword;
+        this.hashedPassword = this.hashedPassword;
       } else {
-        this.passwordSalt = Bcrypt.genSaltSync(10);
-        this.encryptedPassword = this.encryptPassword(
-          this.encryptedPassword,
-          this.passwordSalt,
-        );
+        this.hashedPassword = this.getHashedPassword(this.hashedPassword);
       }
     }
-    Logger.info('afteer hashPassword');
+    Logger.info('after hashPassword');
   }
 
   verifyPassword(password) {
-    return Bcrypt.compareSync(password, this.encryptedPassword);
+    return Bcrypt.compareSync(password, this.hashedPassword);
   }
 
-  encryptPassword(pwd, passwordSalt) {
-    return Bcrypt.hashSync(pwd, passwordSalt);
+  getHashedPassword(password) {
+    return Bcrypt.hashSync(password, 10);
   }
 
   static async signSession(request, userId) {

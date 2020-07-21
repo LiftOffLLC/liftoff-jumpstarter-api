@@ -45,7 +45,7 @@ const options = {
     }
 
     const userObject = _.clone(request.payload);
-    userObject.encryptedPassword = request.payload.password;
+    userObject.hashedPassword = request.payload.password;
     delete userObject.password;
     const result = await UserModel.createOrUpdate(userObject);
 

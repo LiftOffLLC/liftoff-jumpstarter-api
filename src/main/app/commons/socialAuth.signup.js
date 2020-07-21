@@ -61,7 +61,7 @@ async function handler(providerName, request, h) {
       email: request.payload.email,
       name: request.payload.name,
       phoneNumber: request.payload.phoneNumber,
-      encryptedPassword: Uuid.v4(),
+      hashedPassword: Uuid.v4(),
       avatarUrl: request.payload.avatarUrl,
       subscribedToNewsletter: request.payload.subscribedToNewsletter,
     };

@@ -64,12 +64,8 @@ exports.up = knex =>
           .index()
           .comment('E164 Phone number; mobile number');
 
-        // Password and Salt
-        table
-          .string('encryptedPassword')
-          .notNullable()
-          .comment('Encrypted password');
-        table.string('passwordSalt').notNullable().comment('Password Salt');
+        // Password
+        table.string('hashedPassword').notNullable().comment('Hashed password');
 
         // Reset Password
         table
