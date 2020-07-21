@@ -54,7 +54,7 @@ const options = {
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: result.id,
-      isAdmin: result.roleId === 1,
+      isAdmin: result.roleId === Constants.ROLES.ADMIN,
     });
 
     await RedisClient.saveSession(result.id, sessionId, session);
@@ -66,7 +66,9 @@ const options = {
     _.set(
       request,
       'auth.credentials.scope',
-      result.roleId === 1 ? UserRoleEnum.ADMIN : UserRoleEnum.USER,
+      result.roleId === Constants.ROLES.ADMIN
+        ? UserRoleEnum.ADMIN
+        : UserRoleEnum.USER,
     );
 
     const mailVariables = {

@@ -7,6 +7,7 @@ const Logger = require('../commons/logger');
 const BaseModel = require('./base');
 const UserRoleEnum = require('./userRole').loginRoles();
 const RedisClient = require('../commons/redisClient');
+const Constants = require('../commons/constants');
 const PhoneJoiValidator = require('../commons/validators/phoneJoiValidator');
 const EmailBlackListValidator = require('../commons/validators/emailBlackListValidator');
 const PasswordValidator = require('../commons/validators/password-validator');
@@ -135,7 +136,7 @@ module.exports = class User extends BaseModel {
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: user.id,
-      isAdmin: user.roleId === 1,
+      isAdmin: user.roleId === Constants.ROLES.ADMIN,
     });
     await RedisClient.saveSession(user.id, sessionId, session);
     const sessionToken = request.server.methods.sessionsSign(session);
@@ -147,7 +148,9 @@ module.exports = class User extends BaseModel {
     _.set(
       request,
       'auth.credentials.scope',
-      user.roleId === 1 ? UserRoleEnum.ADMIN : UserRoleEnum.USER,
+      user.roleId === Constants.ROLES.ADMIN
+        ? UserRoleEnum.ADMIN
+        : UserRoleEnum.USER,
     );
 
     // HAck to send back the social access/refresh token to self

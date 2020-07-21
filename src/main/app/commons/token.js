@@ -25,6 +25,8 @@ module.exports = {
         const UserModel = require('../models/user');
         // eslint-disable-next-line global-require
         const UserRoleEnum = require('../models/userRole').loginRoles();
+        // eslint-disable-next-line global-require
+        const Constants = require('./constants');
 
         const user = await UserModel.findOne(
           UserModel.buildCriteria('id', session.subject.userId),
@@ -36,7 +38,7 @@ module.exports = {
         if (user) {
           // eslint-disable-next-line eqeqeq
           session.subject.scope =
-            (user.roleId === 1) === true
+            (user.roleId === Constants.ROLES.ADMIN) === true
               ? UserRoleEnum.ADMIN
               : UserRoleEnum.USER;
 
