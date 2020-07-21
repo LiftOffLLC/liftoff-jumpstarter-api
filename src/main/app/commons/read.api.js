@@ -3,7 +3,7 @@ const Util = require('util');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const dbUtil = require('./dbUtil');
-const UserRole = require('../models/userRole');
+const UserRoleEnum = require('../models/userRole').loginRoles();
 const Constants = require('./constants');
 const { throwError } = require('./error.parser');
 
@@ -15,7 +15,8 @@ const readHandler = async (model, request, _h) => {
   };
 
   // includeInactive - for user - should select all active once, and for admin should select both.
-  const isAdmin = _.get(request, 'auth.credentials.scope') === UserRole.ADMIN;
+  const isAdmin =
+    _.get(request, 'auth.credentials.scope') === UserRoleEnum.ADMIN;
   const filterOpts = dbUtil.fetchFilterCriteria(request.query.filters, isAdmin);
   const count = await model.count(_.cloneDeep(filterOpts));
   const items = await model.findAll(_.cloneDeep(filterOpts), criteriaOpts);

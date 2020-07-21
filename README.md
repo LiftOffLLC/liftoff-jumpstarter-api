@@ -230,7 +230,7 @@ Each model has to subclassed from BaseModel. Refer Objection.js/Knex for usage. 
 ```node
 static entityFilteringScope() {
     return {
-      admin: ['encryptedPassword', 'passwordSalt'], // fields hidden from admin
+      admin: ['hashedPassword'], // fields hidden from admin
       user: ['phoneToken', 'isPhoneVerified'], // fields hidden from user role.
       guest: ['resetPasswordToken', 'resetPasswordSentAt','socialLogins'] // fields hidden from user role.
       // guest: 'all' -- Optionally this array be also be 'all' to hide all the fields from this model.

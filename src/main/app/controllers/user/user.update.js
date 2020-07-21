@@ -44,7 +44,7 @@ const options = {
       );
 
       if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
-        payload.encryptedPassword = payload.password;
+        payload.hashedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
         throw Boom.unauthorized('Invalid credentials.');

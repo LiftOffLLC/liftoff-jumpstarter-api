@@ -4,7 +4,7 @@ const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const Uuid = require('node-uuid');
 const UserModel = require('../../models/user');
-const UserRole = require('../../models/userRole');
+const UserRoleEnum = require('../../models/userRole').loginRoles();
 const RedisClient = require('../../commons/redisClient');
 const errorCodes = require('../../commons/errors');
 const Constants = require('../../commons/constants');
@@ -45,7 +45,7 @@ const options = {
     }
 
     const userObject = _.clone(request.payload);
-    userObject.encryptedPassword = request.payload.password;
+    userObject.hashedPassword = request.payload.password;
     delete userObject.password;
     const result = await UserModel.createOrUpdate(userObject);
 
@@ -54,7 +54,7 @@ const options = {
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: result.id,
-      isAdmin: result.isAdmin,
+      isAdmin: result.roleId === Constants.ROLES.ADMIN,
     });
 
     await RedisClient.saveSession(result.id, sessionId, session);
@@ -66,7 +66,9 @@ const options = {
     _.set(
       request,
       'auth.credentials.scope',
-      result.isAdmin ? UserRole.ADMIN : UserRole.USER,
+      result.roleId === Constants.ROLES.ADMIN
+        ? UserRoleEnum.ADMIN
+        : UserRoleEnum.USER,
     );
 
     const mailVariables = {
