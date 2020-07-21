@@ -24,7 +24,7 @@ const options = {
   },
   plugins: {
     'hapi-swagger': {
-      responses: _.omit(Constants.API_STATUS_CODES, [201]),
+      responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
     },
   },
   handler: async (request, _h) => {
