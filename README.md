@@ -19,24 +19,32 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 | Eslint            | Check Eslint Issues                                        |
 | Prettier          | Code Formatting                                            |
 | PM2               | Process management utility to start/stop server            |
+| Jest              | Testing Framework                                          |
 
 ## Project Setup
 
 1. Download the latest zip file or clone the repo with depth=1 using below command -  
    `git clone --depth=1 git@github.com:LiftOffLLC/liftoff-jumpstarter-api.git`
-2. Install PostgreSQL and Redis
-3. Modify the config details
-   2.1 Copy .env.development as .env file in project folder and modify the relevant properties for the project  
-    2.1.1. Database Config  
-    2.1.2. Redis Config (Login auth tokens are stored)  
-    2.1.3. JWT Tokens (Secret Key), etc.  
-   2.2. Fix config/default.js  
-   2.3. Fix plugins/hapi-swagger.js for swagger documentation  
-   2.4. Fix plugins/status-monitor.js for monitoring  
-   2.5. Modify company_name and user_name in views/mail-templates folder.
-4. After adding your project dependencies, use `yarn` to lock dependencies.
+2. Install PostgreSQL and create a database 
+3. Install Redis
+4. Modify the config details  
+   4.1 Copy .env.example as .env file in project folder and modify the relevant properties for the project  
+    4.1.1. Database Config  
+    4.1.2. Redis Config (Login auth tokens are stored)  
+    4.1.3. JWT Tokens (Secret Key), etc.  
+   4.2. Fix config/default.js  
+   4.3. Fix plugins/hapi-swagger.js for swagger documentation  
+   4.4. Fix plugins/status-monitor.js for monitoring  
+5. Run `yarn` to install all the dependencies.
+6. Migrate and seed the database using `yarn db:migrate` and `yarn db:seed`
+7. Run `yarn dev` to start the server in dev environment
 
 ## Pulling changes from Jumpstarter repository into your project's repository
+
+This will merge Jumpstarter into your project, thereby merging the features added into Jumpstarter after you cloned from Jumpstarter. It will also enable you to pull changes from Jumpstarter in the future.  
+**NOTE**: You will probably run into a lot of merge conflicts and breaking changes including but not limited to- renamed/moved/deleted files, renamed/deleted variables, updated database schema, etc. Manually select the changes you want to keep and discard the remaining changes. Preferably keep as many new changes as you can because the future changes will be based on these changes. Use this functionality carefully!  
+
+#### A) Pulling changes for the first time
 
 1. Set Jumpstarter as a remote in your project  
 `git remote add jumpstarter https://github.com/LiftOffLLC/liftoff-jumpstarter-api.git`
@@ -45,31 +53,41 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 3. Pull latest changes from Jumpstarter master into your repository's current branch  
 `git pull --allow-unrelated-histories jumpstarter master`
 
+#### B) Pulling changes next time onwards
+`git pull jumpstarter master`
+
+## Pushing changes from your project's repository into Jumpstarter repository
+
+Don't. Make those changes in Jumpstarter instead. 
+
 ## Project Practices
 
 #### Code Formating and Linting
 
-`$:> yarn format` -- to format the code  
-`$:> yarn lint` -- to Check lint issues  
-`$:> yarn lint:fix` -- to fix possible lint issues  
-`$:> yarn inspect` -- to Detect copied code  
-`$:> yarn test` -- to run test cases
+`yarn format` -- to format the code  
+`yarn lint` -- to Check lint issues  
+`yarn lint:fix` -- to fix possible lint issues  
+`yarn inspect` -- to Detect copied code  
+
+#### Testing
+`yarn test` -- to run test cases
+`yarn test:verbose` -- to run test cases and show verbose logs
 
 #### Database Related Scripts
 
-`$:> yarn db:migrate` -- to apply database migration  
-`$:> yarn db:rollback` -- to rollback database migration  
-`$:> yarn db:seed` -- to run the seed data
+`yarn db:migrate` -- to apply database migration  
+`yarn db:rollback` -- to rollback database migration  
+`yarn db:seed` -- to run the seed data
 
 #### Running Dev Server
 
-`$:> yarn dev` -- to run the development server; also watches the files using nodemon; also runs worker.  
-`$:> yarn worker` -- to run the worker thread
+`yarn dev` -- to run the development server; also watches the files using nodemon; also runs worker.  
+`yarn worker` -- to run the worker thread
 
-#### Running Prod Server on Heroku.
+#### Running Prod Server
 
-`$:> yarn` to lock all the dependencies  
-`$:> yarn start` will stop all the running processes and start the server; No need of Procfile if running only the server.
+`yarn` to install all the dependencies  
+`yarn start` will stop all the running processes and start the server; No need of Procfile if running only the server.
 
 ## Folder Convention
 
@@ -83,13 +101,15 @@ Source Code is located at `src/main` and test code in `src/test`
 	/methods --> server methods; to decorate server.
 	/models --> database model
 	/plugins --> HAPI plugins
+	/policies --> policies
 	/schedulers --> schedulers files; comes handy when deploying on heroku scheduler.
 	/workers --> worker files; dot notation is used to bucket the worker
 /config --> configuration file;
-/migrations --> migrations files
+/database
+  /migrations --> migrations files
+  /seeds/master --> seed data; can be extended per env; but needs to be changed in config file
 /modules --> common reusable modules
 /public --> all the files needed for public view
-/seeds/master --> seed data; can be extended per env; but needs to be changed in config file
 ```
 
 ## Understanding APIs
@@ -285,9 +305,8 @@ create modules
 1. Generalize social.js to pull send standardized output.
 2. Document Preparation Guide for Jumpstarter  
    a. create .env file and modify accordingly.  
-   b. replace **company_name** and **user_name** in email templates.  
-   c. versioning header/ plugins/hapi-swagger.js  
-   d. status monitoring tool / plugins.status-monitor.js
+   b. versioning header/ plugins/hapi-swagger.js  
+   c. status monitoring tool / plugins.status-monitor.js
 3. Generalize error codes and better error schema for response.  
    a. i18n - internalization support (low)  
    b. format error code.  
@@ -301,17 +320,15 @@ create modules
 5. Chat server Jumpstarter kit
 6. Microservices support  
    a. create microservices for pdf generation; image upload; image transformation.
-7. Sync project  
-   a. ability to sync project once Jumpstarter kit is updated
-8. Need elaboration on how to cache responses.
-9. Rate-limit for critical apis. like login/signup.
-10. Docker image and deployment steps for aws.
-11. Strict header versioning check for vendor-specific headers.
-12. Generic CRUD for all models. Scaffolding.
-13. APIs to support unique constraints in path /userIdOruserName/update
-14. Update dependencies and yarn lock file regularly.
-15. Pass server context in all hapi plugins.
-16. Extract error Handler plugin to plugins folder (depends on 15).
+7. Need elaboration on how to cache responses.
+8. Rate-limit for critical apis. like login/signup.
+9.  Docker image and deployment steps for aws.
+10. Strict header versioning check for vendor-specific headers.
+11. Generic CRUD for all models. Scaffolding.
+12. APIs to support unique constraints in path /userIdOruserName/update
+13. Update dependencies and yarn lock file regularly.
+14. Pass server context in all hapi plugins.
+15. Extract error Handler plugin to plugins folder (depends on 15).
 
 ## Contribute back
 
