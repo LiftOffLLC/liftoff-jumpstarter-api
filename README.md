@@ -285,6 +285,10 @@ Checkout Read API in /commons folder for usage. The following are the methods ex
 
 ## Worker Threads
 
+## Nodemailer
+
+The mailer implementation in `src/main/app/commons/mailer.js` is purposely left blank. Update this file as per your email service provider's sdk
+
 ## Socket Notifications
 
 - Simple Use-case - Use Nes.
