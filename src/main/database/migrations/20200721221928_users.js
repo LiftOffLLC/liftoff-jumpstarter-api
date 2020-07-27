@@ -2,6 +2,29 @@
 exports.up = knex =>
   Promise.all([
     /**
+    Table:  User Roles
+    Purpose: Store User's Role data.
+    */
+    knex.schema
+      .createTableIfNotExists('user_roles', table => {
+        table.increments('id').primary();
+        table.string('name', 255).notNullable().comment('Role Name');
+        table
+          .string('description', 255)
+          .notNullable()
+          .comment('Role Description');
+
+        // TimeStamps
+        table.boolean('isActive').defaultTo(true).comment('Active?');
+        table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+        table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
+      })
+      .then(() => {
+        console.log('Created Table: user_roles table');
+        return true;
+      }),
+
+    /**
     Table:  Users
     Purpose: Store User's Profile data.
     */
@@ -41,12 +64,8 @@ exports.up = knex =>
           .index()
           .comment('E164 Phone number; mobile number');
 
-        // Password and Salt
-        table
-          .string('encryptedPassword')
-          .notNullable()
-          .comment('Encrypted password');
-        table.string('passwordSalt').notNullable().comment('Password Salt');
+        // Password
+        table.string('hashedPassword').notNullable().comment('Hashed password');
 
         // Reset Password
         table
@@ -58,8 +77,14 @@ exports.up = knex =>
           .timestamp('resetPasswordSentAt')
           .comment('Reset Password Sent At TimeStamps');
 
-        // is admin role
-        table.boolean('isAdmin').defaultTo(false).comment('Admin flag');
+        // Role
+        table
+          .integer('roleId')
+          .notNullable()
+          .references('user_roles.id')
+          .defaultTo(2)
+          .index()
+          .comment('User Role Id');
 
         // TimeStamps
         table.boolean('isActive').defaultTo(true).comment('Active?');
@@ -114,9 +139,10 @@ exports.up = knex =>
 exports.down = knex =>
   Promise.all([
     knex.raw('drop table if exists social_logins cascade'),
+    knex.raw('drop table if exists user_roles cascade'),
     knex.raw('drop table if exists users cascade'),
-    knex.raw('truncate table knex_migrations_lock'),
-    knex.raw('truncate table knex_migrations'),
+    knex.raw('truncate table knex_migrations_lock RESTART identity'),
+    knex.raw('truncate table knex_migrations RESTART identity'),
   ]).then(
     values => {
       console.log('dropped all tables : ', values);

@@ -51,7 +51,7 @@ const options = {
     // Reset token and create hash from password
     user.resetPasswordSentAt = null;
     user.resetPasswordToken = null;
-    user.encryptedPassword = request.payload.password;
+    user.hashedPassword = request.payload.password;
     const updatedUser = await UserModel.createOrUpdate(user);
 
     request.log(

@@ -1,6 +1,6 @@
 /* eslint-disable arrow-body-style,promise/avoid-new */
 const _ = require('lodash');
-const requireDirs = require('require-dir'); // eslint-disable-line hapi/hapi-capitalize-modules
+const requireDirs = require('require-directory'); // eslint-disable-line hapi/hapi-capitalize-modules
 const Promise = require('bluebird');
 
 // This plugin is used to make hapi support handler as async function
@@ -68,7 +68,7 @@ const registerAsyncMethods = async (server, methodInstance) => {
 
 // configure routes - routes will be picked from ./controllers folder.
 module.exports = async server => {
-  const methods = requireDirs('../methods');
+  const methods = requireDirs(module, '../methods');
   const enabledMethods = _.filter(methods, ['enabled', true]);
   await Promise.all(
     _.each(enabledMethods, async method => {

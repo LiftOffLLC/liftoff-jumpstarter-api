@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const requireDirs = require('require-dir');
+const requireDirs = require('require-directory');
 const Queue = require('bull');
 const Logger = require('./logger');
 const Config = require('../../config');
@@ -44,10 +44,10 @@ class Worker {
    */
   registerEnabledJobs() {
     Logger.info('Registering jobs');
-    const jobs = requireDirs('../workers');
+    const jobs = requireDirs(module, '../workers');
     const enabledJobs = _.filter(jobs, ['enabled', true]);
     this.jobs = enabledJobs;
-    Logger.info('%d job(s) registered', this.jobs.length);
+    Logger.info(`${this.jobs.length} job(s) registered`);
   }
 
   /**
@@ -153,6 +153,15 @@ class Worker {
       return done(new Error('Unknown job'));
     }
     return currentJob.handler(job, done);
+  }
+
+  /**
+   * Stop the worker by shutting down the queue gracefully.
+   * Required for exiting after tests
+   */
+  async stop() {
+    await this.queue.close();
+    Logger.info('Worker Stopped');
   }
 }
 

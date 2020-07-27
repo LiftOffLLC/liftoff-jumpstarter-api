@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const Logger = require('../commons/logger');
 const Utils = require('../commons/utils');
-const UserRole = require('../models/userRole');
+const UserRoleEnum = require('../models/userRole').loginRoles();
 
 const omitEntities = async (items, scope) => {
   await Utils.traverseDeep(items, async obj => {
@@ -34,7 +34,8 @@ const entityFilter = async (request, h) => {
   try {
     Logger.info(`${__filename} entry`);
     const response = request.response.source;
-    const scope = _.get(request, 'auth.credentials.scope') || UserRole.GUEST;
+    const scope =
+      _.get(request, 'auth.credentials.scope') || UserRoleEnum.GUEST;
     await omitEntities(response, scope);
     Logger.info(`${__filename} exit`);
   } catch (err) {

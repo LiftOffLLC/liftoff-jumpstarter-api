@@ -1,5 +1,4 @@
 const Logger = require('./logger');
-const UserRoles = require('../models/userRole');
 
 module.exports = {
   // validate decoded token
@@ -24,20 +23,28 @@ module.exports = {
         // if the session exist, continue to next
         // eslint-disable-next-line global-require
         const UserModel = require('../models/user');
+        // eslint-disable-next-line global-require
+        const UserRoleEnum = require('../models/userRole').loginRoles();
+        // eslint-disable-next-line global-require
+        const Constants = require('./constants');
 
         const user = await UserModel.findOne(
           UserModel.buildCriteria('id', session.subject.userId),
           {
-            columns: 'id,isAdmin',
+            columns: 'id,roleId',
           },
         );
 
         if (user) {
           // eslint-disable-next-line eqeqeq
           session.subject.scope =
-            user.isAdmin === true ? UserRoles.ADMIN : UserRoles.USER;
+            (user.roleId === Constants.ROLES.ADMIN) === true
+              ? UserRoleEnum.ADMIN
+              : UserRoleEnum.USER;
+
+          session.subject.roleId = user.roleId;
         } else {
-          session.subject.scope = UserRoles.GUEST;
+          session.subject.scope = UserRoleEnum.GUEST;
         }
         Logger.info(
           'validateToken : session.user.role :> ',

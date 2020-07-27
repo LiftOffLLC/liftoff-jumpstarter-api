@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const requireDirs = require('require-dir');
+const requireDirs = require('require-directory');
 const Queue = require('bull');
 const Logger = require('../commons/logger');
 
@@ -20,7 +20,7 @@ class Scheduler {
    */
   loadEnabledJobs() {
     Logger.info('Loading scheduled jobs');
-    const jobs = requireDirs('./jobs');
+    const jobs = requireDirs(module, './jobs');
     const enabledJobs = _.filter(jobs, ['enabled', true]);
     this.jobs = enabledJobs;
     Logger.info(`${this.jobs.length} scheduled job(s) loaded`);

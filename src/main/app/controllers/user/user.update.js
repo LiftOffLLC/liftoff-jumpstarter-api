@@ -1,10 +1,10 @@
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
-const UserModel = require('../models/user');
-const checkIfExists = require('../policies/checkIfExists');
-const isAuthorized = require('../policies/isAuthorized');
-const Constants = require('../commons/constants');
+const UserModel = require('../../models/user');
+const checkIfExists = require('../../policies/checkIfExists');
+const isAuthorized = require('../../policies/isAuthorized');
+const Constants = require('../../commons/constants');
 
 const validator = UserModel.validatorRules();
 
@@ -14,7 +14,7 @@ const options = {
   tags: ['api'],
   validate: {
     params: Joi.object({
-      userId: validator.userId.required(),
+      userId: validator.id.required(),
     }),
     payload: Joi.object({
       name: validator.name.optional(),
@@ -44,7 +44,7 @@ const options = {
       );
 
       if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
-        payload.encryptedPassword = payload.password;
+        payload.hashedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
         throw Boom.unauthorized('Invalid credentials.');

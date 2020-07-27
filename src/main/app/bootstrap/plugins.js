@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const toposort = require('toposort');
-const requireDirs = require('require-dir');
+const requireDirs = require('require-directory');
 const Boom = require('@hapi/boom');
 
 const HapiAsyncHandler = {
@@ -42,7 +42,7 @@ const HapiAsyncHandler = {
 
 // configure plugins - list of plugins will be loaded from plugins folder.
 module.exports = async server => {
-  const plugins = requireDirs('../plugins');
+  const plugins = requireDirs(module, '../plugins');
   const enabledPlugins = _.filter(plugins, ['enabled', true]);
 
   const errorHandler = {

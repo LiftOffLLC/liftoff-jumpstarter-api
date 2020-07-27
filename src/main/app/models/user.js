@@ -5,10 +5,12 @@ const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const Uuid = require('node-uuid');
 const Logger = require('../commons/logger');
 const BaseModel = require('./base');
-const UserRole = require('./userRole');
+const UserRoleEnum = require('./userRole').loginRoles();
 const RedisClient = require('../commons/redisClient');
+const Constants = require('../commons/constants');
 const PhoneJoiValidator = require('../commons/validators/phoneJoiValidator');
 const EmailBlackListValidator = require('../commons/validators/emailBlackListValidator');
+const PasswordValidator = require('../commons/validators/password-validator');
 
 module.exports = class User extends BaseModel {
   static get tableName() {
@@ -17,14 +19,13 @@ module.exports = class User extends BaseModel {
 
   static entityFilteringScope() {
     return {
-      admin: ['encryptedPassword', 'passwordSalt'],
+      admin: ['hashedPassword'],
       user: [
         'phoneToken',
         'isPhoneVerified',
         'emailToken',
         'isEmailVerified',
-        'encryptedPassword',
-        'passwordSalt',
+        'hashedPassword',
         'resetPasswordToken',
         'resetPasswordSentAt',
       ],
@@ -33,8 +34,7 @@ module.exports = class User extends BaseModel {
         'isPhoneVerified',
         'emailToken',
         'isEmailVerified',
-        'encryptedPassword',
-        'passwordSalt',
+        'hashedPassword',
         'resetPasswordToken',
         'resetPasswordSentAt',
         'socialLogins',
@@ -44,7 +44,7 @@ module.exports = class User extends BaseModel {
 
   static validatorRules() {
     const rules = {
-      userId: Joi.number().integer().positive().description('User Id'),
+      id: Joi.number().integer().positive().description('User Id'),
       userName: Joi.string()
         .trim()
         .alphanum()
@@ -52,17 +52,13 @@ module.exports = class User extends BaseModel {
         .max(30)
         .description('User Name'),
       name: Joi.string().trim().min(3).max(255).description('Name'),
-      password: Joi.string()
-        .trim()
-        .regex(/^[a-zA-Z0-9]{8,30}$/)
-        .description('Password'),
+      password: PasswordValidator.password().isValid().description('Password'),
       email: EmailBlackListValidator.email()
         .isBlacklisted()
         .description('Email'),
       phoneNumber: PhoneJoiValidator.phone()
         .e164format()
         .description('phone number'),
-      isAdmin: Joi.boolean().default(false).description('Admin?'),
       accessToken: Joi.string().trim().description('Access token'),
       refreshToken: Joi.string().trim().description('Refresh token'),
       rawBody: Joi.string().description('raw social data'),
@@ -78,7 +74,6 @@ module.exports = class User extends BaseModel {
   presaveHook() {
     // if this is new object..
     if (!this.id) {
-      this.isAdmin = false;
       this.userName = Uuid.v4();
     }
 
@@ -87,6 +82,14 @@ module.exports = class User extends BaseModel {
 
   static get relationMappings() {
     return {
+      role: {
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: `${__dirname}/userRole`,
+        join: {
+          from: 'users.roleId',
+          to: 'user_roles.id',
+        },
+      },
       socialLogins: {
         relation: BaseModel.HasManyRelation,
         modelClass: `${__dirname}/socialLogin`,
@@ -99,31 +102,29 @@ module.exports = class User extends BaseModel {
   }
 
   hashPassword() {
-    if (this.encryptedPassword) {
+    if (this.hashedPassword) {
       if (
-        this.encryptedPassword.indexOf('$2b$') === 0 &&
-        this.encryptedPassword.length === 60
+        this.hashedPassword.indexOf('$2b$') === 0 &&
+        this.hashedPassword.length === 60
       ) {
+        // Don't know why this condition exists, please report if you figure out.
+        // Following is a failed attempt of explanation
         // The password is already hashed. It can be the case when the instance is loaded from DB
         // eslint-disable-next-line no-self-assign
-        this.encryptedPassword = this.encryptedPassword;
+        this.hashedPassword = this.hashedPassword;
       } else {
-        this.passwordSalt = Bcrypt.genSaltSync(10);
-        this.encryptedPassword = this.encryptPassword(
-          this.encryptedPassword,
-          this.passwordSalt,
-        );
+        this.hashedPassword = this.getHashedPassword(this.hashedPassword);
       }
     }
-    Logger.info('afteer hashPassword');
+    Logger.info('after hashPassword');
   }
 
   verifyPassword(password) {
-    return Bcrypt.compareSync(password, this.encryptedPassword);
+    return Bcrypt.compareSync(password, this.hashedPassword);
   }
 
-  encryptPassword(pwd, passwordSalt) {
-    return Bcrypt.hashSync(pwd, passwordSalt);
+  getHashedPassword(password) {
+    return Bcrypt.hashSync(password, 10);
   }
 
   static async signSession(request, userId) {
@@ -135,7 +136,7 @@ module.exports = class User extends BaseModel {
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: user.id,
-      isAdmin: user.isAdmin,
+      isAdmin: user.roleId === Constants.ROLES.ADMIN,
     });
     await RedisClient.saveSession(user.id, sessionId, session);
     const sessionToken = request.server.methods.sessionsSign(session);
@@ -147,7 +148,9 @@ module.exports = class User extends BaseModel {
     _.set(
       request,
       'auth.credentials.scope',
-      user.isAdmin ? UserRole.ADMIN : UserRole.USER,
+      user.roleId === Constants.ROLES.ADMIN
+        ? UserRoleEnum.ADMIN
+        : UserRoleEnum.USER,
     );
 
     // HAck to send back the social access/refresh token to self

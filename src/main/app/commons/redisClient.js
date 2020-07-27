@@ -77,6 +77,10 @@ class RedisClient {
     Logger.info(`redisClient: getItem : ${key}, value : `, val);
     return JSON.parse(val);
   }
+
+  async quit() {
+    return this.redisClient.quit();
+  }
 }
 
 module.exports = new RedisClient();
