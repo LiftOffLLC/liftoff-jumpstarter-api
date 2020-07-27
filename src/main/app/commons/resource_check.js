@@ -7,7 +7,7 @@ const resourceCheckHandler = async (model, request, _h) => {
     model.buildCriteriaWithObject(request.params),
   );
   if (_.isEmpty(data)) {
-    throw Boom.notFound('Resource Not Found');
+    throw Boom.notFound('Resource Not Found.');
   }
   return Constants.SUCCESS_RESPONSE;
 };

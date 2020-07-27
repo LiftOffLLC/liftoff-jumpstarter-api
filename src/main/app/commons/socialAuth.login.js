@@ -24,7 +24,7 @@ async function handler(providerName, request, _h) {
       ['error', `user.login.${providerName}`],
       `fetch profile${e.stack}`,
     );
-    throw Boom.unauthorized('Invalid social credentials');
+    throw Boom.unauthorized('Invalid Social Credentials.');
   }
 
   const socialLogin = await SocialLoginModel.findOne(
@@ -91,7 +91,7 @@ module.exports = function socialLoginFn(providerName) {
               'Malformed request, Check accessToken or refreshToken provided',
           },
           401: {
-            description: `Invalid social credentials. Got error while fetching profile from ${providerName}. Check social credentials are not expired`,
+            description: `Invalid Social Credentials. Got error while fetching profile from ${providerName}. Check social credentials are not expired`,
           },
           404: {
             description: `No user found for given ${providerName} details, Try Signup.`,

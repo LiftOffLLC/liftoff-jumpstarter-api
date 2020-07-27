@@ -23,7 +23,7 @@ module.exports = function isAuthorized(userPath) {
     if (exists) {
       return h.continue;
     }
-    throw Boom.illegal('access denied');
+    throw Boom.illegal('Access Denied.');
   };
 
   testIsAuthorized.applyPoint = 'onPreHandler';

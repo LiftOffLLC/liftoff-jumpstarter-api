@@ -16,7 +16,7 @@ module.exports = {
       description: 'Bad Request',
     },
     401: {
-      description: 'Invalid credentials',
+      description: 'Invalid Credentials',
     },
     403: {
       description: 'Forbidden Access',
