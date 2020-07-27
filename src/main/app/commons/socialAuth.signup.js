@@ -26,7 +26,7 @@ async function handler(providerName, request, h) {
     profile = await provider.getProfile(request.payload.accessToken);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], `fetch profile${e.stack}`);
-    throw Boom.badRequest('Invalid social credentials');
+    throw Boom.badRequest('Invalid Social Credentials.');
   }
 
   request.log(

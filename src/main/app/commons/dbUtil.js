@@ -23,7 +23,7 @@ exports.getEagerColumnString = data => {
   const obj = DataObjectParser.transpose(objData);
   const string = JSON.stringify(obj.data());
   // Order is important, otherwise it may screw up the fetch..
-  // DON'T SCREW AROUND, IF YOU"RE NOT SURE WHAT YOU"RE DEALING WITH...
+  // DON'T SCREW AROUND, IF YOU'RE NOT SURE WHAT YOU'RE DEALING WITH...
   const eagerString = string
     .replace(/:true/g, '')
     .replace(/:{/g, '.[')

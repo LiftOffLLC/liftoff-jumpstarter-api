@@ -12,8 +12,8 @@ const options = {
     },
   },
   handler: async (request, _h) => {
-    const userID = _.get(request, 'auth.credentials.userId');
-    const user = await UserModel.findOne(UserModel.buildCriteria('id', userID));
+    const userId = _.get(request, 'auth.credentials.userId');
+    const user = await UserModel.findOne(UserModel.buildCriteria('id', userId));
     return user;
   },
 };

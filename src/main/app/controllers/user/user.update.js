@@ -47,7 +47,7 @@ const options = {
         payload.hashedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
-        throw Boom.unauthorized('Invalid credentials.');
+        throw Boom.unauthorized('Invalid Credentials.');
       }
     }
 

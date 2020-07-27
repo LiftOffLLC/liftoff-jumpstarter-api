@@ -33,7 +33,7 @@ const options = {
       UserModel.buildCriteria('email', request.query.email),
     );
     if (!user) {
-      throw Boom.notFound('User Not Found');
+      throw Boom.notFound('User Not Found.');
     }
 
     // Generate random id

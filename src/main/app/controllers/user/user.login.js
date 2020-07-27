@@ -31,7 +31,7 @@ const options = {
     );
 
     if (!user) {
-      throw Boom.notFound('User does not exists');
+      throw Boom.notFound('User Not Found.');
     }
 
     if (user.verifyPassword(request.payload.password)) {

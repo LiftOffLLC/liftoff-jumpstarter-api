@@ -32,20 +32,20 @@ const options = {
       UserModel.buildCriteria('email', request.payload.email),
     );
     if (!user) {
-      throw Boom.notFound('User Not Found');
+      throw Boom.notFound('User Not Found.');
     }
     request.log(['info', __filename], `user found - ${inspect(user)}`);
 
     // Validate token
     if (request.payload.resetPasswordToken !== user.resetPasswordToken) {
-      throw Boom.badRequest('Invalid Token');
+      throw Boom.badRequest('Invalid Token.');
     }
 
     if (
       +new Date(request.payload.resetPasswordSentAt) - +new Date() >
       Config.get('passwordReset').get('duration')
     ) {
-      throw Boom.badRequest('Token Expired');
+      throw Boom.badRequest('Token Expired.');
     }
 
     // Reset token and create hash from password

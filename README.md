@@ -318,7 +318,7 @@ create modules
     message_utility('user.not.found', {id: userId}, opts="lang-en")
 4. Database Issues (caveats)  
    a. cannot use nested property for filter.  
-   b. pagination/ordering doesnt work for inner associations.  
+   b. pagination/ordering doesn't work for inner associations.  
    c. polymorphic associations issue.  
    d. caching responses.
 5. Chat server Jumpstarter kit
