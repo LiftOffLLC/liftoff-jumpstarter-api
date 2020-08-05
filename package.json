@@ -6,15 +6,15 @@
   "scripts": {
     "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
     "lint:fix": "yarn lint --fix",
-    "inspect": "jsinspect -t 30 --ignore 'src/main/database/migrations/20161006232820_users.js' src/main",
+    "inspect": "jsinspect -t 30 --ignore 'src/main/database/migrations/20200721221928_users.js' src/main",
     "dev": "./bin/dev.sh",
     "worker": "node src/main/worker.js",
     "start": "pm2 delete all; node src/main/pm2.js",
     "db:migrate": "knex --knexfile ./src/main/knexfile.js migrate:latest",
     "db:rollback": "knex --knexfile ./src/main/knexfile.js migrate:rollback",
     "db:seed": "knex --knexfile ./src/main/knexfile.js seed:run",
-    "test:verbose": "jest src/test --verbose --forceExit --detectOpenHandles",
-    "test": "yarn test:verbose --silent",
+    "test": "jest src/test --verbose --forceExit --detectOpenHandles",
+    "test:silent": "yarn test --silent",
     "format": "prettier --write '**/*.{ts,js,css,html}'"
   },
   "repository": {
