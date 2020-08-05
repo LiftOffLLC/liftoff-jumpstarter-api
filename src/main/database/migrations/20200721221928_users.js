@@ -59,10 +59,7 @@ exports.up = knex =>
           .comment('Check if email is verified');
 
         // Phone Related
-        table
-          .string('phoneNumber', 15)
-          .index()
-          .comment('E164 Phone number; mobile number');
+        table.string('phoneNumber', 15).index().comment('E164 Phone number');
 
         // Password
         table.string('hashedPassword').notNullable().comment('Hashed password');

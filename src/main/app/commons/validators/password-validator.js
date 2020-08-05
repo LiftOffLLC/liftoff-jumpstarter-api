@@ -4,9 +4,9 @@ const PasswordValidator = require('password-validator');
 const schema = new PasswordValidator();
 schema
   .is()
-  .min(2) // Minimum length 2
+  .min(8) // Minimum length
   .is()
-  .max(100) // Maximum length 100
+  .max(16) // Maximum length
   // .has()
   // .uppercase() // Must have uppercase letters
   // .has()

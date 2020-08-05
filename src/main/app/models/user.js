@@ -61,7 +61,7 @@ module.exports = class User extends BaseModel {
         .description('phone number'),
       accessToken: Joi.string().trim().description('Access token'),
       refreshToken: Joi.string().trim().description('Refresh token'),
-      rawBody: Joi.string().description('raw social data'),
+      rawBody: Joi.string().description('Raw social data'),
       resetPasswordToken: Joi.string()
         .trim()
         .uuid()

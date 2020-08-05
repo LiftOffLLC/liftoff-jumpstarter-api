@@ -28,13 +28,13 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 2. Install PostgreSQL and create a database 
 3. Install Redis
 4. Modify the config details  
-   4.1 Copy .env.example as .env file in project folder and modify the relevant properties for the project  
+   4.1 Copy `.env.example` as `.env` file in project folder and modify the relevant properties for the project  
     4.1.1. Database Config  
     4.1.2. Redis Config (Login auth tokens are stored)  
     4.1.3. JWT Tokens (Secret Key), etc.  
-   4.2. Fix config/default.js  
-   4.3. Fix plugins/hapi-swagger.js for swagger documentation  
-   4.4. Fix plugins/status-monitor.js for monitoring  
+   4.2. Fix `config/default.js`  
+   4.3. Fix `plugins/hapi-swagger.js` for swagger documentation  
+   4.4. Fix `plugins/status-monitor.js` for monitoring  
 5. Run `yarn` to install all the dependencies.
 6. Migrate and seed the database using `yarn db:migrate` and `yarn db:seed`
 7. Run `yarn dev` to start the server in dev environment
@@ -70,8 +70,8 @@ Don't. Make those changes in Jumpstarter instead.
 `yarn inspect` -- to Detect copied code  
 
 #### Testing
-`yarn test` -- to run test cases
-`yarn test:verbose` -- to run test cases and show verbose logs
+`yarn test` -- to run test cases with verbose logs
+`yarn test:silent` -- to run test cases without verbose logs
 
 #### Database Related Scripts
 
