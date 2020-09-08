@@ -1,4 +1,4 @@
-const UserRoleEnum = require('../models/userRole').loginRoles();
+const UserScope = require('../models/user').scope();
 
 module.exports = {
   SUCCESS_RESPONSE: {
@@ -31,22 +31,17 @@ module.exports = {
     ADMIN_ONLY: {
       strategy: 'jwt',
       mode: 'required',
-      scope: [UserRoleEnum.ADMIN],
+      scope: [UserScope.ADMIN],
     },
     ADMIN_OR_USER: {
       strategy: 'jwt',
       mode: 'required',
-      scope: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
+      scope: [UserScope.ADMIN, UserScope.USER],
     },
     ADMIN_OR_USER_OR_GUEST: {
       strategy: 'jwt',
       mode: 'optional',
-      scope: [UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST],
+      scope: [UserScope.ADMIN, UserScope.USER, UserScope.GUEST],
     },
-  },
-
-  ROLES: {
-    ADMIN: 1,
-    USER: 2,
   },
 };

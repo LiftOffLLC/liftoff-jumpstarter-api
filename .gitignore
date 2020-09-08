@@ -66,6 +66,7 @@ env_prd_config.txt
 mydb2dump.sql
 nes_client.js
 
+# Environment
 .env
 
 artifacts

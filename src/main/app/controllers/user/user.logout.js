@@ -8,8 +8,7 @@ const UserModel = require('../../models/user');
 const Config = require('../../../config');
 const RedisClient = require('../../commons/redisClient');
 const Constants = require('../../commons/constants');
-const UserRoleEnum = require('../../models/userRole').loginRoles();
-
+const UserScope = UserModel.scope();
 const validator = UserModel.validatorRules();
 const { inspect } = Util;
 
@@ -38,7 +37,7 @@ const options = {
     const userId = _.get(request, 'query.userId');
     const isUserIdDefined = !_.isUndefined(userId);
     const isAdmin =
-      _.get(request, 'auth.credentials.scope') === UserRoleEnum.ADMIN;
+      _.get(request, 'auth.credentials.scope') === UserScope.ADMIN;
 
     if (!isAdmin && isUserIdDefined) {
       throw Boom.badRequest();
@@ -49,7 +48,7 @@ const options = {
     Admin can log out a particular user's all sessions using userId optional parameter
     User cannot pass userId parameter, he can only logout his current session
     ---------------------------------------------
-    userRole  authUserId userId  session_to_delete
+    UserScope  authUserId userId  session_to_delete
     ---------------------------------------------
     ADMIN      1                     sessions:1:*
     ADMIN      1             N       sessions:N:*

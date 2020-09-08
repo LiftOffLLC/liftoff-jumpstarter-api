@@ -5,9 +5,9 @@ const _ = require('lodash');
 const UserModel = require('../../models/user');
 const Config = require('../../../config');
 const Constants = require('../../commons/constants');
-
 const { inspect } = Util;
 const validator = UserModel.validatorRules();
+
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Reset password  - Access - ALL',
@@ -65,7 +65,7 @@ const options = {
 const handler = () => {
   const details = {
     method: ['POST'],
-    path: '/api/users/reset_password',
+    path: '/api/users/reset-password',
     options,
   };
   return details;

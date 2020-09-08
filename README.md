@@ -6,7 +6,7 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 
 | Package           | Purpose                                                    |
 | :---------------- | :--------------------------------------------------------- |
-| Node.js           | Node Env; use v12; and use nvm for node version management |
+| Node.js           | Node Environment                                           |
 | Hapi.js           | Server logic                                               |
 | Objection.js/Knex | ORM Framework                                              |
 | newrelic          | Monitoring                                                 |
@@ -25,19 +25,20 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 
 1. Download the latest zip file or clone the repo with depth=1 using below command -  
    `git clone --depth=1 git@github.com:LiftOffLLC/liftoff-jumpstarter-api.git`
-2. Install PostgreSQL and create a database 
-3. Install Redis
-4. Modify the config details  
-   4.1 Copy `.env.example` as `.env` file in project folder and modify the relevant properties for the project  
-    4.1.1. Database Config  
-    4.1.2. Redis Config (Login auth tokens are stored)  
-    4.1.3. JWT Tokens (Secret Key), etc.  
-   4.2. Fix `config/default.js`  
-   4.3. Fix `plugins/hapi-swagger.js` for swagger documentation  
-   4.4. Fix `plugins/status-monitor.js` for monitoring  
-5. Run `yarn` to install all the dependencies.
-6. Migrate and seed the database using `yarn db:migrate` and `yarn db:seed`
-7. Run `yarn dev` to start the server in dev environment
+2. Install nvm for node version management and install node v12
+3. Install PostgreSQL and create a database 
+4. Install Redis
+5. Modify the config details  
+   5.1 Copy `.env.example` as `.env` file in project folder and modify the relevant properties for the project  
+    5.1.1. Database Config  
+    5.1.2. Redis Config (Login auth tokens are stored)  
+    5.1.3. JWT Tokens (Secret Key), etc.  
+   5.2. Fix `config/default.js`  
+   5.3. Fix `plugins/hapi-swagger.js` for swagger documentation  
+   5.4. Fix `plugins/status-monitor.js` for monitoring  
+6. Run `yarn` to install all the dependencies.
+7. Migrate and seed the database using `yarn knex migrate:latest` and `yarn knex seed:run`
+8. Run `yarn dev` to start the server in dev environment
 
 ## Pulling changes from Jumpstarter repository into your project's repository
 
@@ -62,7 +63,7 @@ Don't. Make those changes in Jumpstarter instead.
 
 ## Project Practices
 
-#### Code Formating and Linting
+#### Code Formatting and Linting
 
 `yarn format` -- to format the code  
 `yarn lint` -- to Check lint issues  
@@ -70,14 +71,14 @@ Don't. Make those changes in Jumpstarter instead.
 `yarn inspect` -- to Detect copied code  
 
 #### Testing
-`yarn test` -- to run test cases with verbose logs
-`yarn test:silent` -- to run test cases without verbose logs
+`yarn test` -- to run test cases with verbose logs  
+`yarn test:silent` -- to run test cases without verbose logs  
 
 #### Database Related Scripts
 
-`yarn db:migrate` -- to apply database migration  
-`yarn db:rollback` -- to rollback database migration  
-`yarn db:seed` -- to run the seed data
+`yarn knex migrate:latest` -- to apply database migration  
+`yarn knex migrate:rollback` -- to rollback database migration  
+`yarn knex seed:run` -- to run the seed data
 
 #### Running Dev Server
 
@@ -115,7 +116,7 @@ Source Code is located at `src/main` and test code in `src/test`
 ## Understanding APIs
 
 1. Each API is written in separate file in /controllers folder.
-2. During bootstraping the server
+2. While bootstrapping the server
    - routes are built by scanning all the files in /controllers folder
    - methods are dynamically decorated for server/request and are picked from /methods folder.
    - plugins are added to Hapi server, which give additional functionality like logging, listing all apis, monitoring server status, auth, etc.
@@ -332,7 +333,7 @@ create modules
 12. APIs to support unique constraints in path /userIdOruserName/update
 13. Update dependencies and yarn lock file regularly.
 14. Pass server context in all hapi plugins.
-15. Extract error Handler plugin to plugins folder (depends on 15).
+15. Extract error Handler plugin to plugins folder (depends on 14).
 
 ## Contribute back
 

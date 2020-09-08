@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const Boom = require('@hapi/boom');
 const Logger = require('../commons/logger');
-const UserRoleEnum = require('../models/userRole').loginRoles();
+const UserScope = require('../models/user').scope();
 
 /**
 Policy to verify if the user is who he says to be or an admin.
@@ -16,8 +16,8 @@ module.exports = function isAuthorized(userPath) {
 
     // allow if admin role is found in scope.
     const exists =
-      // eslint-disable-next-line eqeqeq
-      UserRoleEnum.ADMIN == authScopeRole || authScopeUserId == actualUserId;
+      // eslint-disable-next-line
+      UserScope.ADMIN == authScopeRole || authScopeUserId == actualUserId;
     Logger.info(`${__filename} entry :: (exists) :: `, exists);
 
     if (exists) {

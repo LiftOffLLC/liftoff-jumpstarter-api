@@ -67,9 +67,11 @@ class App {
     try {
       console.log(Date.now(), '::: booting up ::::: ');
 
-      // configure database.
-      console.log(Date.now(), ':::: about to configure database ::::');
-      await this.configureDatabase();
+      if (Config.get('server').get('pm2') !== 'true') {
+        // configure database.
+        console.log(Date.now(), ':::: about to configure database ::::');
+        await this.configureDatabase();
+      }
 
       // configure methods.
       console.log(Date.now(), ':::: loading worker ::::');
@@ -99,30 +101,6 @@ class App {
       // configure methods.
       console.log(Date.now(), ':::: loading server methods ::::');
       await Bootstrap.methods(this.server);
-
-      // Start the worker threads.
-      if (Config.get('env') !== 'production') {
-        require('./worker'); // eslint-disable-line global-require
-      }
-
-      // eslint-disable-next-line global-require
-
-      // NOTE: works only if Nes is installed.
-      // TODO: See if we can move inside nes-plugin callback.
-      // server.subscription('/socket/notifications', {
-      //   filter: (path, message, options, next)
-      // => next(message.userId === options.credentials.userId)
-      // });
-
-      // server.decorate('request', 'sendSocketNotification',
-      //   function sendSocketNotification(notificationType, targetUserId, data) {
-      //     const finalData = _.cloneDeep(data);
-      //     Object.assign(finalData, {
-      //       type: notificationType,
-      //       userId: targetUserId
-      //     });
-      //     this.server.publish('/socket/notifications', finalData);
-      //   });
     } catch (e) {
       console.error('could not configure server: ', e);
       throw e;

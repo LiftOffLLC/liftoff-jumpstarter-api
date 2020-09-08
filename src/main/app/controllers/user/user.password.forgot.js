@@ -3,14 +3,14 @@ const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const JWT = require('jsonwebtoken');
-const Uuid = require('node-uuid');
+const uuid = require('uuid');
 const UserModel = require('../../models/user');
 const Config = require('../../../config');
 const Constants = require('../../commons/constants');
 const Utils = require('../../commons/utils');
-
 const validator = UserModel.validatorRules();
 const { inspect } = Util;
+
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Request for password reset - Access - ALL',
@@ -37,7 +37,7 @@ const options = {
     }
 
     // Generate random id
-    const tokenId = Uuid.v4();
+    const tokenId = uuid.v4();
     request.log(['info', __filename], `token id - ${tokenId}`);
 
     // Create JWT string for tokenId
@@ -83,7 +83,7 @@ const options = {
 const handler = () => {
   const details = {
     method: ['GET'],
-    path: '/api/users/forgot_password',
+    path: '/api/users/forgot-password',
     options,
   };
   return details;

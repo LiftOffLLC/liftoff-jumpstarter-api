@@ -2,16 +2,17 @@ const Util = require('util');
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
-const Uuid = require('node-uuid');
+const uuid = require('uuid');
 const UserModel = require('../../models/user');
-const UserRoleEnum = require('../../models/userRole').loginRoles();
 const RedisClient = require('../../commons/redisClient');
 const errorCodes = require('../../commons/errors');
 const Constants = require('../../commons/constants');
 const Utils = require('../../commons/utils');
 const Config = require('../../../config');
-
+const UserScope = UserModel.scope();
+const UserRole = UserModel.role();
 const validator = UserModel.validatorRules();
+
 const options = {
   auth: Constants.AUTH.ALL,
   description: 'Create User - Access - ALL',
@@ -31,52 +32,59 @@ const options = {
     },
   },
   handler: async (request, h) => {
-    const user = await UserModel.findOne([
+    const userWithEmail = await UserModel.findOne([
       UserModel.buildCriteria('email', request.payload.email),
       UserModel.buildCriteria('isActive', [true, false], 'in'),
     ]);
 
     // Error out if email already exists.
-    if (!_.isEmpty(user)) {
-      const errorCode = user.isActive
+    if (!_.isEmpty(userWithEmail)) {
+      const errorCode = userWithEmail.isActive
         ? errorCodes.emailDuplicate
         : errorCodes.userDisabled;
       throw Boom.forbidden(Util.format(errorCode, request.payload.email));
     }
 
-    const userObject = _.clone(request.payload);
-    userObject.hashedPassword = request.payload.password;
-    delete userObject.password;
-    const result = await UserModel.createOrUpdate(userObject);
+    const user = _.clone(request.payload);
+    user.hashedPassword = request.payload.password;
+    delete user.password;
+
+    user.role = UserRole.USER;
+
+    const resultUser = await UserModel.createOrUpdate(user);
 
     // on successful, create login_token for this user.
-    const sessionId = Uuid.v4();
+    const sessionId = uuid.v4();
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
-      userId: result.id,
-      isAdmin: result.roleId === Constants.ROLES.ADMIN,
+      userId: resultUser.id,
+      isAdmin: resultUser.role === UserRole.ADMIN,
     });
 
-    await RedisClient.saveSession(result.id, sessionId, session);
+    await RedisClient.saveSession(resultUser.id, sessionId, session);
     // sign the token
-    result.sessionToken = request.server.methods.sessionsSign(session);
+    resultUser.sessionToken = request.server.methods.sessionsSign(session);
 
     // allow entity filtering to happen here.
-    _.set(request, 'auth.credentials.userId', result.id);
+    _.set(request, 'auth.credentials.userId', resultUser.id);
     _.set(
       request,
       'auth.credentials.scope',
-      result.roleId === Constants.ROLES.ADMIN
-        ? UserRoleEnum.ADMIN
-        : UserRoleEnum.USER,
+      resultUser.role === UserRole.ADMIN ? UserScope.ADMIN : UserScope.USER,
     );
 
     const mailVariables = {
       webUrl: Config.get('webUrl'),
     };
-    await Utils.addMailToQueue('welcome-msg', {}, result.id, {}, mailVariables);
+    await Utils.addMailToQueue(
+      'welcome-msg',
+      {},
+      resultUser.id,
+      {},
+      mailVariables,
+    );
 
-    const response = h.response(result);
+    const response = h.response(resultUser);
     response.code(201);
     return response;
   },
