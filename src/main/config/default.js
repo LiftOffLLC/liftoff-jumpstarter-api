@@ -25,6 +25,9 @@ module.exports = {
     host: process.env.HOST,
     port: parseInt(process.env.PORT, 10),
     forceSSL: process.env.FORCE_SSL,
+    pm2: process.env.PM2,
+    webConcurrency: parseInt(process.env.WEB_CONCURRENCY, 10),
+    webMemory: parseInt(process.env.WEB_MEMORY, 10),
     cache: [
       {
         name: 'redis-cache',
@@ -89,7 +92,7 @@ module.exports = {
       ...redisConfig,
     },
   },
-  // auth-jwt strategy for sesssion.
+  // auth-jwt strategy for session.
   auth: {
     key: process.env.AUTH_JWT_KEY, // Never Share your secret key
     validate: token.validateToken, // validate function defined above
@@ -103,7 +106,7 @@ module.exports = {
     urlKey: false,
     cookieKey: false,
   },
-  // social Credentils
+  // social Credentials
   social: {
     facebook: {
       profileUrl: 'https://graph.facebook.com/me',
@@ -119,7 +122,7 @@ module.exports = {
   adminUrl: `${process.env.WEB_APP_URL}/admin`,
   countryCode: process.env.COUNTRY_CODE,
   country: process.env.COUNTRY,
-  // Forgot password configureation
+  // Forgot password configuration
   passwordReset: {
     duration: 60 * 60 * 24 * 1000,
     tokenSecretkey: process.env.AUTH_JWT_PWD_KEY,

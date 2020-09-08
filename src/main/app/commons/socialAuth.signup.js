@@ -1,10 +1,10 @@
 const Boom = require('@hapi/boom');
-const Uuid = require('node-uuid');
+const uuid = require('uuid');
 const Joi = require('@hapi/joi');
 
 const Util = require('util');
 const UserModel = require('../models/user');
-const SocialLoginModel = require('../models/socialLogin');
+const SocialLoginModel = require('../models/social-login');
 const Social = require('./social');
 const errorCodes = require('./errors');
 const Constants = require('./constants');
@@ -61,7 +61,7 @@ async function handler(providerName, request, h) {
       email: request.payload.email,
       name: request.payload.name,
       phoneNumber: request.payload.phoneNumber,
-      hashedPassword: Uuid.v4(),
+      hashedPassword: uuid.v4(),
       avatarUrl: request.payload.avatarUrl,
       subscribedToNewsletter: request.payload.subscribedToNewsletter,
     };

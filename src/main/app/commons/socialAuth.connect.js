@@ -3,7 +3,7 @@ const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const Util = require('util');
 const UserModel = require('../models/user');
-const SocialLoginModel = require('../models/socialLogin');
+const SocialLoginModel = require('../models/social-login');
 const Social = require('./social');
 const Constants = require('./constants');
 

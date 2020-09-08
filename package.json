@@ -6,14 +6,13 @@
   "scripts": {
     "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
     "lint:fix": "yarn lint --fix",
-    "inspect": "jsinspect -t 30 --ignore 'src/main/database/migrations/20200721221928_users.js' src/main",
-    "dev": "./bin/dev.sh",
+    "inspect": "jsinspect -t 30 --ignore 'src/main/database/' src/main",
+    "dev": "yarn lint; NODE_ENV=development nodemon --ignore src/main/database/ src/main/index.js",
     "worker": "node src/main/worker.js",
     "start": "pm2 delete all; node src/main/pm2.js",
-    "db:migrate": "knex --knexfile ./src/main/knexfile.js migrate:latest",
-    "db:rollback": "knex --knexfile ./src/main/knexfile.js migrate:rollback",
-    "db:seed": "knex --knexfile ./src/main/knexfile.js seed:run",
-    "test": "jest src/test --verbose --forceExit --detectOpenHandles",
+    "knex": "knex --knexfile ./src/main/knexfile.js",
+    "pm2": "pm2",
+    "test": "jest src/test --verbose --forceExit --detectOpenHandles --coverage",
     "test:silent": "yarn test --silent",
     "format": "prettier --write '**/*.{ts,js,css,html}'"
   },
@@ -24,6 +23,7 @@
   "keywords": [
     "liftoff",
     "quickstarter",
+    "jumpstarter",
     "rest-api",
     "server"
   ],
@@ -80,7 +80,6 @@
     "lodash": "^4.17.15",
     "mrhorse": "^6.0.0",
     "newrelic": "^6.7.1",
-    "node-uuid": "^1.4.7",
     "nodemailer": "^6.4.6",
     "nodemailer-ses-transport": "^1.5.0",
     "objection": "^2.1.3",
@@ -91,6 +90,7 @@
     "request": "^2.88.2",
     "require-directory": "^2.1.1",
     "toposort": "^2.0.2",
+    "uuid": "^8.3.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -113,6 +113,6 @@
     "prettier": "^2.0.5"
   },
   "engines": {
-    "node": "12"
+    "node": "12.18.1"
   }
 }

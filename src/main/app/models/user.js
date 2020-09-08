@@ -2,19 +2,17 @@
 const Bcrypt = require('bcrypt');
 const _ = require('lodash');
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const Uuid = require('node-uuid');
+const uuid = require('uuid');
 const Logger = require('../commons/logger');
 const BaseModel = require('./base');
-const UserRoleEnum = require('./userRole').loginRoles();
 const RedisClient = require('../commons/redisClient');
-const Constants = require('../commons/constants');
 const PhoneJoiValidator = require('../commons/validators/phoneJoiValidator');
 const EmailBlackListValidator = require('../commons/validators/emailBlackListValidator');
 const PasswordValidator = require('../commons/validators/password-validator');
 
 module.exports = class User extends BaseModel {
   static get tableName() {
-    return 'users';
+    return 'User';
   }
 
   static entityFilteringScope() {
@@ -58,7 +56,7 @@ module.exports = class User extends BaseModel {
         .description('Email'),
       phoneNumber: PhoneJoiValidator.phone()
         .e164format()
-        .description('phone number'),
+        .description('Phone Number'),
       accessToken: Joi.string().trim().description('Access token'),
       refreshToken: Joi.string().trim().description('Refresh token'),
       rawBody: Joi.string().description('Raw social data'),
@@ -74,28 +72,34 @@ module.exports = class User extends BaseModel {
   presaveHook() {
     // if this is new object..
     if (!this.id) {
-      this.userName = Uuid.v4();
+      this.userName = uuid.v4();
     }
-
     this.hashPassword();
+  }
+
+  static scope() {
+    return {
+      ADMIN: 'admin',
+      USER: 'user',
+      GUEST: 'guest',
+    };
+  }
+
+  static role() {
+    return {
+      ADMIN: 'admin',
+      USER: 'user',
+    };
   }
 
   static get relationMappings() {
     return {
-      role: {
-        relation: BaseModel.BelongsToOneRelation,
-        modelClass: `${__dirname}/userRole`,
-        join: {
-          from: 'users.roleId',
-          to: 'user_roles.id',
-        },
-      },
       socialLogins: {
         relation: BaseModel.HasManyRelation,
-        modelClass: `${__dirname}/socialLogin`,
+        modelClass: `${__dirname}/social-login`,
         join: {
-          from: 'users.id',
-          to: 'social_logins.userId',
+          from: 'User.id',
+          to: 'SocialLogin.userId',
         },
       },
     };
@@ -132,11 +136,11 @@ module.exports = class User extends BaseModel {
       columns: '*,socialLogins.*',
     });
 
-    const sessionId = Uuid.v4();
+    const sessionId = uuid.v4();
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
       id: sessionId,
       userId: user.id,
-      isAdmin: user.roleId === Constants.ROLES.ADMIN,
+      isAdmin: user.role === this.role().ADMIN,
     });
     await RedisClient.saveSession(user.id, sessionId, session);
     const sessionToken = request.server.methods.sessionsSign(session);
@@ -148,9 +152,7 @@ module.exports = class User extends BaseModel {
     _.set(
       request,
       'auth.credentials.scope',
-      user.roleId === Constants.ROLES.ADMIN
-        ? UserRoleEnum.ADMIN
-        : UserRoleEnum.USER,
+      user.role === this.role().ADMIN ? this.scope().ADMIN : this.scope().USER,
     );
 
     // HAck to send back the social access/refresh token to self

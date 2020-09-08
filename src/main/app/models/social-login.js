@@ -2,7 +2,7 @@ const BaseModel = require('./base');
 
 module.exports = class SocialLogin extends BaseModel {
   static get tableName() {
-    return 'social_logins';
+    return 'SocialLogin';
   }
 
   static entityFilteringScope() {
@@ -20,8 +20,8 @@ module.exports = class SocialLogin extends BaseModel {
         relation: BaseModel.BelongsToOneRelation,
         modelClass: `${__dirname}/user`,
         join: {
-          from: 'social_logins.userId',
-          to: 'users.id',
+          from: 'SocialLogin.userId',
+          to: 'User.id',
         },
       },
     };

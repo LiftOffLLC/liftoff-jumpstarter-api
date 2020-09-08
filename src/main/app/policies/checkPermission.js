@@ -3,7 +3,7 @@ const Boom = require('@hapi/boom');
 const Logger = require('../commons/logger');
 const RBAC = require('../commons/rbac');
 const UserModel = require('../models/user');
-const UserRoleEnum = require('../models/userRole').loginRoles();
+const UserScope = UserModel.scope();
 
 const isAdmin = async params => {
   Logger.info(`${__filename} isAdmin :: entry :: params :: `, params);
@@ -28,12 +28,12 @@ const buildRules = (ruleName, condition) => {
       can: ruleName,
     },
     {
-      a: UserRoleEnum.USER,
+      a: UserScope.USER,
       can: editor,
       when: condition,
     },
     {
-      a: UserRoleEnum.ADMIN,
+      a: UserScope.ADMIN,
       can: editor,
     },
   ];
@@ -76,7 +76,7 @@ module.exports = function checkPermission(permission, keysAndValuePaths = {}) {
         parameters,
       );
       const isAllowed = await rbac.check(
-        UserRoleEnum.USER,
+        UserScope.USER,
         permission,
         parameters,
       );

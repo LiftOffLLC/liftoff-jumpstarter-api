@@ -3,7 +3,7 @@ const PhoneUtil = require('../phone');
 
 const phoneJoiValidator = Joi.extend({
   type: 'phone',
-  base: Joi.string().min(10),
+  base: Joi.string().trim().min(10),
   messages: {
     'phone.e164format': 'is invalid',
   },

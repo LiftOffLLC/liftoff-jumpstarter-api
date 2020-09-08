@@ -2,10 +2,8 @@ const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const UserModel = require('../../models/user');
-const checkIfExists = require('../../policies/checkIfExists');
-const isAuthorized = require('../../policies/isAuthorized');
 const Constants = require('../../commons/constants');
-
+const UserScope = UserModel.scope();
 const validator = UserModel.validatorRules();
 
 const options = {
@@ -13,10 +11,8 @@ const options = {
   description: 'Update User - Access - admin,user',
   tags: ['api'],
   validate: {
-    params: Joi.object({
-      userId: validator.id.required(),
-    }),
     payload: Joi.object({
+      userId: validator.id.optional(),
       name: validator.name.optional(),
       phoneNumber: validator.phoneNumber.optional(),
       avatarUrl: validator.avatarUrl.optional(),
@@ -28,14 +24,25 @@ const options = {
     'hapi-swagger': {
       responses: _.omit(Constants.API_STATUS_CODES, [201]),
     },
-    policies: [
-      isAuthorized('params.userId'),
-      checkIfExists(UserModel, 'User', ['id'], ['params.userId']),
-    ],
   },
   handler: async (request, _h) => {
+    const authScopeUserId = _.get(request, 'auth.credentials.userId');
+    const userId = _.get(request, 'payload.userId');
+    const isUserIdDefined = !_.isUndefined(userId);
+    const isAdmin =
+      _.get(request, 'auth.credentials.scope') === UserScope.ADMIN;
+
+    if (!isAdmin && isUserIdDefined) {
+      throw Boom.badRequest();
+    }
+
     const payload = _.cloneDeep(request.payload);
-    payload.id = request.params.userId;
+    if (isUserIdDefined) {
+      payload.id = payload.userId;
+      delete payload.userId;
+    } else {
+      payload.id = authScopeUserId;
+    }
 
     // Update password.
     if (payload.oldPassword || payload.password) {
@@ -43,7 +50,11 @@ const options = {
         UserModel.buildCriteria('id', payload.id),
       );
 
-      if (user.verifyPassword(payload.oldPassword || '') && payload.password) {
+      if (
+        payload.oldPassword &&
+        payload.password &&
+        user.verifyPassword(payload.oldPassword)
+      ) {
         payload.hashedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
@@ -62,7 +73,7 @@ const options = {
 const handler = server => {
   const details = {
     method: ['PUT'],
-    path: '/api/users/{userId}',
+    path: '/api/users',
     options,
   };
   return details;
