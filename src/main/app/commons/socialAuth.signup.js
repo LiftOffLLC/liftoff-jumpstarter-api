@@ -9,6 +9,7 @@ const Social = require('./social');
 const errorCodes = require('./errors');
 const Constants = require('./constants');
 const Utils = require('./utils');
+const UserRole = UserModel.role();
 const Config = require('../../config');
 
 const validator = UserModel.validatorRules();
@@ -64,6 +65,7 @@ async function handler(providerName, request, h) {
       hashedPassword: uuid.v4(),
       avatarUrl: request.payload.avatarUrl,
       subscribedToNewsletter: request.payload.subscribedToNewsletter,
+      role: UserRole.USER,
     };
     try {
       user = await UserModel.createOrUpdate(userObject);
