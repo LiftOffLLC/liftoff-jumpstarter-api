@@ -20,8 +20,8 @@ Aimed to provide Jumpstarter Server Kit for building REST APIs.
 | newrelic          | Monitoring                                      |
 | Node Mailer       | Mail Delivery                                   |
 | Nes               | Socket Notification                             |
-| Bull               | Worker/Job Management                           |
-| Redis             | Caching; Worker Jobs Management (for Bull)       |
+| Bull              | Worker/Job Management                           |
+| Redis             | Caching; Worker Jobs Management (for Bull)      |
 | Lodash            | commons utility                                 |
 | Postgres          | default database connector                      |
 | Eslint            | Check Eslint Issues                             |
