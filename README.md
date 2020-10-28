@@ -149,7 +149,7 @@ Source Code is located at `src/main` and test code in `src/test`
 
 #### Sample Read API
 
-```node
+```js
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,
   description: 'Config Details - Access - admin',
@@ -186,7 +186,7 @@ module.exports = {
 
 Details:
 
-```node
+```js
 {
   enabled: true,
   operation: handler
@@ -199,14 +199,14 @@ Each API must return these two fields - enabled (if true, will be exposed) and o
 - **path** - api path.
 - **config** - discussed below.
 
-```node
+```js
   auth: Constants.AUTH.ADMIN_ONLY,
 ```
 
 By default, the framework has 3 roles - guest, user and admin. Each controller needs to be auth configured as per the access level.  
 Available options are: `ALL, ADMIN_ONLY, ADMIN_OR_USER and ADMIN_OR_USER_OR_GUEST`. Avoid using `ALL` Access level, use `ADMIN_OR_USER_OR_GUEST` instead.
 
-```node
+```js
 	description: 'Config Details - Access - admin',
 	tags: ['api'],
 ```
@@ -214,7 +214,7 @@ Available options are: `ALL, ADMIN_ONLY, ADMIN_OR_USER and ADMIN_OR_USER_OR_GUES
 description and tags are used foe swagger doc generation.  
 **NOTE**: tags must have `api` for this router to be listed under swagger.
 
-```node
+```js
   validate: {
     params: Joi.object({
       userId: Joi.number().integer().positive().description('User Id')
@@ -227,7 +227,7 @@ Validating the payload, param or query. Uses Joi library for validation.
 
 The following options can be used inside the validate block, to strip unknown fields. **NOTE:** Avoid Using it.
 
-```node
+```js
 options: {
       allowUnknown: true,
       stripUnknown: true
@@ -236,7 +236,7 @@ options: {
 
 Plugins add values to hapi framework. In this sample, we build the responses for swagger using hapi-swagger plugin.
 
-```node
+```js
 	plugins: {
     'hapi-swagger': {
       responses: _.omit(Constants.API_STATUS_CODES, [201])
@@ -250,7 +250,7 @@ Plugins add values to hapi framework. In this sample, we build the responses for
 Policies can be used to in handling the pre- and post- operations.
 Modifying the request, response, validating roles, etc. Hapi provides various lifecycle methods, which can be used for controlling the flow. More details can be found at Mr.Horse project page.
 
-```node
+```js
 handler: async (request, h) => Config.toJS();
 ```
 
@@ -270,7 +270,7 @@ Each model has to subclassed from BaseModel. Refer Objection.js/Knex for usage. 
 
 `entityFilteringScope` is for defining the fields that can be displayed/hidden for a given role. The policy `entityFilter` does the filtering on postHandler event.
 
-```node
+```js
 static entityFilteringScope() {
     return {
       admin: ['hashedPassword'], // fields hidden from admin
