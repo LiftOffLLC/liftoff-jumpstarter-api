@@ -1,6 +1,6 @@
-# Liftoff Jumpstarter Server Kit v2.1.1
+# Liftoff Jumpstarter REST API Server Kit v2.1.1
 
-Aimed to provide Jumpstarter kit for building REST APIs.
+Aimed to provide Jumpstarter Server Kit for building REST APIs.
 
 ## When pulling changes while collaborating using git,
 
@@ -20,8 +20,8 @@ Aimed to provide Jumpstarter kit for building REST APIs.
 | newrelic          | Monitoring                                      |
 | Node Mailer       | Mail Delivery                                   |
 | Nes               | Socket Notification                             |
-| kue               | Worker/Job Management                           |
-| Redis             | Caching; Worker Jobs Management (for kue)       |
+| Bull               | Worker/Job Management                           |
+| Redis             | Caching; Worker Jobs Management (for Bull)       |
 | Lodash            | commons utility                                 |
 | Postgres          | default database connector                      |
 | Eslint            | Check Eslint Issues                             |
