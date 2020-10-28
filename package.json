@@ -1,7 +1,7 @@
 {
   "name": "liftoff-jumpstarter-api",
   "version": "2.1.1",
-  "description": "Liftoff Jumpstarter v2.1.1 REST API Server",
+  "description": "LiftOff Jumpstarter v2.1.1 REST API Server",
   "main": "src/main/index.js",
   "scripts": {
     "lint:nofix": "eslint . --ext .js,.ts --ignore-path .gitignore",

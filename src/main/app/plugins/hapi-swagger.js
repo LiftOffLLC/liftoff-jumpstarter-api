@@ -8,7 +8,7 @@ const plugin = {
     options: {
       basePath: '/api/',
       info: {
-        title: 'Liftoff Jumpstarter v2.1.1 REST API Docs',
+        title: 'LiftOff Jumpstarter v2.1.1 REST API Docs',
         description: `NOTE: Top-level user roles are classified as ADMIN, USER or GUEST. 
         <br> <strong>ADMIN</strong> is registered super user, <strong>USER</strong> is registered User,
         where as <strong>GUEST</strong> is not a registered user.

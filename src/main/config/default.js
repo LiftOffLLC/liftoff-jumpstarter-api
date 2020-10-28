@@ -20,7 +20,7 @@ module.exports = {
   env,
   // Server options used to start Hapi server
   server: {
-    name: 'Liftoff Jumpstarter v2.1.1 Server',
+    name: 'LiftOff Jumpstarter v2.1.1 Server',
     version: '2.1.1',
     host: process.env.HOST,
     port: parseInt(process.env.PORT, 10),
@@ -54,7 +54,7 @@ module.exports = {
   },
   // NewRelic Config
   newrelic: {
-    name: `Liftoff Jumpstarter v2.1.1 Server -  ${env}`,
+    name: `LiftOff Jumpstarter v2.1.1 Server -  ${env}`,
     key: process.env.NEW_RELIC_LICENSE_KEY,
     log_level: process.env.NEW_RELIC_LOG_LEVEL,
   },
@@ -132,7 +132,7 @@ module.exports = {
   },
   // mailer configuration
   mailAddress: {
-    name: 'Liftoff Jumpstarter v2.1.1 Server',
+    name: 'LiftOff Jumpstarter v2.1.1 Server',
     info: process.env.INFO_FROM_EMAIL,
     notifications: process.env.NOTIFICATIONS_FROM_EMAIL,
     support: process.env.SUPPORT_FROM_EMAIL,

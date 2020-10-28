@@ -1,4 +1,4 @@
-# Liftoff Jumpstarter REST API Server Kit v2.1.1
+# LiftOff Jumpstarter REST API Server Kit v2.1.1
 
 Aimed to provide Jumpstarter Server Kit for building REST APIs.
 

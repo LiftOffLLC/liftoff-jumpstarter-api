@@ -6,7 +6,7 @@ const plugin = {
   plugin: {
     plugin: HapiStatusMonitor,
     options: {
-      title: 'Liftoff Jumpstarter v2.1.1 Server Status Monitor',
+      title: 'LiftOff Jumpstarter v2.1.1 Server Status Monitor',
       path: '/status',
       routeConfig: {
         auth: false,
