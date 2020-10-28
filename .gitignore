@@ -54,6 +54,7 @@ jspm_packages
 Thumbs.db
 
 # Personal Files
+gitignored
 TODO.md
 tt.js
 ngrok
@@ -67,7 +68,8 @@ mydb2dump.sql
 nes_client.js
 
 # Environment
-.env
+.env*
+bin/env.sh
 
 artifacts
 https://github.com/serverless/serverless

@@ -10,6 +10,6 @@ module.exports = {
   throwError: async err => {
     if (Boom.isBoom(err)) {
       throw err;
-    } else throw Boom.badRequest(err);
+    } else throw Boom.badImplementation(err);
   },
 };

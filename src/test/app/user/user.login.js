@@ -7,6 +7,7 @@ module.exports = (server, shared) => () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
   test('POST /api/users/login with invalid email should respond with 400', async () => {
     const payload = {
       email: 'string',
@@ -19,6 +20,7 @@ module.exports = (server, shared) => () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
   test('POST /api/users/login with invalid password should respond with 400', async () => {
     const payload = {
       email: 'str@ing.com',
@@ -31,6 +33,7 @@ module.exports = (server, shared) => () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
   test('POST /api/users/login with nonexistent user should respond with 404', async () => {
     const payload = {
       email: 'non123@existent.com',
@@ -43,6 +46,7 @@ module.exports = (server, shared) => () => {
     });
     expect(response.statusCode).toBe(404);
   });
+
   test('POST /api/users/login with incorrect password should respond with 401', async () => {
     const payload = {
       email: shared.adminEmail,
@@ -55,6 +59,7 @@ module.exports = (server, shared) => () => {
     });
     expect(response.statusCode).toBe(401);
   });
+
   test('POST /api/users/login with user should respond with user and token', async () => {
     const payload = {
       email: shared.adminEmail,

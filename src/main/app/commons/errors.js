@@ -12,4 +12,12 @@ module.exports = {
   duplicateMember:
     'A team member with same name already exists for this project.',
   teamMemberNotFound: 'A team member with this id does not exist.',
+  authError: 'You are not authorized.',
+  invalidCredentials: 'Invalid Credentials.',
+  infoMissing: 'Missing %s Info.',
+  infoUnwanted: 'Unnecessary %s Info.',
+  adminDeleteError: 'Cannot delete admin!',
+  tokenInvalid: 'Invalid Token.',
+  tokenExpired: 'Token Expired.',
+  alreadySubmitted: '%s already submitted',
 };

@@ -44,4 +44,8 @@ module.exports = {
       scope: [UserScope.ADMIN, UserScope.USER, UserScope.GUEST],
     },
   },
+
+  USER: {
+    ROLE: ['admin', 'user'],
+  },
 };

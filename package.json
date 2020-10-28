@@ -1,18 +1,25 @@
 {
   "name": "liftoff-jumpstarter-api",
-  "version": "2.1.0",
-  "description": "Liftoff Jumpstarter v2.1 REST API Server",
+  "version": "2.1.1",
+  "description": "Liftoff Jumpstarter v2.1.1 REST API Server",
   "main": "src/main/index.js",
   "scripts": {
-    "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
-    "lint:fix": "yarn lint --fix",
+    "lint:nofix": "eslint . --ext .js,.ts --ignore-path .gitignore",
+    "lint": "yarn lint:nofix --fix",
     "inspect": "jsinspect -t 30 --ignore 'src/main/database/' src/main",
-    "dev": "yarn lint; NODE_ENV=development nodemon --ignore src/main/database/ src/main/index.js",
+    "env:create": "cd bin; cp example.env.sh env.sh; chmod +x env.sh",
+    "env": "./bin/env.sh",
+    "dev": "yarn lint; nodemon --ignore src/main/database/ src/main/index.js",
     "worker": "node src/main/worker.js",
     "start": "pm2 delete all; node src/main/pm2.js",
     "knex": "knex --knexfile ./src/main/knexfile.js",
     "pm2": "pm2",
-    "test": "jest src/test --verbose --forceExit --detectOpenHandles --coverage",
+    "migrate": "sh -c 'yarn knex migrate:rollback; yarn knex migrate:latest; yarn knex seed:run;'",
+    "test:nme": "jest src/test --verbose",
+    "test:ne": "NODE_ENV=test yarn migrate; yarn test:nme",
+    "test": "yarn test:ne --forceExit --detectOpenHandles",
+    "test:nm": "yarn test:nme --forceExit --detectOpenHandles",
+    "test:coverage": "yarn test --coverage",
     "test:silent": "yarn test --silent",
     "format": "prettier --write '**/*.{ts,js,css,html}'"
   },
@@ -49,6 +56,11 @@
       "pre-commit": "lint-staged"
     }
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/main/app/controllers/**"
+    ]
+  },
   "dependencies": {
     "@hapi/boom": "^9.1.0",
     "@hapi/catbox-redis": "^5.0.5",
@@ -78,6 +90,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
     "lodash": "^4.17.15",
+    "moment-timezone": "^0.5.31",
     "mrhorse": "^6.0.0",
     "newrelic": "^6.7.1",
     "nodemailer": "^6.4.6",

@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
+const Constants = require('../../app/commons/constants');
+
 exports.up = async knex => {
   /**
-Table:  User
-Purpose: Store User's Data and References
-*/
-  await knex.schema.createTableIfNotExists('User', table => {
+  Table:  User
+  Purpose: Store User's Data and References
+  */
+  await knex.schema.createTable('User', table => {
     table.increments('id').primary();
 
     // Name
@@ -19,10 +21,10 @@ Purpose: Store User's Data and References
 
     // Email Related
     table
-      .string('email', 100)
+      .string('email')
       .index()
-      .notNullable()
       .unique()
+      .notNullable()
       .comment('Email to be in lowercase');
     table.string('emailToken', 15).index().comment('Email Verification Token');
     table
@@ -31,7 +33,11 @@ Purpose: Store User's Data and References
       .comment('Check if email is verified');
 
     // Phone Related
-    table.string('phoneNumber', 15).index().comment('E164 Phone number');
+    table
+      .string('phoneNumber')
+      .index()
+      .notNullable()
+      .comment('E164 Phone number');
 
     // Password
     table.string('hashedPassword').notNullable().comment('Hashed password');
@@ -42,8 +48,12 @@ Purpose: Store User's Data and References
 
     // Role
     table
-      .enu('role', ['admin', 'user'], { useNative: true, enumName: 'Role' })
+      .enu('role', Constants.USER.ROLE, {
+        useNative: true,
+        enumName: 'UserRole',
+      })
       .notNullable()
+      .defaultTo('user')
       .comment('User Role');
 
     // TimeStamps
@@ -102,7 +112,7 @@ exports.down = async knex => {
   try {
     await knex.raw('DROP TABLE IF EXISTS "SocialLogin" CASCADE;');
     await knex.raw('DROP TABLE IF EXISTS "User" CASCADE;');
-    await knex.raw('DROP TYPE IF EXISTS "Role" CASCADE;');
+    await knex.raw('DROP TYPE IF EXISTS "UserRole" CASCADE;');
     await knex.raw('TRUNCATE TABLE "knex_migrations_lock" RESTART IDENTITY;');
     await knex.raw('TRUNCATE TABLE "knex_migrations" RESTART IDENTITY;');
     console.log('Dropped everything');

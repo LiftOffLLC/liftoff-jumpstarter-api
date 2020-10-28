@@ -4,6 +4,7 @@ const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const JWT = require('jsonwebtoken');
 const uuid = require('uuid');
+const Errors = require('../../commons/errors');
 const UserModel = require('../../models/user');
 const Config = require('../../../config');
 const Constants = require('../../commons/constants');
@@ -13,7 +14,7 @@ const { inspect } = Util;
 
 const options = {
   auth: Constants.AUTH.ALL,
-  description: 'Request for password reset - Access - ALL',
+  description: 'Forgot password  - Access - ALL',
   tags: ['api'],
   validate: {
     query: Joi.object({
@@ -33,7 +34,7 @@ const options = {
       UserModel.buildCriteria('email', request.query.email),
     );
     if (!user) {
-      throw Boom.notFound('User Not Found.');
+      throw Boom.notFound(Util.format(Errors.notFound, 'User'));
     }
 
     // Generate random id

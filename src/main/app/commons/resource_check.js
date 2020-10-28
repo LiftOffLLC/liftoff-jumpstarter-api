@@ -1,13 +1,15 @@
 const Boom = require('@hapi/boom');
 const _ = require('lodash');
+const Util = require('util');
 const Constants = require('./constants');
+const Errors = require('./errors');
 
 const resourceCheckHandler = async (model, request, _h) => {
   const data = await model.findOne(
     model.buildCriteriaWithObject(request.params),
   );
   if (_.isEmpty(data)) {
-    throw Boom.notFound('Resource Not Found.');
+    throw Boom.notFound(Util.format(Errors.notFound, 'Resource'));
   }
   return Constants.SUCCESS_RESPONSE;
 };
