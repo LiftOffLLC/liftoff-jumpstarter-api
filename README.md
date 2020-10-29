@@ -17,7 +17,7 @@ Aimed to provide Jumpstarter Server Kit for building REST APIs.
 | Node.js           | Node Environment                                |
 | Hapi.js           | Server logic                                    |
 | Objection.js/Knex | ORM Framework                                   |
-| newrelic          | Monitoring                                      |
+| New Relic         | Monitoring                                      |
 | Node Mailer       | Mail Delivery                                   |
 | Nes               | Socket Notification                             |
 | Bull              | Worker/Job Management                           |

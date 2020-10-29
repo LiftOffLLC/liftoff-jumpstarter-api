@@ -113,7 +113,7 @@ class Worker {
 
   /**
    * To reduce redis instance consumption, job is scheduled to run by parent name
-   * parent name will be splitted from worker name
+   * parent name will be split from worker name
    * eg: worker name : 'email.sendCampaignMessage' , job will be email
    * worker name should be chosen wisely by considering the concurrency issues.
    */
