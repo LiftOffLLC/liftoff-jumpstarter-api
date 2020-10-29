@@ -4,7 +4,7 @@ const Constants = require('../../commons/constants');
 
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,
-  description: 'Config Details - Access - ADMIN',
+  description: 'Config Details - Access - admin',
   tags: ['api'],
   plugins: {
     'hapi-swagger': {

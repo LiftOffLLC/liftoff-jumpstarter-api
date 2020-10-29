@@ -5,10 +5,13 @@ const _ = require('lodash');
 const uuid = require('uuid');
 const UserModel = require('../../models/user');
 const RedisClient = require('../../commons/redisClient');
-const errorCodes = require('../../commons/errors');
+const Errors = require('../../commons/errors');
 const Constants = require('../../commons/constants');
 const Utils = require('../../commons/utils');
 const Config = require('../../../config');
+const Logger = require('../../commons/logger');
+const { throwError } = require('../../commons/error.parser');
+const { getTransaction } = Utils;
 const UserScope = UserModel.scope();
 const UserRole = UserModel.role();
 const validator = UserModel.validatorRules();
@@ -40,53 +43,58 @@ const options = {
     // Error out if email already exists.
     if (!_.isEmpty(userWithEmail)) {
       const errorCode = userWithEmail.isActive
-        ? errorCodes.emailDuplicate
-        : errorCodes.userDisabled;
+        ? Errors.emailDuplicate
+        : Errors.userDisabled;
       throw Boom.forbidden(Util.format(errorCode, request.payload.email));
     }
 
-    const user = _.clone(request.payload);
-    user.hashedPassword = request.payload.password;
-    delete user.password;
+    const trx = await getTransaction();
+    let initialUser;
+    try {
+      initialUser = _.clone(request.payload);
+      initialUser.hashedPassword = request.payload.password;
+      delete initialUser.password;
+      const resultUser = await UserModel.createOrUpdate(initialUser, true, trx);
 
-    user.role = UserRole.USER;
+      // on successful, create login_token for this user.
+      const sessionId = uuid.v4();
+      const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
+        id: sessionId,
+        userId: resultUser.id,
+        isAdmin: resultUser.role === UserRole.ADMIN,
+      });
 
-    const resultUser = await UserModel.createOrUpdate(user);
+      await RedisClient.saveSession(resultUser.id, sessionId, session);
+      // sign the token
+      resultUser.sessionToken = request.server.methods.sessionsSign(session);
 
-    // on successful, create login_token for this user.
-    const sessionId = uuid.v4();
-    const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
-      id: sessionId,
-      userId: resultUser.id,
-      isAdmin: resultUser.role === UserRole.ADMIN,
-    });
+      // allow entity filtering to happen here.
+      _.set(request, 'auth.credentials.userId', resultUser.id);
+      _.set(
+        request,
+        'auth.credentials.scope',
+        resultUser.role === UserRole.ADMIN ? UserScope.ADMIN : UserScope.USER,
+      );
 
-    await RedisClient.saveSession(resultUser.id, sessionId, session);
-    // sign the token
-    resultUser.sessionToken = request.server.methods.sessionsSign(session);
+      const mailVariables = {
+        webUrl: Config.get('webUrl'),
+      };
+      await Utils.addMailToQueue(
+        'welcome-msg',
+        {},
+        resultUser.id,
+        {},
+        mailVariables,
+      );
 
-    // allow entity filtering to happen here.
-    _.set(request, 'auth.credentials.userId', resultUser.id);
-    _.set(
-      request,
-      'auth.credentials.scope',
-      resultUser.role === UserRole.ADMIN ? UserScope.ADMIN : UserScope.USER,
-    );
+      await trx.commit();
 
-    const mailVariables = {
-      webUrl: Config.get('webUrl'),
-    };
-    await Utils.addMailToQueue(
-      'welcome-msg',
-      {},
-      resultUser.id,
-      {},
-      mailVariables,
-    );
-
-    const response = h.response(resultUser);
-    response.code(201);
-    return response;
+      return h.response(resultUser).code(201);
+    } catch (err) {
+      await trx.rollback();
+      Logger.error('User Create Err:: ', err);
+      return throwError(err);
+    }
   },
 };
 

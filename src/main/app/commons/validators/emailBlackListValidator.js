@@ -27,7 +27,7 @@ function isEmailBlacklisted(email) {
 
 const emailBlackListValidator = Joi.extend({
   type: 'email',
-  base: Joi.string().trim().lowercase().email(),
+  base: Joi.string().max(50).trim().lowercase().email(),
   messages: {
     'email.isBlacklisted': 'is blacklisted',
   },

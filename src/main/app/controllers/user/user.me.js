@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const UserModel = require('../../models/user');
 const Constants = require('../../commons/constants');
 
 const options = {
@@ -11,11 +10,7 @@ const options = {
       responses: _.omit(Constants.API_STATUS_CODES, [201, 403]),
     },
   },
-  handler: async (request, _h) => {
-    const userId = _.get(request, 'auth.credentials.userId');
-    const user = await UserModel.findOne(UserModel.buildCriteria('id', userId));
-    return user;
-  },
+  handler: async (request, _h) => request.auth.credentials.user,
 };
 
 // eslint-disable-next-line no-unused-vars

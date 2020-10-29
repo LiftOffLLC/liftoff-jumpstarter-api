@@ -3,6 +3,7 @@ const querystring = require('querystring');
 module.exports = (server, shared) => () => {
   const emails = ['str1@ing.com', 'str2@ing.com', 'str3@ing.com'];
   const userIds = [];
+
   describe('Logging in', () => {
     test('POST /api/users/login with admin should respond with user and token', async () => {
       const payload = {
@@ -20,6 +21,7 @@ module.exports = (server, shared) => () => {
       shared.adminToken = user.sessionToken;
     });
   });
+
   describe('Registering users for deletion', () => {
     test('Before registration, delete existing users with these emails', async () => {
       const query = {
@@ -55,6 +57,7 @@ module.exports = (server, shared) => () => {
         expect([200, 404]).toContain(userResponse.statusCode);
       }
     });
+
     test('Registering users', async () => {
       for (const email of emails) {
         const payload = {
@@ -75,7 +78,8 @@ module.exports = (server, shared) => () => {
       }
     });
   });
-  describe('Logging in', () => {
+
+  describe('Logging in again', () => {
     test('POST /api/users/login with admin should respond with user and token', async () => {
       const payload = {
         email: shared.adminEmail,
@@ -92,6 +96,7 @@ module.exports = (server, shared) => () => {
       shared.adminToken = user.sessionToken;
       shared.adminId = user.id;
     });
+
     test('POST /api/users/login with user should respond with user and token', async () => {
       const payload = {
         email: shared.userEmail,
@@ -108,6 +113,7 @@ module.exports = (server, shared) => () => {
       shared.userToken = user.sessionToken;
     });
   });
+
   describe('Invalid Cases', () => {
     test('DELETE /api/users without auth should respond with 401', async () => {
       const query = {
@@ -119,6 +125,7 @@ module.exports = (server, shared) => () => {
       });
       expect(response.statusCode).toBe(401);
     });
+
     test('DELETE /api/users with user auth should respond with 403', async () => {
       const query = {
         userId: userIds[0],
@@ -132,6 +139,7 @@ module.exports = (server, shared) => () => {
       });
       expect(response.statusCode).toBe(403);
     });
+
     test('DELETE /api/users with admin auth without userId should respond with 400', async () => {
       const response = await server.inject({
         method: 'delete',
@@ -142,6 +150,7 @@ module.exports = (server, shared) => () => {
       });
       expect(response.statusCode).toBe(400);
     });
+
     test('DELETE /api/users with admin auth with invalid userId should respond with 404', async () => {
       const query = {
         userId: 9999999,
@@ -155,6 +164,7 @@ module.exports = (server, shared) => () => {
       });
       expect(response.statusCode).toBe(404);
     });
+
     test('DELETE /api/users with admin auth with admin userId should respond with 403', async () => {
       const query = {
         userId: shared.adminId,
@@ -169,6 +179,7 @@ module.exports = (server, shared) => () => {
       expect(response.statusCode).toBe(403);
     });
   });
+
   describe('Valid Deletions', () => {
     describe('Without hardDeleteFlag', () => {
       test('DELETE /api/users with admin auth without hardDeleteFlag should respond with success', async () => {
@@ -187,6 +198,7 @@ module.exports = (server, shared) => () => {
           success: true,
         });
       });
+
       test('GET /api/users with soft-deleted userId should respond with inActive user', async () => {
         const query = {
           fields: ['id', 'isActive'].join(','),
@@ -209,6 +221,7 @@ module.exports = (server, shared) => () => {
         expect(result.items[0].isActive).toBe(false);
       });
     });
+
     describe('With hardDeleteFlag = false', () => {
       test('DELETE /api/users with admin auth with hardDeleteFlag = false should respond with success', async () => {
         const query = {
@@ -227,6 +240,7 @@ module.exports = (server, shared) => () => {
           success: true,
         });
       });
+
       test('GET /api/users with soft-deleted userId should respond with inActive user', async () => {
         const query = {
           fields: ['id', 'isActive'].join(','),
@@ -249,6 +263,7 @@ module.exports = (server, shared) => () => {
         expect(result.items[0].isActive).toBe(false);
       });
     });
+
     describe('With hardDeleteFlag = true', () => {
       test('DELETE /api/users with admin auth with hardDeleteFlag = true should respond with success', async () => {
         const query = {
@@ -267,6 +282,7 @@ module.exports = (server, shared) => () => {
           success: true,
         });
       });
+
       test('GET /api/users with hard-deleted userId should respond with no user', async () => {
         const query = {
           fields: ['id', 'isActive'].join(','),

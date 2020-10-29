@@ -2,7 +2,7 @@ const Util = require('util');
 const _ = require('lodash');
 const Boom = require('@hapi/boom');
 const Logger = require('../commons/logger');
-const errorCodes = require('../commons/errors');
+const Errors = require('../commons/errors');
 
 module.exports = function checkIfExists(model, modelName, keys, valuePaths) {
   const testExistance = async (request, h) => {
@@ -53,11 +53,11 @@ module.exports = function checkIfExists(model, modelName, keys, valuePaths) {
       return h.continue;
     }
 
-    throw Boom.notFound(Util.format(errorCodes.notFound, modelName));
+    throw Boom.notFound(Util.format(Errors.notFound, modelName));
     // return next(
     //   exists
     //     ? null
-    //     : Boom.notFound(Util.format(errorCodes.notFound, modelName)),
+    //     : Boom.notFound(Util.format(Errors.notFound, modelName)),
     //   exists,
     // );
   };

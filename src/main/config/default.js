@@ -1,11 +1,11 @@
 /* eslint-disable import/first */
-require('dotenv').config();
+const env = process.env.NODE_ENV || 'development';
+require('dotenv').config({ path: `.env.${env}` });
 const _ = require('lodash');
 const CatboxRedis = require('@hapi/catbox-redis');
 const path = require('path');
 const token = require('../app/commons/token');
 const errorParser = require('../app/commons/error.parser');
-const env = process.env.NODE_ENV;
 const urlParser = require('../app/commons/url_parser');
 
 // replace REDIS_URL with the appropriate variable provided by your redis provider on heroku
@@ -20,8 +20,8 @@ module.exports = {
   env,
   // Server options used to start Hapi server
   server: {
-    name: 'Liftoff Jumpstarter v2.1 Server',
-    version: '2.1.0',
+    name: 'LiftOff Jumpstarter v2.1.1 Server',
+    version: '2.1.1',
     host: process.env.HOST,
     port: parseInt(process.env.PORT, 10),
     forceSSL: process.env.FORCE_SSL,
@@ -54,7 +54,7 @@ module.exports = {
   },
   // NewRelic Config
   newrelic: {
-    name: `Liftoff Jumpstarter v2.1 Server -  ${env}`,
+    name: `LiftOff Jumpstarter v2.1.1 Server -  ${env}`,
     key: process.env.NEW_RELIC_LICENSE_KEY,
     log_level: process.env.NEW_RELIC_LOG_LEVEL,
   },
@@ -82,6 +82,7 @@ module.exports = {
       seeds: {
         directory: path.join(__dirname, '..', 'database', 'seeds', 'master'),
       },
+      idNamespace: process.env.DB_ID_NAMESPACE,
 
       // IMPORTANT :: Commenting out acquireConnectionTimeout
       //    - https://github.com/tgriesser/knex/issues/1382#issuecomment-217020465
@@ -131,7 +132,7 @@ module.exports = {
   },
   // mailer configuration
   mailAddress: {
-    name: 'Liftoff Jumpstarter v2.1 Server',
+    name: 'LiftOff Jumpstarter v2.1.1 Server',
     info: process.env.INFO_FROM_EMAIL,
     notifications: process.env.NOTIFICATIONS_FROM_EMAIL,
     support: process.env.SUPPORT_FROM_EMAIL,

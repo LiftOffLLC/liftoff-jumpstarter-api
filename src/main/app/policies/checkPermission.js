@@ -4,6 +4,7 @@ const Logger = require('../commons/logger');
 const RBAC = require('../commons/rbac');
 const UserModel = require('../models/user');
 const UserScope = UserModel.scope();
+const Errors = require('../commons/errors');
 
 const isAdmin = async params => {
   Logger.info(`${__filename} isAdmin :: entry :: params :: `, params);
@@ -89,7 +90,7 @@ module.exports = function checkPermission(permission, keysAndValuePaths = {}) {
         return h.continue;
       }
 
-      throw Boom.forbidden();
+      throw Boom.forbidden(Errors.authError);
     }
 
     Logger.info(
@@ -110,7 +111,7 @@ module.exports = function checkPermission(permission, keysAndValuePaths = {}) {
       return h.continue;
     }
 
-    throw Boom.forbidden();
+    throw Boom.forbidden(Errors.authError);
   };
 
   hasSpecificRole.applyPoint = 'onPreHandler';

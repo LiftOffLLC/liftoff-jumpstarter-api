@@ -2,6 +2,7 @@ const Util = require('util');
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
+const Errors = require('../../commons/errors');
 const UserModel = require('../../models/user');
 const Config = require('../../../config');
 const Constants = require('../../commons/constants');
@@ -32,20 +33,20 @@ const options = {
       UserModel.buildCriteria('email', request.payload.email),
     );
     if (!user) {
-      throw Boom.notFound('User Not Found.');
+      throw Boom.notFound(Util.format(Errors.notFound, 'User'));
     }
     request.log(['info', __filename], `user found - ${inspect(user)}`);
 
     // Validate token
     if (request.payload.resetPasswordToken !== user.resetPasswordToken) {
-      throw Boom.badRequest('Invalid Token.');
+      throw Boom.forbidden(Errors.tokenInvalid);
     }
 
     if (
       +new Date(request.payload.resetPasswordSentAt) - +new Date() >
       Config.get('passwordReset').get('duration')
     ) {
-      throw Boom.badRequest('Token Expired.');
+      throw Boom.forbidden(Errors.tokenExpired);
     }
 
     // Reset token and create hash from password

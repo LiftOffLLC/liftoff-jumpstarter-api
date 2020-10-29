@@ -112,10 +112,10 @@ class Worker {
   }
 
   /**
-   * To reduce redis instance consumption, job is sheduled to run by parent name
-   * parent name will be splited from worker name
-   *  eg: woeker name : 'email.sendCampaignMessage' , job will be email
-   * worker name should be choosen wisely by considerining the curcurrnecy issues.
+   * To reduce redis instance consumption, job is scheduled to run by parent name
+   * parent name will be split from worker name
+   * eg: worker name : 'email.sendCampaignMessage' , job will be email
+   * worker name should be chosen wisely by considering the concurrency issues.
    */
   async addJob(name, data = {}, jobOptions = {}) {
     Logger.info(`Registering Job ${name}`);
@@ -123,6 +123,11 @@ class Worker {
 
     if (!this.jobs || !_.some(this.jobs, _.zipObject(['name'], [name]))) {
       throw new Error(`Unknown job '${name}', Verify job enabled or not`);
+    }
+
+    if (Config.get('env') === 'test') {
+      Logger.info(`Test environment:: Not Adding Job ${name} to Queue`);
+      return {};
     }
 
     const currentJob = _.find(this.jobs, ['name', name]);

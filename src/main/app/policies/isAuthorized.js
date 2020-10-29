@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const Boom = require('@hapi/boom');
+const Errors = require('../commons/errors');
 const Logger = require('../commons/logger');
 const UserScope = require('../models/user').scope();
 
@@ -23,7 +24,7 @@ module.exports = function isAuthorized(userPath) {
     if (exists) {
       return h.continue;
     }
-    throw Boom.illegal('Access Denied.');
+    throw Boom.illegal(Errors.authError);
   };
 
   testIsAuthorized.applyPoint = 'onPreHandler';

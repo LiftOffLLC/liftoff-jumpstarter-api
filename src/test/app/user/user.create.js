@@ -9,7 +9,7 @@ module.exports = (server, shared) => () => {
       });
       expect(response.statusCode).toBe(400);
     });
-    test('POST /api/users with unknown param in payload should respond with 400', async () => {
+    test('POST /api/users with unknown param should respond with 400', async () => {
       const payload = {
         name: 'string',
         password: 'stringstring',

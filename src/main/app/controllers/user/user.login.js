@@ -2,9 +2,9 @@ const Util = require('util');
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
+const Errors = require('../../commons/errors');
 const UserModel = require('../../models/user');
 const Constants = require('../../commons/constants');
-
 const validator = UserModel.validatorRules();
 const { inspect } = Util;
 
@@ -31,7 +31,7 @@ const options = {
     );
 
     if (!user) {
-      throw Boom.notFound('User Not Found.');
+      throw Boom.notFound(Util.format(Errors.notFound, 'User'));
     }
 
     if (user.verifyPassword(request.payload.password)) {
@@ -40,7 +40,7 @@ const options = {
       return user;
     }
 
-    throw Boom.unauthorized('Invalid credentials.');
+    throw Boom.unauthorized(Errors.authError);
   },
 };
 

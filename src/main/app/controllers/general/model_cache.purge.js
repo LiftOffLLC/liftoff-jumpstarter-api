@@ -7,7 +7,7 @@ const cachePurgeHandler = _server => {
     path: '/api/model-cache/purge',
     options: {
       auth: Constants.AUTH.ADMIN_OR_USER,
-      description: 'Purge cached model data - Access - admin, user',
+      description: 'Purge cached model data - Access - admin,user',
       tags: ['api'],
     },
     handler: async (_request, _h) => {

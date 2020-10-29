@@ -1,6 +1,8 @@
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
+const Util = require('util');
+const Errors = require('../../commons/errors');
 const UserModel = require('../../models/user');
 const Constants = require('../../commons/constants');
 const UserScope = UserModel.scope();
@@ -18,7 +20,9 @@ const options = {
       avatarUrl: validator.avatarUrl.optional(),
       oldPassword: validator.password.optional(),
       password: validator.password.optional(),
-    }),
+    })
+      .min(1)
+      .and('oldPassword', 'password'),
   },
   plugins: {
     'hapi-swagger': {
@@ -33,7 +37,7 @@ const options = {
       _.get(request, 'auth.credentials.scope') === UserScope.ADMIN;
 
     if (!isAdmin && isUserIdDefined) {
-      throw Boom.badRequest();
+      throw Boom.badRequest(Util.format(Errors.infoUnwanted, 'userId'));
     }
 
     const payload = _.cloneDeep(request.payload);
@@ -44,26 +48,20 @@ const options = {
       payload.id = authScopeUserId;
     }
 
-    // Update password.
-    if (payload.oldPassword || payload.password) {
+    if (payload.oldPassword && payload.password) {
       const user = await UserModel.findOne(
         UserModel.buildCriteria('id', payload.id),
       );
-
-      if (
-        payload.oldPassword &&
-        payload.password &&
-        user.verifyPassword(payload.oldPassword)
-      ) {
+      if (user.verifyPassword(payload.oldPassword)) {
         payload.hashedPassword = payload.password;
         // TODO: Send back Fresh tokens for login. Ideally we should log out this guy.
       } else {
-        throw Boom.unauthorized('Invalid Credentials.');
+        throw Boom.unauthorized(Errors.invalidCredentials);
       }
+      delete payload.oldPassword;
+      delete payload.password;
     }
 
-    delete payload.oldPassword;
-    delete payload.password;
     const result = await UserModel.createOrUpdate(payload);
     return result;
   },

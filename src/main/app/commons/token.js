@@ -27,9 +27,6 @@ module.exports = {
         const UserRole = UserModel.role();
         const user = await UserModel.findOne(
           UserModel.buildCriteria('id', session.subject.userId),
-          {
-            columns: 'id,role',
-          },
         );
 
         if (user) {
@@ -40,6 +37,7 @@ module.exports = {
               : UserScope.USER;
 
           session.subject.role = user.role;
+          session.subject.user = user;
         } else {
           session.subject.scope = UserScope.GUEST;
         }

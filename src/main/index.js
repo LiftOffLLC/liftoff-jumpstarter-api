@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 require('newrelic');
-const knexClass = require('knex');
 const Config = require('./config');
+const configureDatabase = require('./configureDatabase');
 const Bootstrap = require('./app/bootstrap');
 // Configure Winston Logger for logging in utils, models, etc.
 // eslint-disable-next-line no-unused-vars
@@ -22,55 +22,24 @@ process.on('rejectionHandled', promise => {
   // See Promise.onUnhandledRejectionHandled for parameter documentation
   console.log('Possibly Unhandled Rejection at: Promise ', promise);
 });
-
 class App {
   constructor() {
-    console.log(Date.now(), '::: bootstraping ::::: ');
+    console.log(Date.now(), ':::: bootstrapping :::: ');
     // create server instance
     this.server = Bootstrap.server(Config);
   }
 
-  async configureDatabase() {
-    try {
-      const dbConfig = Config.get('database').get('postgres').toJS();
-      this.knex = knexClass(dbConfig);
-
-      await this.knex.raw(dbConfig.validateQuery);
-
-      if (dbConfig.recreateDatabase === 'true') {
-        console.log(
-          Date.now(),
-          '::: running database migration :::: started !!!',
-        );
-        await this.knex.migrate.rollback(dbConfig);
-        await this.knex.migrate.latest(dbConfig);
-
-        // Populate Seed Data
-        await this.knex.seed.run(dbConfig);
-        // Flush all Redis keys...
-        // eslint-disable-next-line global-require
-        this.RedisClient = require('./app/commons/redisClient');
-
-        await this.RedisClient.flushDB();
-        console.log(
-          Date.now(),
-          '::: running database migration :::: ended !!!',
-        );
-      }
-    } catch (e) {
-      console.error('could not configure database: ', e);
-      throw e;
-    }
-  }
-
   async configure() {
     try {
-      console.log(Date.now(), '::: booting up ::::: ');
+      console.log(Date.now(), ':::: booting up :::: ');
 
-      if (Config.get('server').get('pm2') !== 'true') {
+      if (
+        Config.get('server').get('pm2') !== 'true' &&
+        Config.get('env') !== 'test'
+      ) {
         // configure database.
         console.log(Date.now(), ':::: about to configure database ::::');
-        await this.configureDatabase();
+        await configureDatabase();
       }
 
       // configure methods.
@@ -123,20 +92,6 @@ class App {
       `${this.server.settings.app.get('server').get('name')} started at ${
         this.server.info.uri
       }`,
-    );
-  }
-
-  async stop() {
-    if (this.RedisClient) {
-      await this.RedisClient.quit();
-    }
-    await this.knex.destroy();
-    await this.worker.stop();
-    console.log(Date.now(), ':::: stopping server ::::');
-    await this.server.stop();
-    console.log(
-      Date.now(),
-      `${this.server.settings.app.get('server').get('name')} stopped`,
     );
   }
 }
