@@ -1,33 +1,35 @@
 # LiftOff Jumpstarter REST API Server Kit v2.1.1
 
-Aimed to provide Jumpstarter Server Kit for building REST APIs.
+Jumpstarter is a boilerplate for building a REST API server using Node.js. Most of the web applications have some common set of basic and advanced features that are often rewritten from scratch. Using any kind of boilerplate allows us to focus directly on the actual business logic instead of reinventing the wheel.
 
-## When pulling changes while collaborating using git,
+**NOTE**: This readme focuses on how to use Jumpstarter. For a detailed description about the Jumpstarter itself as a boilerplate, read our medium blog post here- [LiftOff Jumpstarter REST API Server Kit](https://medium.com/@liftoffllc/liftoff-jumpstarter-rest-api-server-kit-cde019f8761)
 
-- If the `yarn.lock` was changed, run `yarn`
-- If `.example.env` was changed, run `yarn env`
-- If `DB_RECREATE` is `true`; after running `yarn dev`, set it to `false` to prevent migration on every dev run
+## Overview of the main components
 
-**NOTE**: Not following any one of the above steps will make the environment inconsistent for further development
+![Overview-Components](https://user-images.githubusercontent.com/18231119/97817427-752c4200-1cc2-11eb-98c7-54afb8fea8b9.jpg)  
+*All rights belong to their respective owners*
 
-## Packages Used
-
-| Package           | Purpose                                         |
-| :---------------- | :---------------------------------------------- |
-| Node.js           | Node Environment                                |
-| Hapi.js           | Server logic                                    |
-| Objection.js/Knex | ORM Framework                                   |
-| New Relic         | Monitoring                                      |
-| Node Mailer       | Mail Delivery                                   |
-| Nes               | Socket Notification                             |
-| Bull              | Worker/Job Management                           |
-| Redis             | Caching; Worker Jobs Management (for Bull)      |
-| Lodash            | commons utility                                 |
-| Postgres          | default database connector                      |
-| Eslint            | Check Eslint Issues                             |
-| Prettier          | Code Formatting                                 |
-| PM2               | Process management utility to start/stop server |
-| Jest              | Testing Framework                               |
+| Component           | Purpose                                     |
+|---------------------|---------------------------------------------|
+| Node.js             | Node Environment                            |
+| Yarn                | Package Manager                             |
+| Hapi.js             | Server Framework                            |
+| Postgres            | Database                                    |
+| Objection.js / Knex | ORM Framework, Migrations and Seeding       |
+| Bull                | Job Queue Management for Worker / Scheduler |
+| Redis               | Bull, Login Sessions, Caching               |
+| Nes                 | WebSockets                                  |
+| Node Mailer         | Mail Delivery                               |
+| New Relic           | Performance Monitoring                      |
+| Winston             | Logging                                     |
+| Bell                | Social Logins (In Progress)                 |
+| Joi                 | Validation                                  |
+| Lodash              | Utility                                     |
+| Eslint and Prettier | Code Linting and Formatting                 |
+| Swagger             | API Documentation                           |
+| PM2                 | Process Management                          |
+| Jest / Istanbul     | Testing Framework / Coverage                |
+| GitHub Actions      | CI/CD                                       |
 
 ## Project Setup
 
@@ -65,6 +67,14 @@ This will merge Jumpstarter into your project, thereby merging the features adde
 #### B) Pulling changes next time onwards
 
 `git pull jumpstarter master`
+
+## When pulling changes while collaborating using git,
+
+- If the `yarn.lock` was changed, run `yarn`
+- If `.example.env` was changed, run `yarn env`
+- If `DB_RECREATE` is `true`; after running `yarn dev`, set it to `false` to prevent migration on every dev run
+
+**NOTE**: Not following any one of the above steps will make the environment inconsistent for further development
 
 ## Pushing changes from your project's repository into Jumpstarter repository
 
@@ -115,14 +125,22 @@ e.g. `NODE_ENV=test yarn migrate`
 `yarn` to install all the dependencies  
 `yarn start` will stop all the running processes and start the server; No need of Procfile if running only the server.
 
-## Folder Convention
+## Naming Conventions
 
-Source Code is located at `src/main` and test code in `src/test`
+- **Tables, Models**: PascalCase
+- **Columns, Variables**: camelCase
+- **Constants**: CONSTANT_CASE
+- **Routes**: kebab-case
+- **Files**: kebab-case[.some-operation].extension
+
+## Folder Structure
+
+Main source code is located in `src/main` and test code in `src/test`
 
 ```
 /app
 	/bootstrap --> contains bootstrap logic; *DO NOT TOUCH*
-	/commons --> common logic; better to create re-usable components and move to /modules director
+	/commons --> common logic; better to create re-usable components and move to /modules folder
 	/controllers --> controller per file
 	/methods --> server methods; to decorate server.
 	/models --> database model

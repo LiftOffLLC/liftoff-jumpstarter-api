@@ -129,7 +129,7 @@ module.exports = (server, shared) => () => {
   });
 
   describe('Again Login User and Admin', () => {
-    test('POST /api/users/login with user should respond with user and token', async () => {
+    test('POST /api/users/login with admin should respond with user and token', async () => {
       const payload = {
         email: shared.adminEmail,
         password: shared.adminPassword,

@@ -68,7 +68,7 @@ Table:  SocialLogin
 Purpose: Store User's Social Logins
 */
   await knex.schema
-    .createTableIfNotExists('SocialLogin', table => {
+    .createTable('SocialLogin', table => {
       table.increments('id').primary();
       table
         .integer('userId')
