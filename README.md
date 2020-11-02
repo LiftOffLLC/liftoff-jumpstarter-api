@@ -6,7 +6,8 @@ Jumpstarter is a boilerplate for building a REST API server using Node.js. Most 
 
 ## Overview of the main components
 
-![Overview-Components](https://user-images.githubusercontent.com/18231119/97817427-752c4200-1cc2-11eb-98c7-54afb8fea8b9.jpg)
+![Overview-Components](https://user-images.githubusercontent.com/18231119/97817427-752c4200-1cc2-11eb-98c7-54afb8fea8b9.jpg)  
+*All rights belong to their respective owners*
 
 | Component           | Purpose                                     |
 |---------------------|---------------------------------------------|
