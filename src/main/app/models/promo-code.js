@@ -1,6 +1,4 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const moment = require('moment');
-const _ = require('lodash');
 const BaseModel = require('./base');
 const dateTimeFormat = 'YYYY-MM-DDTHH:mm:ss';
 
@@ -31,9 +29,6 @@ module.exports = class PromoCode extends BaseModel {
         'Is Discount Percentage?',
       ),
       discountValue: Joi.number().integer().positive().description('Id'),
-      timezone: Joi.string()
-        .description('Timezone')
-        .valid(..._.values(moment.tz.names())),
       validityStartDateTime: Joi.date()
         .utc()
         .format(dateTimeFormat)

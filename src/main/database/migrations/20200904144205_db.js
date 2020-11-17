@@ -130,6 +130,7 @@ Purpose: Store User's Social Logins
     table
       .timestamp('validityEndDateTimeTZ')
       .comment('Validity End Time with Timezone');
+    table.integer('maxRedemptionCount').comment('Max Redemption Count');
     table
       .boolean('isOneTimePerGuest')
       .notNullable()
@@ -142,16 +143,53 @@ Purpose: Store User's Social Logins
     table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
   });
   console.log('Created Table: PromoCode');
+
+  /**
+  Table:  Transaction
+  Purpose: Store User's Transaction
+  */
+  await knex.schema.createTable('Transaction', table => {
+    table.increments('id').primary();
+    // Foreign Keys
+    table
+      .integer('userId')
+      .references('User.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+      .index()
+      .comment('User Id');
+    table
+      .integer('promoCodeId')
+      .references('PromoCode.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+      .comment('PromoCode Id');
+    // Primary Data
+    table
+      .enu('status', Constants.TRANSACTION.STATUS, {
+        useNative: true,
+        enumName: 'TransactionStatus',
+      })
+      .comment('Transaction Status');
+    table.integer('price').comment('transaction amount');
+    // TimeStamps
+    table.boolean('isActive').notNullable().defaultTo(true).comment('Active?');
+    table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+    table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
+  });
+  console.log('Created Table: Transaction');
 };
 
 exports.down = async knex => {
   try {
     await knex.raw('DROP TABLE IF EXISTS "SocialLogin" CASCADE;');
     await knex.raw('DROP TABLE IF EXISTS "User" CASCADE;');
+    await knex.raw('DROP TABLE IF EXISTS "PromoCode" CASCADE;');
+    await knex.raw('DROP TABLE IF EXISTS "Transaction" CASCADE;');
+    await knex.raw('DROP TYPE IF EXISTS "TransactionStatus" CASCADE;');
     await knex.raw('DROP TYPE IF EXISTS "UserRole" CASCADE;');
     await knex.raw('TRUNCATE TABLE "knex_migrations_lock" RESTART IDENTITY;');
     await knex.raw('TRUNCATE TABLE "knex_migrations" RESTART IDENTITY;');
-    await knex.raw('DROP TABLE IF EXISTS "PromoCode" CASCADE;');
     console.log('Dropped everything');
   } catch (err) {
     console.log('Failed to rollback: ', err);

@@ -5,6 +5,7 @@ const PromoCodeModel = require('../../models/promo-code');
 const Constants = require('../../commons/constants');
 const validator = PromoCodeModel.validatorRules();
 const dateTimeFormat = 'YYYY-MM-DDTHH:mm:ss';
+const timezone = 'America/Los_Angeles';
 
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,
@@ -23,12 +24,9 @@ const options = {
           .optional(),
         otherwise: validator.validityEndDateTime.optional(),
       }),
-      timezone: validator.timezone,
       isOneTimePerGuest: validator.isOneTimePerGuest.required(),
       note: validator.note.optional(),
-    })
-      .with('validityStartDateTime', 'timezone')
-      .with('validityEndDateTime', 'timezone'),
+    }),
   },
   plugins: {
     'hapi-swagger': {
@@ -38,23 +36,16 @@ const options = {
   handler: async (request, h) => {
     const { payload } = request;
     if (payload.validityStartDateTime) {
-      const startDateTime = moment.tz(
-        payload.validityStartDateTime,
-        payload.timezone,
-      );
+      const startDateTime = moment.tz(payload.validityStartDateTime, timezone);
       payload.validityStartDateTime = startDateTime.format(dateTimeFormat);
       payload.validityStartDateTimeTZ = startDateTime.toISOString();
     }
     if (payload.validityEndDateTime) {
-      const endDateTime = moment.tz(
-        payload.validityEndDateTime,
-        payload.timezone,
-      );
+      const endDateTime = moment.tz(payload.validityEndDateTime, timezone);
       payload.validityEndDateTime = endDateTime.format(dateTimeFormat);
       payload.validityEndDateTimeTZ = endDateTime.toISOString();
     }
-    const promoCode = _.omit(payload, 'timezone');
-    const resultPromoCode = await PromoCodeModel.createOrUpdate(promoCode);
+    const resultPromoCode = await PromoCodeModel.createOrUpdate(payload);
     return h.response(resultPromoCode).code(201);
   },
 };

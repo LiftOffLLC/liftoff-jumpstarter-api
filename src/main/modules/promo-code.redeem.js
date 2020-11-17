@@ -4,14 +4,29 @@ const moment = require('moment-timezone');
 const Util = require('util');
 const Errors = require('../app/commons/errors');
 const PromoCodeModel = require('../app/models/promo-code');
+const TransactionModel = require('../app/models/transaction');
 
-const promoRedeemHandler = async ({ promoCode, price }) => {
+const promoRedeemHandler = async ({ userId, promoCode, price }) => {
   const retrievedPromoCode = await PromoCodeModel.findOne(
     PromoCodeModel.buildCriteria('code', promoCode),
   );
   if (!retrievedPromoCode) {
     throw Boom.notFound(Util.format(Errors.notFound, 'Promo Code'));
   }
+  const promises = [];
+  promises.push(
+    TransactionModel.count([
+      TransactionModel.buildCriteria('promoCodeId', retrievedPromoCode.id),
+    ]),
+    TransactionModel.count([
+      TransactionModel.buildCriteria('promoCodeId', retrievedPromoCode.id),
+      TransactionModel.buildCriteria('userId', userId),
+    ]),
+  );
+  const [totalRedemptionCount, userRedemptionCount] = await Promise.all(
+    promises,
+  );
+
   const now = moment();
   if (
     retrievedPromoCode.validityEndDateTimeTZ &&
@@ -22,6 +37,13 @@ const promoRedeemHandler = async ({ promoCode, price }) => {
     retrievedPromoCode.validityStartDateTimeTZ &&
     now < moment(retrievedPromoCode.validityStartDateTimeTZ)
   ) {
+    throw Boom.badRequest(Errors.invalidCode);
+  } else if (
+    retrievedPromoCode.maxRedemptionCount !== null &&
+    totalRedemptionCount >= retrievedPromoCode.maxRedemptionCount
+  ) {
+    throw Boom.badRequest(Errors.invalidCode);
+  } else if (retrievedPromoCode.isOneTimePerGuest && userRedemptionCount >= 1) {
     throw Boom.badRequest(Errors.invalidCode);
   }
 

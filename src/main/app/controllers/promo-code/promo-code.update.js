@@ -8,6 +8,7 @@ const PromoCodeModel = require('../../models/promo-code');
 const Constants = require('../../commons/constants');
 const validator = PromoCodeModel.validatorRules();
 const dateTimeFormat = 'YYYY-MM-DDTHH:mm:ss';
+const timezone = 'America/Los_Angeles';
 
 const options = {
   auth: Constants.AUTH.ADMIN_ONLY,
@@ -29,35 +30,25 @@ const options = {
           .optional(),
         otherwise: validator.validityEndDateTime.optional(),
       }),
-      timezone: validator.timezone,
       isOneTimePerGuest: validator.isOneTimePerGuest.optional(),
       note: validator.note.optional(),
-    })
-      .min(1)
-      .with('validityStartDateTime', 'timezone')
-      .with('validityEndDateTime', 'timezone'),
+    }).min(1),
   },
   handler: async (request, _h) => {
     const id = _.get(request, 'params.id');
-    let { payload } = request;
+    const { payload } = request;
     const promoCode = await PromoCodeModel.findOne(
       PromoCodeModel.buildCriteria('id', id),
     );
     if (_.isEmpty(promoCode))
       throw Boom.notFound(Util.format(Errors.notFound, 'Promo Code'));
     if (payload.validityStartDateTime) {
-      const startDateTime = moment.tz(
-        payload.validityStartDateTime,
-        payload.timezone,
-      );
+      const startDateTime = moment.tz(payload.validityStartDateTime, timezone);
       payload.validityStartDateTime = startDateTime.format(dateTimeFormat);
       payload.validityStartDateTimeTZ = startDateTime.toISOString();
     }
     if (payload.validityEndDateTime) {
-      const endDateTime = moment.tz(
-        payload.validityEndDateTime,
-        payload.timezone,
-      );
+      const endDateTime = moment.tz(payload.validityEndDateTime, timezone);
       payload.validityEndDateTime = endDateTime.format(dateTimeFormat);
       payload.validityEndDateTimeTZ = endDateTime.toISOString();
     }
@@ -85,7 +76,6 @@ const options = {
         throw Boom.badRequest(Errors.invalidEndDate);
       }
     }
-    payload = _.omit(payload, 'timezone');
     payload.id = request.params.id;
     const toUpdatePromoCode = {
       ...payload,
