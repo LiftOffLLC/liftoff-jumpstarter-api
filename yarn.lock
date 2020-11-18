@@ -344,18 +344,6 @@
   dependencies:
     "@hapi/hoek" "9.x.x"
 
-"@hapi/bell@^12.1.1":
-  version "12.1.1"
-  resolved "https://registry.yarnpkg.com/@hapi/bell/-/bell-12.1.1.tgz#2cec24628bb36fe2db4bcc56b26b5cf70734a85a"
-  integrity sha512-KD7Kx5+2J9bGA2bTgLS2Vkf8TJ0shsjsdcu+ccTPciGpvl8rzbbZdxEydtLa87MSxsISag8JszXlyPRt58VpmQ==
-  dependencies:
-    "@hapi/boom" "9.x.x"
-    "@hapi/bounce" "2.x.x"
-    "@hapi/cryptiles" "^5.1.0"
-    "@hapi/hoek" "9.x.x"
-    "@hapi/wreck" "17.x.x"
-    joi "17.x.x"
-
 "@hapi/boom@9.x.x", "@hapi/boom@^9.0.0", "@hapi/boom@^9.1.0":
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-9.1.0.tgz#0d9517657a56ff1e0b42d0aca9da1b37706fec56"
@@ -423,7 +411,7 @@
   dependencies:
     "@hapi/boom" "9.x.x"
 
-"@hapi/cryptiles@5.x.x", "@hapi/cryptiles@^5.1.0":
+"@hapi/cryptiles@5.x.x":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@hapi/cryptiles/-/cryptiles-5.1.0.tgz#655de4cbbc052c947f696148c83b187fc2be8f43"
   integrity sha512-fo9+d1Ba5/FIoMySfMqPBR/7Pa29J2RsiPrl7bkwo5W5o+AN1dAYQRi4SPrPwwVxVGKjgLOEWrsvt1BonJSfLA==
@@ -1163,23 +1151,6 @@
   dependencies:
     "@sentry/types" "5.22.3"
     tslib "^1.9.3"
-
-"@sideway/address@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.0.tgz#0b301ada10ac4e0e3fa525c90615e0b61a72b78d"
-  integrity sha512-wAH/JYRXeIFQRsxerIuLjgUu2Xszam+O5xKeatJ4oudShOOirfmsQ1D6LL54XOU2tizpCYku+s1wmU0SYdpoSA==
-  dependencies:
-    "@hapi/hoek" "^9.0.0"
-
-"@sideway/formula@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@sideway/formula/-/formula-3.0.0.tgz#fe158aee32e6bd5de85044be615bc08478a0a13c"
-  integrity sha512-vHe7wZ4NOXVfkoRb8T5otiENVlT7a3IAiw7H5M2+GO+9CDgcVUUsX1zalAztCmwyOr2RUTGJdgB+ZvSVqmdHmg==
-
-"@sideway/pinpoint@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
-  integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -4909,17 +4880,6 @@ jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
-
-joi@17.x.x:
-  version "17.3.0"
-  resolved "https://registry.yarnpkg.com/joi/-/joi-17.3.0.tgz#f1be4a6ce29bc1716665819ac361dfa139fff5d2"
-  integrity sha512-Qh5gdU6niuYbUIUV5ejbsMiiFmBdw8Kcp8Buj2JntszCkCfxJ9Cz76OtHxOZMPXrt5810iDIXs+n1nNVoquHgg==
-  dependencies:
-    "@hapi/hoek" "^9.0.0"
-    "@hapi/topo" "^5.0.0"
-    "@sideway/address" "^4.1.0"
-    "@sideway/formula" "^3.0.0"
-    "@sideway/pinpoint" "^2.0.0"
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
