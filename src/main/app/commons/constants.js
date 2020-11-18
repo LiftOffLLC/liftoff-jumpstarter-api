@@ -43,5 +43,13 @@ module.exports = {
       mode: 'optional',
       scope: [UserScope.ADMIN, UserScope.USER, UserScope.GUEST],
     },
+    GOOGLE: {
+      strategy: 'google',
+      mode: 'try',
+    },
+    FACEBOOK: {
+      strategy: 'facebook',
+      mode: 'try',
+    },
   },
 };
