@@ -28,6 +28,7 @@ module.exports = async server => {
         // add HTTP Check at beginning.
         policies.unshift('requireHTTPs');
       }
+      policies.push('checkScope');
       policies.push('entityFilter');
       policies.push('boomResponseHandler');
       routes.push(func);

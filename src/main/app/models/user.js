@@ -131,10 +131,14 @@ module.exports = class User extends BaseModel {
     return Bcrypt.hashSync(password, 10);
   }
 
-  static async signSession(request, userId) {
-    const user = await this.findOne(this.buildCriteria('id', userId), {
-      columns: '*,socialLogins.*',
-    });
+  static async signSession(request, userId, trx) {
+    const user = await this.findOne(
+      this.buildCriteria('id', userId),
+      {
+        columns: '*,socialLogins.*',
+      },
+      trx,
+    );
 
     const sessionId = uuid.v4();
     const session = await request.server.asyncMethods.sessionsAdd(sessionId, {

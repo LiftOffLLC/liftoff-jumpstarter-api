@@ -2,9 +2,7 @@ const Util = require('util');
 const Boom = require('@hapi/boom');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
-const uuid = require('uuid');
 const UserModel = require('../../models/user');
-const RedisClient = require('../../commons/redisClient');
 const Errors = require('../../commons/errors');
 const Constants = require('../../commons/constants');
 const Utils = require('../../commons/utils');
@@ -12,8 +10,6 @@ const Config = require('../../../config');
 const Logger = require('../../commons/logger');
 const { throwError } = require('../../commons/error.parser');
 const { getTransaction } = Utils;
-const UserScope = UserModel.scope();
-const UserRole = UserModel.role();
 const validator = UserModel.validatorRules();
 
 const options = {
@@ -54,27 +50,9 @@ const options = {
       initialUser = _.clone(request.payload);
       initialUser.hashedPassword = request.payload.password;
       delete initialUser.password;
-      const resultUser = await UserModel.createOrUpdate(initialUser, true, trx);
+      let resultUser = await UserModel.createOrUpdate(initialUser, true, trx);
 
-      // on successful, create login_token for this user.
-      const sessionId = uuid.v4();
-      const session = await request.server.asyncMethods.sessionsAdd(sessionId, {
-        id: sessionId,
-        userId: resultUser.id,
-        isAdmin: resultUser.role === UserRole.ADMIN,
-      });
-
-      await RedisClient.saveSession(resultUser.id, sessionId, session);
-      // sign the token
-      resultUser.sessionToken = request.server.methods.sessionsSign(session);
-
-      // allow entity filtering to happen here.
-      _.set(request, 'auth.credentials.userId', resultUser.id);
-      _.set(
-        request,
-        'auth.credentials.scope',
-        resultUser.role === UserRole.ADMIN ? UserScope.ADMIN : UserScope.USER,
-      );
+      resultUser = await UserModel.signSession(request, resultUser.id, trx);
 
       const mailVariables = {
         webUrl: Config.get('webUrl'),

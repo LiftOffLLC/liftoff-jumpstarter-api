@@ -106,12 +106,87 @@ Purpose: Store User's Social Logins
       );
     });
   console.log('Created Table: SocialLogin');
+
+  /**
+ Table:  PromoCode
+ */
+  await knex.schema.createTable('PromoCode', table => {
+    table.increments('id').primary();
+    table
+      .string('code')
+      .index()
+      .notNullable()
+      .comment('Promo Code in uppercase alphanumeric');
+    table
+      .boolean('isDiscountPercentage')
+      .notNullable()
+      .comment('Is Discount Percentage?');
+    table.integer('discountValue').notNullable().comment('Discount Value');
+    table.string('validityStartDateTime').comment('Validity Start Time');
+    table.string('validityEndDateTime').comment('Validity End Time');
+    table
+      .timestamp('validityStartDateTimeTZ')
+      .comment('Validity Start Time with Timezone');
+    table
+      .timestamp('validityEndDateTimeTZ')
+      .comment('Validity End Time with Timezone');
+    table.integer('maxRedemptionCount').comment('Max Redemption Count');
+    table
+      .boolean('isOneTimePerGuest')
+      .notNullable()
+      .comment('Is One Time Per Guest?');
+    table.varchar('note', 2000).comment('Note');
+
+    // TimeStamps
+    table.boolean('isActive').notNullable().defaultTo(true).comment('Active?');
+    table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+    table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
+  });
+  console.log('Created Table: PromoCode');
+
+  /**
+  Table:  Transaction
+  Purpose: Store User's Transaction
+  */
+  await knex.schema.createTable('Transaction', table => {
+    table.increments('id').primary();
+    // Foreign Keys
+    table
+      .integer('userId')
+      .references('User.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+      .index()
+      .comment('User Id');
+    table
+      .integer('promoCodeId')
+      .references('PromoCode.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE')
+      .comment('PromoCode Id');
+    // Primary Data
+    table
+      .enu('status', Constants.TRANSACTION.STATUS, {
+        useNative: true,
+        enumName: 'TransactionStatus',
+      })
+      .comment('Transaction Status');
+    table.integer('price').comment('transaction amount');
+    // TimeStamps
+    table.boolean('isActive').notNullable().defaultTo(true).comment('Active?');
+    table.timestamp('createdAt').notNullable().defaultTo(knex.fn.now());
+    table.timestamp('updatedAt').notNullable().defaultTo(knex.fn.now());
+  });
+  console.log('Created Table: Transaction');
 };
 
 exports.down = async knex => {
   try {
     await knex.raw('DROP TABLE IF EXISTS "SocialLogin" CASCADE;');
     await knex.raw('DROP TABLE IF EXISTS "User" CASCADE;');
+    await knex.raw('DROP TABLE IF EXISTS "PromoCode" CASCADE;');
+    await knex.raw('DROP TABLE IF EXISTS "Transaction" CASCADE;');
+    await knex.raw('DROP TYPE IF EXISTS "TransactionStatus" CASCADE;');
     await knex.raw('DROP TYPE IF EXISTS "UserRole" CASCADE;');
     await knex.raw('TRUNCATE TABLE "knex_migrations_lock" RESTART IDENTITY;');
     await knex.raw('TRUNCATE TABLE "knex_migrations" RESTART IDENTITY;');

@@ -48,4 +48,8 @@ module.exports = {
   USER: {
     ROLE: ['admin', 'user'],
   },
+
+  TRANSACTION: {
+    STATUS: ['successful', 'needs-action'],
+  },
 };
