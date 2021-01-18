@@ -50,9 +50,9 @@ const options = {
       initialUser = _.clone(request.payload);
       initialUser.hashedPassword = request.payload.password;
       delete initialUser.password;
-      const resultUser = await UserModel.createOrUpdate(initialUser, true, trx);
+      let resultUser = await UserModel.createOrUpdate(initialUser, true, trx);
 
-      await UserModel.signSession(request, resultUser.id);
+      resultUser = await UserModel.signSession(request, resultUser.id, trx);
 
       const mailVariables = {
         webUrl: Config.get('webUrl'),
