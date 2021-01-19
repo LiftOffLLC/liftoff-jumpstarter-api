@@ -1,13 +1,9 @@
 const Boom = require('@hapi/boom');
-const Joi = require('@hapi/joi');
 
 const { inspect } = require('util');
 const UserModel = require('../models/user');
 const SocialLoginModel = require('../models/social-login');
-const Social = require('./social');
 const Constants = require('./constants');
-
-const validator = UserModel.validatorRules();
 
 async function handler(providerName, request, _h) {
   request.log(
@@ -15,17 +11,14 @@ async function handler(providerName, request, _h) {
     `payload:: ${inspect(request.payload)}`,
   );
 
-  const provider = new Social(providerName);
-  let profile;
-  try {
-    profile = await provider.getProfile(request.payload.accessToken);
-  } catch (e) {
-    request.log(
-      ['error', `user.login.${providerName}`],
-      `fetch profile${e.stack}`,
+  if (!request.auth.isAuthenticated) {
+    throw Boom.forbidden(
+      `Authentication failed due to: ${request.auth.error.message}`,
     );
-    throw Boom.unauthorized('Invalid Social Credentials.');
   }
+
+  const { credentials } = request.auth;
+  const { profile } = credentials;
 
   const socialLogin = await SocialLoginModel.findOne(
     SocialLoginModel.buildCriteriaWithObject({
@@ -37,7 +30,7 @@ async function handler(providerName, request, _h) {
   let userId;
   if (!socialLogin) {
     const emailUser = await UserModel.findOne(
-      UserModel.buildCriteria('email', request.payload.email.toLowerCase()),
+      UserModel.buildCriteria('email', profile.email.toLowerCase()),
     );
     if (emailUser) {
       // if user exists create socialLogin else throw error
@@ -46,15 +39,15 @@ async function handler(providerName, request, _h) {
           userId: emailUser.id,
           provider: providerName,
           providerId: profile.id,
-          accessToken: request.payload.accessToken,
-          refreshToken: request.payload.refreshToken,
+          accessToken: credentials.token,
+          refreshToken: null,
           isPrimaryLogin: true,
         };
 
         await SocialLoginModel.createOrUpdate(socialObject);
       } catch (e) {
         request.log(['error', `${providerName}.login`], e);
-        throw Boom.forbidden(e.message, request.payload.email);
+        throw Boom.forbidden(e.message, profile.email);
       }
       userId = emailUser.id;
     } else {
@@ -70,16 +63,9 @@ async function handler(providerName, request, _h) {
 
 module.exports = function socialLoginFn(providerName) {
   const options = {
-    auth: Constants.AUTH.ALL,
+    auth: Constants.AUTH[providerName.toUpperCase()],
     description: `Login ${providerName} - Access - ALL`,
     tags: ['api'],
-    validate: {
-      payload: Joi.object({
-        accessToken: validator.accessToken.required(),
-        refreshToken: validator.refreshToken.required(),
-        email: validator.refreshToken.required(),
-      }),
-    },
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -107,7 +93,7 @@ module.exports = function socialLoginFn(providerName) {
   };
 
   return () => ({
-    method: ['POST'],
+    method: ['GET', 'POST'],
     path: `/api/users/login/${providerName}`,
     options,
   });

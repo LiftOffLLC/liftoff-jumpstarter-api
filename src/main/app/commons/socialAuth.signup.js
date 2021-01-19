@@ -1,18 +1,15 @@
 const Boom = require('@hapi/boom');
 const uuid = require('uuid');
-const Joi = require('@hapi/joi');
 
 const Util = require('util');
 const UserModel = require('../models/user');
 const SocialLoginModel = require('../models/social-login');
-const Social = require('./social');
 const errorCodes = require('./errors');
 const Constants = require('./constants');
 const Utils = require('./utils');
 const UserRole = UserModel.role();
 const Config = require('../../config');
 
-const validator = UserModel.validatorRules();
 const { inspect } = Util;
 
 async function handler(providerName, request, h) {
@@ -21,14 +18,14 @@ async function handler(providerName, request, h) {
     `payload:: ${inspect(request.payload)}`,
   );
 
-  const provider = new Social(providerName);
-  let profile;
-  try {
-    profile = await provider.getProfile(request.payload.accessToken);
-  } catch (e) {
-    request.log(['error', `${providerName}.signup`], `fetch profile${e.stack}`);
-    throw Boom.badRequest('Invalid Social Credentials.');
+  if (!request.auth.isAuthenticated) {
+    throw Boom.forbidden(
+      `Authentication failed due to: ${request.auth.error.message}`,
+    );
   }
+
+  const { credentials } = request.auth;
+  const { profile } = credentials;
 
   request.log(
     ['info', `${providerName}.signup`],
@@ -52,19 +49,16 @@ async function handler(providerName, request, h) {
 
   let user;
   const usersRegisteredUsingEmail = await UserModel.findOne(
-    UserModel.buildCriteria('email', request.payload.email.toLowerCase()),
+    UserModel.buildCriteria('email', profile.email.toLowerCase()),
   );
 
   if (usersRegisteredUsingEmail) {
     user = usersRegisteredUsingEmail;
   } else {
     const userObject = {
-      email: request.payload.email,
-      name: request.payload.name,
-      phoneNumber: request.payload.phoneNumber,
+      email: profile.email,
+      name: profile.name,
       hashedPassword: uuid.v4(),
-      avatarUrl: request.payload.avatarUrl,
-      subscribedToNewsletter: request.payload.subscribedToNewsletter,
       role: UserRole.USER,
     };
     try {
@@ -80,16 +74,15 @@ async function handler(providerName, request, h) {
       userId: user.id,
       provider: providerName,
       providerId: profile.id,
-      accessToken: request.payload.accessToken,
-      refreshToken: request.payload.refreshToken,
-      rawBody: request.payload.rawBody,
+      accessToken: credentials.token,
+      refreshToken: null,
       isPrimaryLogin: true,
     };
 
     await SocialLoginModel.createOrUpdate(socialObject);
   } catch (e) {
     request.log(['error', `${providerName}.signup`], e);
-    throw Boom.forbidden(e.message, request.payload.email);
+    throw Boom.forbidden(e.message, profile.email);
   }
 
   const mailVariables = {
@@ -106,20 +99,9 @@ async function handler(providerName, request, h) {
 
 module.exports = function socialSignUp(providerName) {
   const options = {
-    auth: Constants.AUTH.ALL,
+    auth: Constants.AUTH[providerName.toUpperCase()],
     description: `User create ${providerName} - Access - ALL`,
     tags: ['api'],
-    validate: {
-      payload: Joi.object({
-        name: validator.name.required(),
-        email: validator.email.required(),
-        accessToken: validator.accessToken.required(),
-        refreshToken: validator.refreshToken.required(),
-        phoneNumber: validator.phoneNumber.optional(),
-        avatarUrl: validator.avatarUrl.optional(),
-        rawBody: validator.rawBody.optional(),
-      }),
-    },
     plugins: {
       'hapi-swagger': {
         responses: {
@@ -144,7 +126,7 @@ module.exports = function socialSignUp(providerName) {
   };
 
   return () => ({
-    method: ['POST'],
+    method: ['GET', 'POST'],
     path: `/api/users/signup/${providerName}`,
     options,
   });

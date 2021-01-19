@@ -43,7 +43,7 @@ module.exports = {
     routes: {
       cors: true,
       state: {
-        parse: false, // Parse content of req.headers.cookie
+        parse: true, // Parse content of req.headers.cookie
         failAction: 'ignore', // Action on bad cookie - 'error': return 400, 'log': log and continue, 'ignore': continue
       },
       validate: {
@@ -117,6 +117,20 @@ module.exports = {
     },
     instagram: {
       profileUrl: 'https://api.instagram.com/v1/users/self',
+    },
+  },
+  socialStartegyParams: {
+    facebook: {
+      password: 'cookie_encryption_password_secure',
+      isSecure: false,
+      clientId: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+    },
+    google: {
+      password: 'cookie_encryption_password_secure',
+      isSecure: false,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     },
   },
   webUrl: `${process.env.WEB_APP_URL}`,
