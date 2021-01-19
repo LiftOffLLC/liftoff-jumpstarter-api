@@ -1,4 +1,6 @@
 {
   "cSpell.words": ["Jumpstarter"],
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

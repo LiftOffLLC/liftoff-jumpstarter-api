@@ -10,6 +10,9 @@
     "PKief.material-icon-theme",
     "coenraads.bracket-pair-colorizer",
     "VisualStudioExptTeam.vscodeintellicode",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "streetsidesoftware.code-spell-checker",
+    "matt-meyers.vscode-dbml",
+    "wmaurer.change-case"
   ]
 }
