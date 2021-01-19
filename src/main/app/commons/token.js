@@ -24,19 +24,13 @@ module.exports = {
         // eslint-disable-next-line global-require
         const UserModel = require('../models/user');
         const UserScope = UserModel.scope();
-        const UserRole = UserModel.role();
         const user = await UserModel.findOne(
           UserModel.buildCriteria('id', session.subject.userId),
         );
 
         if (user) {
           // eslint-disable-next-line
-          session.subject.scope =
-            (user.role === UserRole.ADMIN) === true
-              ? UserScope.ADMIN
-              : UserScope.USER;
-
-          session.subject.role = user.role;
+          session.subject.scope = user.role;
           session.subject.user = user;
         } else {
           session.subject.scope = UserScope.GUEST;

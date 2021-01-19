@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-const Util = require('util');
 const Joi = require('@hapi/joi');
 const _ = require('lodash');
 const dbUtil = require('./dbUtil');
@@ -14,8 +13,10 @@ const readHandler = async (model, request, _h) => {
     columns: _.compact(_.words(request.query.fields, /[^, ]+/g)),
   };
 
-  // includeInactive - for user - should select all active once, and for admin should select both.
-  const isAdmin = _.get(request, 'auth.credentials.scope') === UserScope.ADMIN;
+  // includeInactive - who can read inactive records
+  const allowedScopes = [UserScope.ADMIN];
+  const currentScope = _.get(request, 'auth.credentials.scope');
+  const isAdmin = _.includes(allowedScopes, currentScope);
   const filterOpts = dbUtil.fetchFilterCriteria(request.query.filters, isAdmin);
   const count = await model.count(_.cloneDeep(filterOpts));
   const items = await model.findAll(_.cloneDeep(filterOpts), criteriaOpts);
